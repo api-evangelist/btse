@@ -1,23 +1,321 @@
 aid: btse
 name: BTSE
-description: 'BTSE is a company surfaced via the API Evangelist harvest backlog (source: market-gap:crypto-exchanges)
-  and added to the network as a stub for full-pipeline profiling.'
+description: BTSE is a global cryptocurrency exchange offering spot, perpetual futures, OTC, earn and wallet services. Its developer program at docs.btse.com publishes OpenAPI 3 contracts for the Markets,
+  Spot, Futures, Wallet, Earn and OTC REST APIs, AsyncAPI contracts for its WebSocket streams, a FIX protocol interface, HMAC-SHA384 request signing, and a testnet at testapi.btse.io.
 url: https://raw.githubusercontent.com/api-evangelist/btse/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:market-gap:crypto-exchanges
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: 'enrichment pass 2026-10-13 (local-v5; was stub: harvest)'
 specificationVersion: '0.20'
 created: '2026-10-13'
 modified: '2026-10-13'
 tags:
 - Company
-apis: []
+- Cryptocurrency
+- Exchanges
+- Trading
+- Digital Assets
+- Futures
+- WebSockets
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/btse-agentic-access.yml
+- type: RateLimits
+  url: rate-limits/btse-rate-limits.yml
+- type: Spectral
+  url: rules/btse-rules.yml
+- type: JSONLD
+  url: json-ld/btse-context.jsonld
+- type: Vocabulary
+  url: vocabulary/btse-vocabulary.yml
+- type: AsyncAPI
+  url: asyncapi/btse-spot-websocket-asyncapi.yml
+- type: AsyncAPI
+  url: asyncapi/btse-otc-websocket-asyncapi.yml
+- type: AsyncAPI
+  url: asyncapi/btse-futures-websocket-asyncapi.yml
+- type: DataModel
+  url: data-model/btse-data-model.yml
+- type: ChangeLog
+  url: changelog/btse-changelog.yml
+- type: Sandbox
+  url: sandbox/btse-sandbox.yml
+- type: ErrorCatalog
+  url: errors/btse-problem-types.yml
+- type: Conformance
+  url: conformance/btse-conformance.yml
+- type: LLMsTxt
+  url: llms/btse-llms.txt
+- type: Hosts
+  url: hosts/btse-hosts.yml
+- type: Vendors
+  url: vendors/btse-vendors.yml
+- type: DeveloperPortal
+  url: https://api.btse.com`
+- type: Authentication
+  url: authentication/btse-authentication.yml
+- type: DomainSecurity
+  url: security/btse-domain-security.yml
 - type: Website
   url: https://www.btse.com
+- type: Documentation
+  url: https://docs.btse.com/
+- type: GettingStarted
+  url: https://docs.btse.com/quickstart/
+- type: APIReference
+  url: https://docs.btse.com/api-explorer/markets/markets-api/
+- type: GitHubOrganization
+  url: https://github.com/btsecom
+- type: Support
+  url: https://support.btse.com
+- type: Login
+  url: https://www.btse.com/en/login
+- type: SignUp
+  url: https://www.btse.com/en/register
+- type: TermsOfService
+  url: https://www.btse.com/en/termsandconditions
+- type: PrivacyPolicy
+  url: https://www.btse.com/en/privacy
+- type: ChangeLog
+  url: https://docs.btse.com/spot/changelog
+apis:
+- aid: btse:markets
+  name: BTSE Markets API
+  description: 'Public market data: market summary, order book, trades, price, OHLCV and funding rates.'
+  humanURL: https://docs.btse.com/markets/overview/
+  baseURL: https://api.btse.com
+  tags:
+  - Cryptocurrency
+  - Trading
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-markets-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://docs.btse.com/specs/markets-rest.openapi.yaml
+  - type: Documentation
+    url: https://docs.btse.com/markets/overview/
+  - type: JSONSchema
+    url: json-schema/btse-exchange-info-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ohlcvresponse-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-markets-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-funding-rate-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-market-risk-limit-array-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ticker24-hr-full-array-response-schema.json
+  image: https://docs.btse.com/img/logo.svg
+- aid: btse:spot
+  name: BTSE Spot API
+  description: 'Spot trading: place, amend, cancel and query orders, fees and trade history.'
+  humanURL: https://docs.btse.com/spot/overview/
+  baseURL: https://api.btse.com
+  tags:
+  - Cryptocurrency
+  - Trading
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-spot-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://docs.btse.com/specs/spot_openapi_v4.yaml
+  - type: Documentation
+    url: https://docs.btse.com/spot/overview/
+  - type: JSONSchema
+    url: json-schema/btse-query-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-place-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-twap-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-trade-history-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-conditional-schema.json
+  image: https://docs.btse.com/img/logo.svg
+- aid: btse:spot-legacy
+  name: BTSE Spot (Legacy v3.3) API
+  description: Legacy Spot API v3.3 endpoints.
+  humanURL: https://docs.btse.com/spot/overview/
+  baseURL: https://api.btse.com/spot
+  tags:
+  - Cryptocurrency
+  - Trading
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-spot-legacy-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://docs.btse.com/specs/spot-rest.openapi.yaml
+  - type: Documentation
+    url: https://docs.btse.com/spot/overview/
+  - type: JSONSchema
+    url: json-schema/btse-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-query-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-user-trade-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-account-fee-schema.json
+  image: https://docs.btse.com/img/logo.svg
+- aid: btse:futures
+  name: BTSE Futures API
+  description: 'Perpetual futures trading: orders, positions, leverage and risk limits.'
+  humanURL: https://docs.btse.com/futures/overview/
+  baseURL: https://api.btse.com/futures/api
+  tags:
+  - Cryptocurrency
+  - Trading
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-futures-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://docs.btse.com/specs/futures_openapi_v3.yaml
+  - type: Documentation
+    url: https://docs.btse.com/futures/overview/
+  - type: JSONSchema
+    url: json-schema/btse-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-conditional-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-trade-history-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-twap-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-close-position-resp-schema.json
+  image: https://docs.btse.com/img/logo.svg
+- aid: btse:futures-legacy
+  name: BTSE Futures (Legacy v2.3) API
+  description: Legacy Futures API v2.3 endpoints.
+  humanURL: https://docs.btse.com/futures/overview/
+  baseURL: https://api.btse.com/futures
+  tags:
+  - Cryptocurrency
+  - Trading
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-futures-legacy-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://docs.btse.com/specs/futures-rest.openapi.yaml
+  - type: Documentation
+    url: https://docs.btse.com/futures/overview/
+  - type: JSONSchema
+    url: json-schema/btse-create-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-query-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-open-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-user-trade-schema.json
+  image: https://docs.btse.com/img/logo.svg
+- aid: btse:wallet
+  name: BTSE Wallet API
+  description: Wallet balances, deposits, withdrawals, transfers and asset exchange rates.
+  humanURL: https://docs.btse.com/wallet/overview/
+  baseURL: https://api.btse.com
+  tags:
+  - Cryptocurrency
+  - Trading
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-wallet-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://docs.btse.com/specs/wallet-rest.openapi.yaml
+  - type: Documentation
+    url: https://docs.btse.com/wallet/overview/
+  - type: JSONSchema
+    url: json-schema/btse-withdraw-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-transfer-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-convert-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-address-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-default-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-asset-exchange-rate-response-schema.json
+  image: https://docs.btse.com/img/logo.svg
+- aid: btse:earn
+  name: BTSE Earn API
+  description: 'Earn products: subscribe, redeem and query earn positions.'
+  humanURL: https://docs.btse.com/earn/overview/
+  baseURL: https://api.btse.com/spot
+  tags:
+  - Cryptocurrency
+  - Trading
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-earn-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://docs.btse.com/specs/earn-rest.openapi.yaml
+  - type: Documentation
+    url: https://docs.btse.com/earn/overview/
+  - type: JSONSchema
+    url: json-schema/btse-investment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-product-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-deposit-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-renew-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-redeem-investment-request-schema.json
+  image: https://docs.btse.com/img/logo.svg
+- aid: btse:otc
+  name: BTSE OTC API
+  description: 'OTC desk: request quotes and execute OTC trades.'
+  humanURL: https://docs.btse.com/otc/overview/
+  baseURL: https://api.btse.com
+  tags:
+  - Cryptocurrency
+  - Trading
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-otc-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://docs.btse.com/specs/otc-rest.openapi.yaml
+  - type: Documentation
+    url: https://docs.btse.com/otc/overview/
+  - type: JSONSchema
+    url: json-schema/btse-otcrequest-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcaccept-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcmarket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcquote-response-schema.json
+  image: https://docs.btse.com/img/logo.svg
+x-enrichment:
+  date: '2026-10-13'
+  status: enriched
+  artifacts_added: 30
+  pass: local-v5
+image: https://docs.btse.com/img/logo.svg

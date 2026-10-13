@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-query-order-resp-schema.json",
+  "title": "QueryOrderResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-spot-openapi.yml#/components/schemas/QueryOrderResp",
+  "type": "object",
+  "properties": {
+    "requestId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Request identifier associated with the order submission."
+    },
+    "orderId": {
+      "type": "string",
+      "description": "Server-assigned unique order identifier."
+    },
+    "clOrderId": {
+      "type": "string",
+      "description": "Client-supplied order identifier (custom tag)."
+    },
+    "symbol": {
+      "type": "string",
+      "description": "Trading pair, formatted as BASE-QUOTE (e.g. BTC-USDT)."
+    },
+    "quote": {
+      "type": "string",
+      "description": "Quote currency of the trading pair."
+    },
+    "orderState": {
+      "type": "string",
+      "description": "Current order status label (e.g. active, inactive, cancelled)."
+    },
+    "orderType": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Numeric order-type code (limit, market, peg, TWAP)."
+    },
+    "orderSide": {
+      "type": "string",
+      "description": "Order side: BUY or SELL."
+    },
+    "orderPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Order limit price. Zero for market orders."
+    },
+    "orderValue": {
+      "type": "number",
+      "format": "double",
+      "description": "Current order value expressed in the user's account currency."
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Order creation timestamp in Unix epoch milliseconds."
+    },
+    "timeInForce": {
+      "type": "string",
+      "description": "Time-in-force policy: GTC, IOC, FOK, or null if not applicable."
+    },
+    "orderCurrency": {
+      "type": "string",
+      "description": "Indicates which size fields are populated: \"quote\" (quote-denominated) or \"base\" (base-denominated)."
+    },
+    "originalOrderBaseSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Original order size in base currency. Populated only when orderCurrency is \"base\"."
+    },
+    "originalOrderQuoteSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Original order size in quote currency. Populated only when orderCurrency is \"quote\"."
+    },
+    "currentOrderBaseSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Current outstanding order size in base currency. Populated only when orderCurrency is \"base\"."
+    },
+    "currentOrderQuoteSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Current outstanding order size in quote currency. Populated only when orderCurrency is \"quote\"."
+    },
+    "remainingOrderBaseSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Remaining unfilled size in base currency. Populated only when orderCurrency is \"base\"."
+    },
+    "remainingOrderQuoteSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Remaining unfilled size in quote currency. Populated only when orderCurrency is \"quote\"."
+    },
+    "totalFilledBaseSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Cumulative filled quantity in base currency."
+    },
+    "avgFilledPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Volume-weighted average fill price across all executions of this order."
+    },
+    "orderDetailType": {
+      "type": "string",
+      "description": "Order detail category classifying the order's purpose or subtype.",
+      "enum": [
+        "TWAP",
+        "PARTIAL_LIQUIDATION",
+        "FORCED_MARKET_BUY",
+        "FORCED_MARKET_SELL"
+      ]
+    },
+    "orderDetail": {
+      "$ref": "#/$defs/OrderDetail",
+      "description": "Additional order detail metadata associated with orderDetailType."
+    },
+    "triggerOrder": {
+      "type": "boolean",
+      "description": "True if this is a trigger (conditional) order."
+    },
+    "triggered": {
+      "type": "boolean",
+      "description": "True once the trigger condition has fired and the underlying order has been released."
+    },
+    "triggerUseLastPrice": {
+      "type": "boolean",
+      "description": "True if the trigger evaluates against the last-traded price; false if it evaluates against the mark price. Only meaningful for trigger orders."
+    },
+    "triggerPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Effective trigger price. Only meaningful for trigger orders."
+    },
+    "triggerOriginalPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Trigger price originally submitted by the client. Only meaningful for trigger orders."
+    },
+    "triggerOrderType": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Numeric trigger order-type code (stop-loss, take-profit, stop-loss-limit, or take-profit-limit). Only meaningful for trigger orders."
+    },
+    "triggerStopPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Stop price for the trigger order. Only meaningful for trigger orders."
+    },
+    "triggerTrailingStopDeviation": {
+      "type": "number",
+      "format": "double",
+      "description": "Trailing stop deviation from the reference price. Only meaningful for trailing-stop trigger orders."
+    },
+    "trailValue": {
+      "type": "number",
+      "format": "double",
+      "description": "Trailing offset magnitude. Only meaningful for trailing-stop orders."
+    },
+    "trailValueType": {
+      "type": "string",
+      "description": "Interpretation of trailValue (e.g. absolute amount or percentage). Only meaningful for trailing-stop orders.",
+      "enum": [
+        "DISTANCE",
+        "PERCENTAGE"
+      ]
+    },
+    "pegPriceMin": {
+      "type": "number",
+      "format": "double",
+      "description": "Lower cap of the peg price band. Only meaningful for peg orders."
+    },
+    "pegPriceMax": {
+      "type": "number",
+      "format": "double",
+      "description": "Upper cap of the peg price band. Only meaningful for peg orders."
+    },
+    "pegPriceDeviation": {
+      "type": "number",
+      "format": "double",
+      "description": "Offset applied to the reference price when pegging. Only meaningful for peg orders."
+    },
+    "currentPegPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Current effective peg price. Only meaningful for peg orders."
+    },
+    "wrapperOrder": {
+      "type": "boolean",
+      "description": "True if the order is a wrapper for a group of related orders (e.g. bracket/OCO)."
+    },
+    "activationPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Activation price at which the order becomes eligible for execution. Only present for orders that use an activation-price feature."
+    },
+    "activationPriceType": {
+      "type": "string",
+      "description": "Reference price type used when evaluating activationPrice. Only present for orders that use an activation-price feature.",
+      "enum": [
+        "INDEX_PRICE",
+        "LAST_PRICE",
+        "MARK_PRICE"
+      ]
+    }
+  },
+  "$defs": {
+    "OrderDetail": {}
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-convert-request-schema.json",
+  "title": "ConvertRequest",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-wallet-openapi.yml#/components/schemas/ConvertRequest",
+  "type": "object",
+  "required": [
+    "fromAsset",
+    "toAsset",
+    "amount"
+  ],
+  "properties": {
+    "fromAsset": {
+      "type": "string",
+      "description": "From asset",
+      "minLength": 1
+    },
+    "toAsset": {
+      "type": "string",
+      "description": "To asset",
+      "minLength": 1
+    },
+    "amount": {
+      "type": "string",
+      "description": "The amount to convert from an asset, which should be greater than 0. The maximum integer digits is 14 and the maximum decimal places is 10."
+    }
+  }
+}

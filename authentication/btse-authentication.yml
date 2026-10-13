@@ -1,0 +1,51 @@
+generated: '2026-10-13'
+method: derived
+source: openapi/btse-earn-openapi.yml, openapi/btse-futures-legacy-openapi.yml, openapi/btse-futures-openapi.yml,
+  openapi/btse-markets-openapi.yml, openapi/btse-otc-openapi.yml, openapi/btse-spot-legacy-openapi.yml,
+  openapi/btse-spot-openapi.yml, openapi/btse-wallet-openapi.yml
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+schemes:
+- name: api
+  type: apiKey
+  in: header
+  parameter: request-api
+  description: API key
+  sources:
+  - openapi/btse-earn-openapi.yml
+  - openapi/btse-futures-legacy-openapi.yml
+  - openapi/btse-futures-openapi.yml
+  - openapi/btse-otc-openapi.yml
+  - openapi/btse-spot-legacy-openapi.yml
+  - openapi/btse-spot-openapi.yml
+  - openapi/btse-wallet-openapi.yml
+- name: nonce
+  type: apiKey
+  in: header
+  parameter: request-nonce
+  description: Current timestamp in milliseconds
+  sources:
+  - openapi/btse-earn-openapi.yml
+  - openapi/btse-futures-legacy-openapi.yml
+  - openapi/btse-futures-openapi.yml
+  - openapi/btse-otc-openapi.yml
+  - openapi/btse-spot-legacy-openapi.yml
+  - openapi/btse-spot-openapi.yml
+  - openapi/btse-wallet-openapi.yml
+- name: sign
+  type: apiKey
+  in: header
+  parameter: request-sign
+  description: '`HMAC-SHA384(secret, path + nonce + body)`'
+  sources:
+  - openapi/btse-earn-openapi.yml
+  - openapi/btse-futures-legacy-openapi.yml
+  - openapi/btse-futures-openapi.yml
+  - openapi/btse-markets-openapi.yml
+  - openapi/btse-otc-openapi.yml
+  - openapi/btse-spot-legacy-openapi.yml
+  - openapi/btse-spot-openapi.yml
+  - openapi/btse-wallet-openapi.yml

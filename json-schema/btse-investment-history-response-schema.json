@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-investment-history-response-schema.json",
+  "title": "InvestmentHistoryResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-earn-openapi.yml#/components/schemas/InvestmentHistoryResponse",
+  "type": "object",
+  "properties": {
+    "totalRows": {
+      "type": "integer",
+      "description": "Total records"
+    },
+    "pageNumber": {
+      "type": "integer",
+      "description": "Current page"
+    },
+    "pageSize": {
+      "type": "integer",
+      "description": "Records per page"
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/InvestmentHistoryObject"
+      },
+      "description": "History entries"
+    }
+  },
+  "$defs": {
+    "InvestmentHistoryObject": {
+      "type": "object",
+      "properties": {
+        "txnTime": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Transaction time"
+        },
+        "name": {
+          "type": "string",
+          "description": "Product name"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency"
+        },
+        "rate": {
+          "type": "number",
+          "description": "Interest rate"
+        },
+        "type": {
+          "type": "string",
+          "description": "Product type"
+        },
+        "txnType": {
+          "type": "string",
+          "description": "Transaction type (e.g. INVEST_SERVICE_TYPE_DEPOSIT)"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Transaction amount"
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Total invested amount"
+        },
+        "interestEarned": {
+          "type": "number",
+          "description": "Interest earned"
+        },
+        "duration": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Duration"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-otcquote-response-schema.json",
+  "title": "OTCQuoteResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-otc-openapi.yml#/components/schemas/OTCQuoteResponse",
+  "allOf": [
+    {
+      "$ref": "#/$defs/CommonResponse"
+    },
+    {
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/OTCQuoteItem"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "CommonResponse": {
+      "type": "object",
+      "required": [
+        "success",
+        "code",
+        "msg",
+        "time"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Request validation result. `true` when the HTTP status is `200`."
+        },
+        "code": {
+          "type": "integer",
+          "description": "Request status code. `1` on success; otherwise an error code."
+        },
+        "msg": {
+          "type": "string",
+          "description": "Request status message. `Success` on success; otherwise an error message."
+        },
+        "time": {
+          "type": "number",
+          "description": "Current Unix timestamp."
+        }
+      }
+    },
+    "OTCQuoteItem": {
+      "type": "object",
+      "required": [
+        "quoteId",
+        "clOrderId",
+        "side",
+        "baseSize",
+        "baseCurrency",
+        "quoteSize",
+        "quoteCurrency",
+        "ratio",
+        "status",
+        "expireTime"
+      ],
+      "properties": {
+        "quoteId": {
+          "type": "string",
+          "description": "Quote ID"
+        },
+        "clOrderId": {
+          "type": "string",
+          "description": "Client order ID assigned by the client"
+        },
+        "side": {
+          "$ref": "#/$defs/TxnSideEnum"
+        },
+        "baseSize": {
+          "type": "string",
+          "description": "Size in `baseCurrency`. Max 8 decimal places when `side=BUY`; max 9 decimal places when `side=SELL`."
+        },
+        "baseCurrency": {
+          "type": "string",
+          "description": "Base currency"
+        },
+        "quoteSize": {
+          "type": "string",
+          "description": "Size in `quoteCurrency`. Max 9 decimal places when `side=BUY`; max 8 decimal places when `side=SELL`."
+        },
+        "quoteCurrency": {
+          "type": "string",
+          "description": "Quote currency"
+        },
+        "ratio": {
+          "type": "string",
+          "description": "How many `quoteCurrency` per one `baseCurrency` (`quoteSize` / `baseSize`). Max 10 decimal places."
+        },
+        "status": {
+          "$ref": "#/$defs/OTCQuoteStatusEnum"
+        },
+        "expireTime": {
+          "type": "number",
+          "description": "Expiration timestamp (Unix ms)"
+        },
+        "ttl": {
+          "type": "number",
+          "description": "Time to live in seconds"
+        }
+      }
+    },
+    "OTCQuoteStatusEnum": {
+      "type": "string",
+      "enum": [
+        "NEW_QUOTE",
+        "REQUOTE",
+        "COMPLETED",
+        "EXPIRED"
+      ],
+      "description": "Quote status"
+    },
+    "TxnSideEnum": {
+      "type": "string",
+      "enum": [
+        "BUY",
+        "SELL"
+      ],
+      "description": "Transaction side"
+    }
+  }
+}

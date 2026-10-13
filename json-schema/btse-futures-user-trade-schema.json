@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-futures-user-trade-schema.json",
+  "title": "FuturesUserTrade",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-futures-legacy-openapi.yml#/components/schemas/FuturesUserTrade",
+  "type": "object",
+  "properties": {
+    "symbol": {
+      "type": "string",
+      "description": "Market symbol"
+    },
+    "side": {
+      "type": "string",
+      "enum": [
+        "BUY",
+        "SELL"
+      ],
+      "description": "Trade side"
+    },
+    "price": {
+      "type": "number",
+      "description": "Transacted price"
+    },
+    "size": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Original order size"
+    },
+    "serialId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Running sequence ID"
+    },
+    "tradeId": {
+      "type": "string",
+      "description": "Trade identifier"
+    },
+    "orderId": {
+      "type": "string",
+      "description": "Order ID"
+    },
+    "clOrderID": {
+      "type": "string",
+      "description": "Custom order ID"
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Trade timestamp"
+    },
+    "base": {
+      "type": "string",
+      "description": "Base currency"
+    },
+    "quote": {
+      "type": "string",
+      "description": "Quote currency"
+    },
+    "wallet": {
+      "type": "string",
+      "description": "`CROSS@` or `ISOLATED@{symbol}-USDT`"
+    },
+    "feeCurrency": {
+      "type": "string",
+      "description": "Fee currency"
+    },
+    "feeAmount": {
+      "type": "number",
+      "description": "Fee amount"
+    },
+    "filledPrice": {
+      "type": "number",
+      "description": "Filled price"
+    },
+    "avgFilledPrice": {
+      "type": "number",
+      "description": "Average filled price"
+    },
+    "filledSize": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Filled size"
+    },
+    "orderType": {
+      "type": "integer",
+      "description": "Order type"
+    },
+    "realizedPnL": {
+      "type": "number",
+      "description": "Realized P&L"
+    },
+    "positionId": {
+      "type": "string",
+      "description": "Position ID"
+    },
+    "contractSize": {
+      "type": "number",
+      "description": "Contract size"
+    }
+  }
+}

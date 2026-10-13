@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-position-schema.json",
+  "title": "Position",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-futures-legacy-openapi.yml#/components/schemas/Position",
+  "type": "object",
+  "properties": {
+    "symbol": {
+      "type": "string",
+      "description": "Market symbol"
+    },
+    "side": {
+      "type": "string",
+      "description": "Trade side"
+    },
+    "size": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Position size"
+    },
+    "entryPrice": {
+      "type": "number",
+      "description": "Entry price"
+    },
+    "markPrice": {
+      "type": "number",
+      "description": "Mark price"
+    },
+    "marginType": {
+      "type": "integer",
+      "description": "`91`: Cross · `92`: Isolated"
+    },
+    "orderValue": {
+      "type": "number",
+      "description": "Notional value"
+    },
+    "settleWithAsset": {
+      "type": "string",
+      "description": "Settlement currency"
+    },
+    "totalMaintenanceMargin": {
+      "type": "number",
+      "description": "Maintenance margin"
+    },
+    "unrealizedProfitLoss": {
+      "type": "number",
+      "description": "Unrealized P&L"
+    },
+    "liquidationPrice": {
+      "type": "number",
+      "description": "Liquidation price"
+    },
+    "isolatedLeverage": {
+      "type": "number",
+      "description": "Isolated leverage"
+    },
+    "adlScoreBucket": {
+      "type": "number",
+      "description": "ADL probability score"
+    },
+    "liquidationInProgress": {
+      "type": "boolean",
+      "description": "Whether liquidation is in progress"
+    },
+    "currentLeverage": {
+      "type": "number",
+      "description": "Current leverage"
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Query timestamp"
+    },
+    "takeProfitOrder": {
+      "type": "object",
+      "description": "Take profit order info"
+    },
+    "stopLossOrder": {
+      "type": "object",
+      "description": "Stop loss order info"
+    },
+    "positionMode": {
+      "type": "string",
+      "description": "`ONE_WAY` · `HEDGE` · `ISOLATED`"
+    },
+    "positionDirection": {
+      "type": "string",
+      "description": "Position direction: `LONG` · `SHORT` (only present in HEDGE/ISOLATED mode)"
+    },
+    "positionId": {
+      "type": "string",
+      "description": "Position ID"
+    }
+  }
+}

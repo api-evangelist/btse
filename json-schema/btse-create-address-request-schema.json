@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-create-address-request-schema.json",
+  "title": "CreateAddressRequest",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-wallet-openapi.yml#/components/schemas/CreateAddressRequest",
+  "type": "object",
+  "required": [
+    "crypto",
+    "network"
+  ],
+  "properties": {
+    "crypto": {
+      "type": "string",
+      "description": "Crypto currency",
+      "minLength": 1
+    },
+    "network": {
+      "type": "string",
+      "description": "Crypto network",
+      "minLength": 1
+    },
+    "webhookUrl": {
+      "type": "string",
+      "description": "If you want to receive notifications, fill in the 'webhookUrl' parameter. Then, notify us so we can whitelist the 'webhookUrl'."
+    }
+  }
+}

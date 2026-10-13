@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-user-trade-schema.json",
+  "title": "UserTrade",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-spot-legacy-openapi.yml#/components/schemas/UserTrade",
+  "type": "object",
+  "properties": {
+    "symbol": {
+      "type": "string",
+      "description": "Market symbol"
+    },
+    "side": {
+      "type": "string",
+      "description": "BUY or SELL"
+    },
+    "price": {
+      "type": "number",
+      "description": "Fill price"
+    },
+    "size": {
+      "type": "number",
+      "description": "Fill size"
+    },
+    "serialId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Serial ID"
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Fill timestamp"
+    },
+    "orderId": {
+      "type": "string",
+      "description": "Order ID"
+    },
+    "clOrderId": {
+      "type": "string",
+      "description": "Custom order ID"
+    },
+    "feeAmount": {
+      "type": "number",
+      "description": "Fee charged"
+    },
+    "feeCurrency": {
+      "type": "string",
+      "description": "Fee currency"
+    }
+  }
+}

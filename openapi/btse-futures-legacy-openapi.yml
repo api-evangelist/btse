@@ -1,0 +1,1917 @@
+openapi: 3.0.3
+info:
+  title: Futures API
+  version: 2.3.0
+  description: |
+    Futures trading REST API for perpetual and time-based contracts.
+
+    **Base URL:** `https://api.btse.com/futures`
+    **Testnet:** `https://testapi.btse.io/futures`
+
+    ## Authentication
+
+    Private endpoints require three HTTP headers:
+    - `request-api` — your API key
+    - `request-nonce` — current timestamp in milliseconds
+    - `request-sign` — `HMAC-SHA384(secret, path + nonce + body)`
+
+    See the [Authentication Guide](/authentication) for full details.
+
+    ## Rate Limits
+
+    | Bucket | Limit |
+    |--------|-------|
+    | Query endpoints | 15 req/s per endpoint · 30 req/s per user |
+    | Order endpoints | 75 req/s per endpoint · 75 req/s per user |
+
+    ## Position Modes
+
+    Futures supports three position modes:
+    - **ONE_WAY** — single position per symbol (default)
+    - **HEDGE** — simultaneous long and short positions
+    - **ISOLATED** — isolated margin per position
+
+    > **Tip:** Use `cancelAllAfter` (Dead Man's Switch) to protect against connection loss during active trading.
+  contact:
+    name: Support
+    url: https://support.btse.com
+
+servers:
+  - url: https://api.btse.com/futures
+    description: Production
+  - url: https://testapi.btse.io/futures
+    description: Testnet
+
+tags:
+  - name: Trade
+    description: Requires API key with Trading permission
+  - name: Wallet
+    description: Requires API key with Read or Transfer permission
+
+paths:
+  # ─── Trade Endpoints ───────────────────────────────────────────────────
+  # Public market data endpoints (market_summary, ohlcv, price, orderbook,
+  # orderbook/L2, funding_history, market/risk_limit) have been migrated to
+  # specs/markets-rest.openapi.yaml.
+
+  /api/v2.3/order:
+    post:
+      operationId: createOrder
+      summary: Create New Order
+      description: |
+        Creates a new order. Supports **MARKET**, **LIMIT**, **OCO**, trigger, and TP/SL orders.
+
+        > **Tip:** Use `clOrderID` to track orders with your own identifier.
+
+        For trigger orders, set `txType` to `STOP` or `TRIGGER` and provide `triggerPrice`.
+        Attach take-profit and stop-loss using `takeProfitPrice`/`stopLossPrice` parameters.
+
+        Supports one-way and hedge position modes via `positionMode`.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+            examples:
+              market:
+                summary: MARKET order
+                value:
+                  symbol: BTC-PERP
+                  size: 10
+                  side: BUY
+                  type: MARKET
+              limit:
+                summary: LIMIT order
+                value:
+                  symbol: BTC-PERP
+                  size: 10
+                  price: 21000
+                  side: BUY
+                  type: LIMIT
+              limit_stop:
+                summary: LIMIT STOP order
+                value:
+                  symbol: BTC-PERP
+                  size: 10
+                  price: 21000
+                  side: BUY
+                  type: LIMIT
+                  txType: STOP
+                  triggerPrice: 30000
+              oco:
+                summary: OCO order
+                value:
+                  symbol: BTC-PERP
+                  size: 10
+                  price: 21000
+                  side: BUY
+                  type: OCO
+                  txType: LIMIT
+                  trigger: markPrice
+                  stopPrice: 30010
+                  triggerPrice: 30000
+              limit_tpsl:
+                summary: LIMIT with TP/SL
+                value:
+                  symbol: BTC-PERP
+                  size: 10
+                  price: 29000
+                  side: BUY
+                  type: LIMIT
+                  takeProfitPrice: 31000
+                  takeProfitTrigger: markPrice
+                  stopLossPrice: 27000
+                  stopLossTrigger: lastPrice
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FuturesOrderResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+    get:
+      operationId: getOrder
+      summary: Query Order
+      description: Queries order details. Cancelled orders are only available for 30 minutes after cancellation.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: orderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Internal order ID. Takes precedence over `clOrderID` if both provided
+        - name: clOrderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Custom order ID. Required if `orderID` not provided
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryOrderResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+    put:
+      operationId: amendOrder
+      summary: Amend Order
+      description: |
+        Amends an existing order's price, size, or trigger price.
+        Does not apply to algo orders. Already-triggered trigger orders cannot have their trigger price amended.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AmendOrderRequest'
+            examples:
+              amend_price:
+                summary: Amend price
+                value:
+                  symbol: BTC-PERP
+                  orderID: 25248336-66d8-41ff-99fd-83489c4e6029
+                  type: PRICE
+                  value: 35000
+              amend_size:
+                summary: Amend size
+                value:
+                  symbol: BTC-PERP
+                  orderID: 689bf733-4879-4e32-8d1f-cb81f63d24d4
+                  type: SIZE
+                  value: 5
+              amend_all:
+                summary: Amend multiple fields
+                value:
+                  symbol: BTC-PERP
+                  orderID: cb2785b0-558e-4b30-bf1f-8a8c56174d0c
+                  type: ALL
+                  orderPrice: 40010
+                  orderSize: 5
+                  triggerPrice: 40000
+      responses:
+        '200':
+          description: Same fields as Create New Order response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FuturesOrderResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+    delete:
+      operationId: cancelOrder
+      summary: Cancel Order
+      description: |
+        Cancels pending orders. If neither `orderID` nor `clOrderID` is provided,
+        all orders in the market are cancelled. When cancelling by `clOrderID`,
+        all orders with that ID are cancelled.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Market symbol
+        - name: orderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Internal order ID to cancel
+        - name: clOrderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Custom order ID to cancel
+      responses:
+        '200':
+          description: Same fields as Create New Order response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FuturesOrderResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/order/peg:
+    post:
+      operationId: createAlgoOrder
+      summary: Create New Algo Order
+      description: Creates an algo (peg) order — price tracks market price within the specified deviation range.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAlgoOrderRequest'
+      responses:
+        '200':
+          description: Same fields as Create New Order response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FuturesOrderResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/order/cancelAllAfter:
+    post:
+      operationId: cancelAllAfter
+      summary: Dead Man's Switch (Cancel All After)
+      description: |
+        Sets a TTL (time-to-live) for all open orders. If the server does not receive a new
+        `cancelAllAfter` request before the timeout, all orders are cancelled.
+        Extend by sending another request.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [timeout]
+              properties:
+                timeout:
+                  type: integer
+                  format: int64
+                  description: TTL in milliseconds
+            example:
+              timeout: 60000
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/order/close_position:
+    post:
+      operationId: closePosition
+      summary: Close Position
+      description: |
+        Closes a position at market or limit price.
+
+        > **Note:** When using `positionMode: HEDGE` or `ISOLATED`, the `positionId` parameter is required.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClosePositionRequest'
+      responses:
+        '200':
+          description: Same fields as Create New Order response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FuturesOrderResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/order/bind/tpsl:
+    post:
+      operationId: bindTpSl
+      summary: Bind TP/SL
+      description: |
+        Binds a take profit and/or stop loss to an existing position.
+        At least one of `takeProfitPrice` or `stopLossPrice` must be set.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BindTpSlRequest'
+      responses:
+        '200':
+          description: Same fields as Create New Order response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FuturesOrderResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/risk_limit:
+    get:
+      operationId: getRiskLimit
+      summary: Get Risk Limit
+      description: Returns the current risk limit for the specified market.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Market symbol
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskLimitStatus'
+              example:
+                symbol: BTC-PERP
+                riskLimit: 3000000
+                riskLimitLevel: 1
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+    post:
+      operationId: setRiskLimit
+      summary: Set Risk Limit
+      description: Updates the risk limit tier for the specified market.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetRiskLimitRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskLimitUpdateResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/leverage:
+    get:
+      operationId: getLeverage
+      summary: Get Leverage
+      description: Returns the current leverage setting for the specified market.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Market symbol
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeverageStatus'
+              example:
+                - symbol: BTC-PERP
+                  leverage: 100
+                  marginMode: CROSS
+                  positionDirection: null
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+    post:
+      operationId: setLeverage
+      summary: Set Leverage
+      description: |
+        Changes the leverage setting for the specified market.
+
+        > **Warning:** Setting leverage to `0` applies cross-wallet maximum leverage. Reducing leverage on an existing position may trigger liquidation if the margin is insufficient.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetLeverageRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeverageUpdateResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/settle_in:
+    post:
+      operationId: changeContractSettlementCurrency
+      summary: Change Contract Settlement Currency
+      description: Changes the settlement currency for the current position.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettlementCurrencyRequest'
+      responses:
+        '200':
+          description: Success (response body only appears on error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/position_mode:
+    get:
+      operationId: getPositionMode
+      summary: Query Position Mode
+      description: Returns the current position mode for each market.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Market symbol
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PositionMode'
+              example:
+                - symbol: BTC-PERP
+                  positionMode: ONE_WAY
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+    post:
+      operationId: changePositionMode
+      summary: Change Position Mode
+      description: Changes the position mode for the specified market.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePositionModeRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PositionModeUpdateResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/user/open_orders:
+    get:
+      operationId: getOpenOrders
+      summary: Query Open Orders
+      description: Returns open orders that have not been matched or were recently matched.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Market symbol
+        - name: orderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by internal order ID
+        - name: clOrderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by custom order ID (ignored if `orderID` provided)
+      responses:
+        '200':
+          description: Array of open order objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OpenOrderResponse'
+              example:
+                []
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/user/trade_history:
+    get:
+      operationId: getUserTradesFills
+      summary: Query Trades Fills
+      description: |
+        Returns the authenticated user's trade history.
+
+        **Time range constraints:**
+        - `startTime` + `endTime`: max 7 days
+        - `startTime` only: 7 days after start
+        - `endTime` only: 7 days before end
+        - Neither: 7 days before current time
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Market symbol
+        - name: startTime
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: Start time in milliseconds
+        - name: endTime
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: End time in milliseconds
+        - name: beforeSerialId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: Pagination for high-volume markets
+        - name: afterSerialId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: Pagination for high-volume markets
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: Number of records
+        - name: includeOld
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Include records older than 7 days
+        - name: orderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by order ID
+        - name: clOrderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by custom order ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FuturesUserTrade'
+              example:
+                []
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/user/positions:
+    get:
+      operationId: getPosition
+      summary: Query Position
+      description: Returns all open positions. When no symbol is specified, all positions are returned.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Market symbol
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Position'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/user/fees:
+    get:
+      operationId: getAccountFees
+      summary: Query Account Fee
+      description: Returns the user's trading fees for futures.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Market symbol
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountFee'
+              example:
+                - symbol: BTC-PERP
+                  makerFee: 0.0002
+                  takerFee: 0.00055
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/user/margin_setting:
+    get:
+      operationId: getMarginSetting
+      summary: Query Margin Setting
+      description: Returns the user's initial and maintenance margin percentages. Returns all markets if no symbol is provided.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Market symbol
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MarginSetting'
+              example:
+                - symbol: BTC-PERP
+                  initialMarginPercentage: 0.01
+                  maintenanceMarginPercentage: 0.005
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  # ─── Wallet Endpoints ──────────────────────────────────────────────────
+
+  /api/v2.3/user/wallet:
+    get:
+      operationId: getWalletBalance
+      summary: Query Wallet Balance
+      description: Returns the user's futures wallet balance.
+      tags: [Wallet]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: wallet
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Wallet identifier — `CROSS@` or `ISOLATED@{symbol}-USDT` (e.g. `ISOLATED@BTC-PERP-USDT`). Optional — if omitted, returns balances across all wallets.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletBalance'
+              example:
+                - wallet: CROSS@
+                  activeWalletName: String
+                  queryType: 0
+                  trackingID: 0
+                  walletTotalValue: 0
+                  totalValue: 100
+                  marginBalance: 100
+                  availableBalance: 100
+                  unrealisedProfitLoss: 0
+                  maintenanceMargin: 0
+                  leverage: 0
+                  openMargin: 0
+                  assets:
+                    - balance: 0.20183537
+                      assetPrice: 7158.845
+                      currency: BTC
+                  assetsInUse:
+                    - balance: 0.01
+                      assetPrice: 7158.845
+                      currency: BTC
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/user/wallet_history:
+    get:
+      operationId: getWalletHistory
+      summary: Query Wallet History
+      description: Returns wallet transaction history for futures wallets.
+      tags: [Wallet]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: wallet
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Wallet identifier (`CROSS@` or `ISOLATED@BTC-PERP-USDT`). Omit to return all wallets
+        - name: startTime
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: Start time in milliseconds
+        - name: endTime
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: End time in milliseconds
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Number of records to return
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletHistoryEntry'
+              example:
+                []
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/user/unifiedWallet/margin:
+    get:
+      operationId: getUnifiedWalletMargin
+      summary: Query Unified Wallet Margin
+      description: Returns margin information for the upgraded unified wallet. Use this endpoint if you have upgraded to the unified wallet.
+      tags: [Wallet]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Market symbol
+        - name: positionId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Position unique ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnifiedWalletMargin'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/user/margin:
+    get:
+      operationId: getWalletMargin
+      summary: Query Wallet Margin
+      description: |
+        Returns margin information for the specified wallet.
+        **Not available for unified wallet users** — use Query Unified Wallet Margin instead.
+      tags: [Wallet]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Market symbol
+      responses:
+        '200':
+          description: Same structure as Query Wallet Balance with additional `requestId` field
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletBalance'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/user/wallet/transfer:
+    post:
+      operationId: transferFundsBetweenFuturesWallets
+      summary: Transfer Funds Between Futures Wallets
+      description: |
+        Transfers funds between user wallets (e.g. Spot → Cross, Cross → Isolated).
+
+        > **Important:** When transferring to/from an `ISOLATED` wallet, you must specify the full wallet identifier (e.g. `ISOLATED@BTC-PERP-USDT`).
+        >
+        > **Note:** the source wallet must hold balance in every `currency` listed in `apiWallets` before calling this endpoint.
+      tags: [Wallet]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletTransferRequest'
+            example:
+              walletSrc: ''
+              walletSrcType: SPOT
+              walletDest: ''
+              walletDestType: CROSS
+              apiWallets:
+                - currency: USD
+                  allBalance: true
+                - currency: BTC
+                  allBalance: true
+      responses:
+        '200':
+          description: Same structure as Query Wallet Balance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletBalance'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v2.3/subaccount/wallet/transfer:
+    post:
+      operationId: subAccountWalletTransfer
+      summary: Sub-Account Wallet Transfer
+      description: Transfers funds between the main account and a sub-account wallet.
+      tags: [Wallet]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubAccountTransferRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubAccountTransferResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+# ═════════════════════════════════════════════════════════════════════════
+# Components
+# ═════════════════════════════════════════════════════════════════════════
+
+components:
+  securitySchemes:
+    api:
+      type: apiKey
+      in: header
+      name: request-api
+      description: API key
+    nonce:
+      type: apiKey
+      in: header
+      name: request-nonce
+      description: Current timestamp in milliseconds
+    sign:
+      type: apiKey
+      in: header
+      name: request-sign
+      description: "`HMAC-SHA384(secret, path + nonce + body)`"
+
+  schemas:
+    # ─── Trade ─────────────────────────────────────────────────────────────
+
+    CreateOrderRequest:
+      type: object
+      required: [symbol, size, side, type]
+      properties:
+        symbol:             { type: string,  description: Market symbol }
+        size:               { type: integer, format: int64, description: Order size in contract units }
+        side:               { type: string,  enum: [BUY, SELL], description: Order side }
+        type:               { type: string,  enum: [LIMIT, MARKET, OCO], description: "Order type: `LIMIT` · `MARKET` · `OCO` (One-Cancels-the-Other)" }
+        price:              { type: number,  description: Required for LIMIT orders }
+        time_in_force:      { type: string,  enum: [GTC, IOC, FOK, HALFMIN, FIVEMIN, HOUR, TWELVEHOUR, DAY, WEEK, MONTH], description: "Time in force: `GTC` (Good Till Cancelled) · `IOC` (Immediate Or Cancel) · `FOK` (Fill Or Kill) · `HALFMIN` (30 seconds) · `FIVEMIN` (5 minutes) · `HOUR` (1 hour) · `TWELVEHOUR` (12 hours) · `DAY` (1 day) · `WEEK` (1 week) · `MONTH` (1 month)" }
+        txType:             { type: string,  enum: [LIMIT, STOP, TRIGGER], description: "Transaction type: `LIMIT` (default) · `STOP` (requires `triggerPrice`) · `TRIGGER` (requires `triggerPrice`)" }
+        stopPrice:          { type: number,  description: Required for OCO orders }
+        triggerPrice:       { type: number,  description: "Required for STOP, TRIGGER, and OCO orders" }
+        trailValue:         { type: number,  description: Trail value. TP/SL not supported when set }
+        postOnly:           { type: boolean, description: Post-only order — charged maker fee }
+        reduceOnly:         { type: boolean, description: Reduce-only order }
+        clOrderID:          { type: string,  description: Custom order ID }
+        trigger:            { type: string,  enum: [markPrice, lastPrice], description: "Trigger type for STOP/TRIGGER: `markPrice` (default) or `lastPrice`" }
+        takeProfitPrice:    { type: number,  description: Take profit trigger price }
+        takeProfitTrigger:  { type: string,  enum: [markPrice, lastPrice], description: "Take profit trigger type: `markPrice` (default) or `lastPrice`" }
+        stopLossPrice:      { type: number,  description: Stop loss trigger price }
+        stopLossTrigger:    { type: string,  enum: [markPrice, lastPrice], description: "Stop loss trigger type: `markPrice` (default) or `lastPrice`" }
+        positionMode:       { type: string,  enum: [ONE_WAY, HEDGE, ISOLATED], description: "Position mode: `ONE_WAY` (default) · `HEDGE` · `ISOLATED`" }
+
+    CreateAlgoOrderRequest:
+      type: object
+      required: [symbol, price, size, side]
+      properties:
+        symbol:       { type: string,  description: Market symbol }
+        price:        { type: number,  description: Min price (sell) or max price (buy) }
+        size:         { type: integer, format: int64, description: Order size }
+        side:         { type: string,  enum: [BUY, SELL], description: Order side }
+        clOrderID:    { type: string,  description: Custom order ID }
+        deviation:    { type: number,  description: "Deviation from index price in % (`-10` to `10`)" }
+        stealth:      { type: number,  description: Percentage of order to display on orderbook }
+        positionMode: { type: string,  enum: [ONE_WAY, HEDGE, ISOLATED], description: "Position mode: `ONE_WAY` (default) · `HEDGE` · `ISOLATED`" }
+
+    AmendOrderRequest:
+      type: object
+      required: [symbol, type]
+      properties:
+        symbol:       { type: string,  description: Market symbol }
+        orderID:      { type: string,  description: "Internal order ID. Required if `clOrderID` is not provided. Takes precedence over `clOrderID` if both are provided" }
+        clOrderID:    { type: string,  description: "Custom order ID. Required if `orderID` is not provided" }
+        type:         { type: string,  enum: [PRICE, SIZE, TRIGGERPRICE, ALL], description: "Amendment type: `PRICE` (amend price, use `value`) · `SIZE` (amend size, use `value`) · `TRIGGERPRICE` (amend trigger price, use `value`) · `ALL` (amend multiple fields, use `orderPrice`/`orderSize`/`triggerPrice`)" }
+        value:        { type: number,  description: "New value. Required for `PRICE`, `SIZE`, or `TRIGGERPRICE` amendment types" }
+        orderPrice:   { type: number,  description: "New order price. Used when `type` is `ALL`" }
+        orderSize:    { type: integer, description: "New order size in contract units. Used when `type` is `ALL`" }
+        triggerPrice: { type: number,  description: "New trigger price (trigger orders only). Used when `type` is `ALL`" }
+
+    ClosePositionRequest:
+      type: object
+      required: [symbol, type]
+      properties:
+        symbol:     { type: string,  description: Market symbol }
+        type:       { type: string,  enum: [LIMIT, MARKET], description: "Close type — `LIMIT` requires `price`" }
+        price:      { type: number,  description: "Close price. Required for `LIMIT` type" }
+        postOnly:   { type: boolean, description: Post-only order }
+        positionId: { type: string,  description: "Required when `positionMode` is `HEDGE` or `ISOLATED`" }
+
+    BindTpSlRequest:
+      type: object
+      required: [symbol, side]
+      properties:
+        symbol:            { type: string, description: Market symbol }
+        side:              { type: string, enum: [BUY, SELL], description: "Required in HEDGE mode — closes the specified position side" }
+        takeProfitPrice:   { type: number, description: "Take profit trigger price. At least one of `takeProfitPrice` or `stopLossPrice` must be set" }
+        takeProfitTrigger: { type: string, enum: [markPrice, lastPrice], description: "`markPrice` (default) · `lastPrice`" }
+        stopLossPrice:     { type: number, description: "Stop loss trigger price. At least one of `takeProfitPrice` or `stopLossPrice` must be set" }
+        stopLossTrigger:   { type: string, enum: [markPrice, lastPrice], description: "`markPrice` (default) · `lastPrice`" }
+        positionMode:      { type: string, enum: [ONE_WAY, HEDGE, ISOLATED], description: "`ONE_WAY` (default) · `HEDGE` · `ISOLATED`" }
+        positionId:        { type: string, description: "Required when `positionMode` is `ISOLATED`" }
+
+    SetRiskLimitRequest:
+      type: object
+      required: [symbol, riskLimitLevel]
+      properties:
+        symbol:         { type: string,  description: Market symbol }
+        riskLimitLevel: { type: integer, description: Risk limit tier to apply }
+        positionMode:   { type: string,  description: "Required when `positionMode` is `HEDGE` or `ISOLATED`" }
+
+    SetLeverageRequest:
+      type: object
+      required: [symbol, leverage]
+      properties:
+        symbol:       { type: string,  description: Market symbol }
+        leverage:     { type: number,  description: "Leverage value. `0` = cross max leverage" }
+        marginMode:   { type: string,  enum: [CROSS, ISOLATED], description: "`CROSS` · `ISOLATED` (default)" }
+        positionMode: { type: string,  description: "Required when `positionMode` is `HEDGE` or `ISOLATED`" }
+        positionId:   { type: string,  description: "Required when `positionMode` is `HEDGE` or `ISOLATED`" }
+
+    SettlementCurrencyRequest:
+      type: object
+      required: [symbol, currency]
+      properties:
+        symbol:     { type: string, description: Market symbol }
+        currency:   { type: string, description: Settlement currency }
+        positionId: { type: string, description: "Required when `positionMode` is `HEDGE` or `ISOLATED`" }
+
+    ChangePositionModeRequest:
+      type: object
+      required: [symbol, positionMode]
+      properties:
+        symbol:       { type: string, description: Market symbol }
+        positionMode: { type: string, enum: [ONE_WAY, HEDGE, ISOLATED], description: "`ONE_WAY` · `HEDGE` · `ISOLATED`" }
+
+    WalletTransferRequest:
+      type: object
+      required: [walletSrcType, walletDestType, apiWallets]
+      properties:
+        walletSrc:     { type: string, description: "Source wallet identifier. Required when `walletSrcType` is `ISOLATED`" }
+        walletSrcType: { type: string, enum: [SPOT, CROSS, ISOLATED], description: Source wallet type }
+        walletDest:    { type: string, description: "Destination wallet identifier. Required when `walletDestType` is `ISOLATED`" }
+        walletDestType: { type: string, enum: [SPOT, CROSS, ISOLATED], description: Destination wallet type }
+        apiWallets:    { type: array, items: { $ref: '#/components/schemas/WalletTransferDetail' }, description: Transfer details }
+
+    WalletTransferDetail:
+      type: object
+      required: [currency, allBalance]
+      properties:
+        currency:   { type: string,  description: Currency }
+        allBalance: { type: boolean, description: "Whether to transfer entire balance. When `true`, `balance` is ignored" }
+        balance:    { type: number,  description: "Amount to transfer (e.g. `10`). Required when `allBalance` is `false`" }
+
+    SubAccountTransferRequest:
+      type: object
+      required: [walletSrcType, walletDestType, fromUser, receiver, apiWallets]
+      properties:
+        walletSrcType:  { type: string, enum: [SPOT, CROSS, ISOLATED], description: Source wallet type }
+        walletSrc:      { type: string, description: "Required when `walletSrcType` is `ISOLATED`" }
+        walletDestType: { type: string, enum: [SPOT, CROSS, ISOLATED], description: Destination wallet type }
+        walletDest:     { type: string, description: "Required when `walletDestType` is `ISOLATED`" }
+        fromUser:       { type: string, description: Source username }
+        receiver:       { type: string, description: Receiver username }
+        apiWallets:     { type: array, items: { $ref: '#/components/schemas/WalletTransferDetail' }, description: Transfer details }
+
+    FuturesOrderResponse:
+      type: object
+      properties:
+        symbol:             { type: string,  description: Market symbol }
+        orderID:            { type: string,  description: Order ID }
+        clOrderID:          { type: string,  description: Custom order ID }
+        orderType:          { type: integer, description: "`76`: Limit · `77`: Market · `80`: Algo" }
+        side:               { type: string,  description: Trade side }
+        price:              { type: number,  description: Order price }
+        status:             { type: integer, description: "Order status code: `2` (ORDER_INSERTED) · `4` (FULLY_MATCHED) · `5` (PARTIAL_FILL) · `6` (CANCELLED) · `9` (TRIGGER_INSERTED) · `10` (TRIGGER_ACTIVATED) · `15` (REJECTED)" }
+        time_in_force:      { type: string,  description: "Time in force: `GTC` · `IOC` · `FOK` · `HALFMIN` · `FIVEMIN` · `HOUR` · `TWELVEHOUR` · `DAY` · `WEEK` · `MONTH`" }
+        timestamp:          { type: integer, format: int64, description: Order timestamp }
+        trigger:            { type: boolean, description: Whether order is a trigger order }
+        triggerPrice:       { type: number,  description: "Trigger price (`0` if not a trigger order)" }
+        avgFilledPrice:     { type: number,  description: Average filled price }
+        message:            { type: string,  description: Trade message }
+        stealth:            { type: number,  description: Algo orders only }
+        deviation:          { type: number,  description: Algo orders only }
+        remainingSize:      { type: integer, description: Current order size minus filled size }
+        originalOrderSize:  { type: integer, description: Original quantity — unchanged after amendments }
+        currentOrderSize:   { type: integer, description: Latest quantity (filled + remaining) }
+        filledSize:         { type: integer, description: Quantity filled in this update }
+        totalFilledSize:    { type: integer, description: Cumulative filled quantity }
+        postOnly:           { type: boolean, description: Whether order is post-only }
+        positionMode:       { type: string,  description: "`ONE_WAY` · `HEDGE` · `ISOLATED`" }
+        positionDirection:  { type: string,  description: "Position direction: `LONG` · `SHORT` (only present in HEDGE/ISOLATED mode)" }
+        positionId:         { type: string,  description: Position ID }
+
+    QueryOrderResponse:
+      type: object
+      properties:
+        orderID:                       { type: string,  description: Order ID }
+        symbol:                        { type: string,  description: Market symbol }
+        orderType:                     { type: integer, description: Order type }
+        side:                          { type: string,  description: Trade side }
+        price:                         { type: number,  description: Order price }
+        orderValue:                    { type: number,  description: Total order value }
+        originalOrderSize:             { type: integer, description: Original quantity }
+        currentOrderSize:              { type: integer, description: Latest quantity }
+        totalFilledSize:               { type: integer, description: Cumulative filled quantity }
+        remainingSize:                 { type: integer, description: Remaining quantity }
+        pegPriceMin:                   { type: number,  description: Min peg price }
+        pegPriceMax:                   { type: number,  description: Max peg price }
+        pegPriceDeviation:             { type: number,  description: Deviation from index price (%) }
+        timestamp:                     { type: integer, format: int64, description: Order timestamp }
+        triggerOrder:                  { type: boolean, description: Whether it is a trigger order }
+        triggerPrice:                  { type: number,  description: Trigger price }
+        triggerOriginalPrice:          { type: number,  description: Original trigger price }
+        triggerOrderType:              { type: integer, description: Trigger order type }
+        triggerTrailingStopDeviation:  { type: number,  description: Trailing stop deviation (%) }
+        triggerStopPrice:              { type: number,  description: Stop price (Algo only) }
+        triggered:                     { type: boolean, description: Whether trigger has fired }
+        trailValue:                    { type: number,  description: Trail value }
+        clOrderID:                     { type: string,  description: Custom order ID }
+        avgFilledPrice:                { type: number,  description: Average filled price }
+        status:                        { type: integer, description: "Order status code: `2` (ORDER_INSERTED) · `4` (FULLY_MATCHED) · `5` (PARTIAL_FILL) · `6` (CANCELLED) · `9` (TRIGGER_INSERTED) · `10` (TRIGGER_ACTIVATED) · `15` (REJECTED)" }
+        takeProfitOrder:               { type: object,  description: Take profit order info }
+        stopLossOrder:                 { type: object,  description: Stop loss order info }
+        closeOrder:                    { type: boolean, description: Whether it closes a position }
+        timeInForce:                   { type: string,  description: Order validity }
+        contractSize:                  { type: number,  description: Contract size }
+
+    OpenOrderResponse:
+      type: object
+      properties:
+        symbol:            { type: string,  description: Market symbol }
+        orderID:           { type: string,  description: Order ID }
+        clOrderID:         { type: string,  description: Custom order ID }
+        orderType:         { type: integer, description: "`76`: Limit · `77`: Market · `80`: Algo" }
+        side:              { type: string,  description: Trade side }
+        price:             { type: number,  description: Order price }
+        orderValue:        { type: number,  description: Notional value }
+        originalOrderSize: { type: integer, description: Original quantity }
+        currentOrderSize:  { type: integer, description: Latest quantity }
+        totalFilledSize:   { type: integer, description: Cumulative filled }
+        remainingSize:     { type: integer, description: Remaining quantity }
+        timestamp:         { type: integer, format: int64, description: Order timestamp }
+        timeInForce:       { type: string,  description: Order validity }
+        triggerOrder:      { type: boolean, description: Whether trigger order }
+        triggered:         { type: boolean, description: Whether triggered }
+        triggerPrice:      { type: number,  description: Trigger price }
+        reduceOnly:        { type: boolean, description: Whether reduce-only }
+        avgFilledPrice:    { type: number,  description: Average filled price }
+        orderState:        { type: string,  enum: [STATUS_ACTIVE, STATUS_INACTIVE], description: Order state }
+        takeProfitOrder:   { type: object,  description: Take profit order info }
+        stopLossOrder:     { type: object,  description: Stop loss order info }
+        closeOrder:        { type: boolean, description: Whether closes a position }
+        positionMode:      { type: string,  description: "`ONE_WAY` · `HEDGE` · `ISOLATED`" }
+        positionDirection: { type: string,  description: "Position direction: `LONG` · `SHORT` (only present in HEDGE/ISOLATED mode)" }
+        positionId:        { type: string,  description: Position ID }
+        contractSize:      { type: number,  description: Contract size }
+
+    FuturesUserTrade:
+      type: object
+      properties:
+        symbol:         { type: string,  description: Market symbol }
+        side:           { type: string,  enum: [BUY, SELL], description: Trade side }
+        price:          { type: number,  description: Transacted price }
+        size:           { type: integer, format: int64, description: Original order size }
+        serialId:       { type: integer, format: int64, description: Running sequence ID }
+        tradeId:        { type: string,  description: Trade identifier }
+        orderId:        { type: string,  description: Order ID }
+        clOrderID:      { type: string,  description: Custom order ID }
+        timestamp:      { type: integer, format: int64, description: Trade timestamp }
+        base:           { type: string,  description: Base currency }
+        quote:          { type: string,  description: Quote currency }
+        wallet:         { type: string,  description: "`CROSS@` or `ISOLATED@{symbol}-USDT`" }
+        feeCurrency:    { type: string,  description: Fee currency }
+        feeAmount:      { type: number,  description: Fee amount }
+        filledPrice:    { type: number,  description: Filled price }
+        avgFilledPrice: { type: number,  description: Average filled price }
+        filledSize:     { type: integer, format: int64, description: Filled size }
+        orderType:      { type: integer, description: Order type }
+        realizedPnL:    { type: number,  description: Realized P&L }
+        positionId:     { type: string,  description: Position ID }
+        contractSize:   { type: number,  description: Contract size }
+
+    Position:
+      type: object
+      properties:
+        symbol:                  { type: string,  description: Market symbol }
+        side:                    { type: string,  description: Trade side }
+        size:                    { type: integer, format: int64, description: Position size }
+        entryPrice:              { type: number,  description: Entry price }
+        markPrice:               { type: number,  description: Mark price }
+        marginType:              { type: integer, description: "`91`: Cross · `92`: Isolated" }
+        orderValue:              { type: number,  description: Notional value }
+        settleWithAsset:         { type: string,  description: Settlement currency }
+        totalMaintenanceMargin:  { type: number,  description: Maintenance margin }
+        unrealizedProfitLoss:    { type: number,  description: Unrealized P&L }
+        liquidationPrice:        { type: number,  description: Liquidation price }
+        isolatedLeverage:        { type: number,  description: Isolated leverage }
+        adlScoreBucket:          { type: number,  description: ADL probability score }
+        liquidationInProgress:   { type: boolean, description: Whether liquidation is in progress }
+        currentLeverage:         { type: number,  description: Current leverage }
+        timestamp:               { type: integer, format: int64, description: Query timestamp }
+        takeProfitOrder:         { type: object,  description: Take profit order info }
+        stopLossOrder:           { type: object,  description: Stop loss order info }
+        positionMode:            { type: string,  description: "`ONE_WAY` · `HEDGE` · `ISOLATED`" }
+        positionDirection:       { type: string,  description: "Position direction: `LONG` · `SHORT` (only present in HEDGE/ISOLATED mode)" }
+        positionId:              { type: string,  description: Position ID }
+
+    RiskLimitStatus:
+      type: object
+      properties:
+        symbol:         { type: string,  description: Market symbol }
+        riskLimit:      { type: integer, format: int64, description: Risk limit value in notional }
+        riskLimitLevel: { type: integer, description: Current risk limit tier }
+
+    RiskLimitUpdateResponse:
+      type: object
+      properties:
+        symbol:    { type: string,  description: Market symbol }
+        status:    { type: integer, description: "`8`: Insufficient balance · `12`: Error · `20`: Success · `41`: Invalid risk limit" }
+        type:      { type: number,  description: "`94` — indicates risk limit update" }
+        timestamp: { type: integer, format: int64, description: Update timestamp }
+        message:   { type: string,  description: Response message }
+
+    LeverageStatus:
+      type: object
+      properties:
+        symbol:            { type: string, description: Market symbol }
+        leverage:          { type: number, description: "Current leverage (`0` = cross max leverage)" }
+        marginMode:        { type: string, description: "Current margin mode: `CROSS` · `ISOLATED`" }
+        positionDirection: { type: string, description: "Position direction: `LONG` · `SHORT` · `null` (in one-way mode)" }
+
+    LeverageUpdateResponse:
+      type: object
+      properties:
+        symbol:    { type: string,  description: Market symbol }
+        status:    { type: integer, description: "`8`: Insufficient · `13`: Invalid leverage · `20`: Success · `64`: Liquidation" }
+        type:      { type: number,  description: "`93` — indicates leverage update" }
+        timestamp: { type: integer, format: int64, description: Update timestamp }
+        message:   { type: string,  description: Response message }
+
+    PositionMode:
+      type: object
+      properties:
+        symbol:       { type: string, description: Market symbol }
+        positionMode: { type: string, enum: [ONE_WAY, HEDGE, ISOLATED], description: "`ONE_WAY` · `HEDGE` · `ISOLATED`" }
+
+    PositionModeUpdateResponse:
+      type: object
+      properties:
+        symbol:    { type: string,  description: Market symbol }
+        status:    { type: integer, description: "`20`: Success" }
+        type:      { type: string,  description: "`129` — Futures config mode change" }
+        timestamp: { type: integer, format: int64, description: Update timestamp }
+        message:   { type: string,  description: Response message }
+
+    AccountFee:
+      type: object
+      properties:
+        symbol:   { type: string, description: Market symbol }
+        makerFee: { type: number, description: Maker fee rate }
+        takerFee: { type: number, description: Taker fee rate }
+
+    MarginSetting:
+      type: object
+      properties:
+        symbol:                      { type: string, description: Market symbol }
+        initialMarginPercentage:     { type: number, description: Current initial margin percentage }
+        maintenanceMarginPercentage: { type: number, description: Current maintenance margin percentage }
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:   { type: integer, description: Error status code }
+        error:    { type: string,  description: Error message }
+        code:     { type: integer, description: Internal error code }
+        message:  { type: string,  description: Human-readable error description }
+
+    RateLimitError:
+      type: object
+      properties:
+        status:  { type: integer, description: "HTTP status code (429)" }
+        message: { type: string,  description: Rate limit exceeded message }
+
+    # ─── Wallet ────────────────────────────────────────────────────────────
+
+    WalletAsset:
+      type: object
+      properties:
+        balance:    { type: number, description: Asset balance }
+        assetPrice: { type: number, description: Asset price }
+        currency:   { type: string, description: Currency }
+
+    WalletBalance:
+      type: object
+      properties:
+        wallet:               { type: string,  description: Wallet identifier }
+        activeWalletName:     { type: string,  description: Active wallet name }
+        queryType:            { type: integer, description: Query type }
+        trackingID:           { type: integer, format: int64, description: Internal tracking ID }
+        walletTotalValue:     { type: number,  description: Wallet total value }
+        totalValue:           { type: number,  description: Total value }
+        marginBalance:        { type: number,  description: Margin balance }
+        availableBalance:     { type: number,  description: Available balance }
+        unrealisedProfitLoss: { type: number,  description: Unrealized P&L }
+        maintenanceMargin:    { type: number,  description: Maintenance margin }
+        leverage:             { type: number,  description: "Current leverage (CROSS: current, not setting)" }
+        openMargin:           { type: number,  description: Open margin }
+        assets:               { type: array, items: { $ref: '#/components/schemas/WalletAsset' }, description: Available assets }
+        assetsInUse:          { type: array, items: { $ref: '#/components/schemas/WalletAsset' }, description: Assets in use }
+
+    WalletHistoryEntry:
+      type: object
+      properties:
+        currency:    { type: string,  description: Currency }
+        amount:      { type: number,  description: Transaction amount }
+        fees:        { type: number,  description: Fees charged }
+        orderId:     { type: string,  description: Internal wallet order ID }
+        wallet:      { type: string,  description: "`CROSS@` or `ISOLATED@`" }
+        description: { type: string,  description: Transaction description }
+        status:      { type: integer, description: "`1`: PENDING · `2`: PROCESSING · `10`: COMPLETED · `16`: CANCELLED" }
+        type:        { type: integer, description: "`105`: Wallet Transfer · `106`: Liquidation · `108`: Realized PnL · `110`: Funding · `121`: Asset Conversion" }
+
+    WalletDetail:
+      type: object
+      properties:
+        activeWalletName:     { type: string, description: Wallet name }
+        unrealisedProfitLoss: { type: number, description: Wallet unrealized P&L }
+        walletTotalValue:     { type: number, description: Wallet total value }
+        marginBalance:        { type: number, description: Margin balance }
+        availableBalance:     { type: number, description: Available balance }
+        maintenanceMargin:    { type: number, description: Maintenance margin }
+
+    UnifiedWalletMargin:
+      type: object
+      properties:
+        symbol:                          { type: string, description: Market symbol }
+        walletTotalValue:                { type: number, description: Total wallet value }
+        walletTotalUnrealizedProfitLoss: { type: number, description: Total unrealized P&L }
+        futuresTotalAvailableBalance:    { type: number, description: Total available balance }
+        wallets:                         { type: array, items: { $ref: '#/components/schemas/WalletDetail' }, description: Per-wallet breakdown }
+
+    SubAccountTransferResponse:
+      type: object
+      properties:
+        code:    { type: integer, description: Response code }
+        msg:     { type: string,  description: Response message }
+        time:    { type: integer, format: int64, description: Response timestamp }
+        data:    { type: object,  description: Transfer result data }
+        success: { type: boolean, description: Whether transfer succeeded }

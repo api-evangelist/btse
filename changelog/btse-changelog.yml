@@ -1,0 +1,45 @@
+generated: '2026-10-13'
+method: searched
+source: https://docs.btse.com/spot/changelog
+scheme: semver (per product)
+current_version: 3.4.17
+docs: https://docs.btse.com/spot/changelog
+entries:
+- version: 3.4.17
+  date: '2026-03-16'
+  breaking: false
+  highlights:
+  - Create new order - update price description and add STOP / TAKE PROFIT / TRAILING
+    STOP MARKET examples
+- version: 3.4.16
+  date: '2025-09-22'
+  breaking: false
+  highlights:
+  - Create new order adds triggerPriceType (INDEX_PRICE or LAST_PRICE)
+- version: 3.4.15
+  date: '2025-04-09'
+  breaking: false
+  highlights:
+  - Update description of request field type for Amend order
+- version: 3.4.14
+  date: '2024-11-06'
+  breaking: false
+  highlights:
+  - Maximum days of trade history explanation for Query User Trades Fills
+- version: 3.4.13
+  date: '2024-10-30'
+  breaking: false
+  highlights:
+  - Add TIMEOUT status for Create/Amend/Cancel order
+- version: 3.4.10
+  date: '2024-07-10'
+  breaking: false
+  highlights:
+  - Add rate limit mechanism description
+product_changelogs:
+- https://docs.btse.com/spot/changelog
+- https://docs.btse.com/futures/changelog
+- https://docs.btse.com/wallet/changelog
+- https://docs.btse.com/earn/changelog
+- https://docs.btse.com/otc/changelog
+- https://docs.btse.com/fix/changelog

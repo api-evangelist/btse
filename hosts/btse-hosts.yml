@@ -1,0 +1,140 @@
+generated: '2026-10-13'
+method: derived
+source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
+generator: derive-hosts.py
+summary:
+  hosts: 9
+  own: 5
+  other_domain: 2
+  platform: 2
+  roles:
+  - api
+  - docs
+  - other
+  - portal
+  - source
+  - support
+  - website
+hosts:
+- host: api.btse.com
+  found_by:
+  - apis[]
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types: []
+  serves:
+  - api
+  - cdn
+  vendor: cloudflare
+  registrable_domain: btse.com
+  role: api
+  relation: own
+- host: api.btse.com`
+  found_by:
+  - pointer
+  types:
+  - DeveloperPortal
+  serves: []
+  registrable_domain: btse.com`
+  role: portal
+  relation: other-domain
+- host: app.btse.com
+  found_by:
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: btse.com
+  role: other
+  relation: own
+- host: docs.btse.com
+  found_by:
+  - pointer
+  - apis[]
+  - probed
+  - site-links
+  - namespace-probe
+  - docs-index
+  - spec-found
+  - contract-discovery
+  - well-known
+  types:
+  - Documentation
+  - GettingStarted
+  - APIReference
+  - ChangeLog
+  serves:
+  - docs
+  - spec
+  title: API Documentation | BTSE API Documentation
+  status: 200
+  registrable_domain: btse.com
+  role: docs
+  relation: own
+- host: github.com
+  found_by:
+  - pointer
+  types:
+  - GitHubOrganization
+  serves: []
+  registrable_domain: github.com
+  role: source
+  relation: platform
+- host: openapi-generator.tech
+  found_by:
+  - docs-index
+  types: []
+  serves:
+  - docs
+  registrable_domain: openapi-generator.tech
+  role: other
+  relation: other-domain
+- host: raw.githubusercontent.com
+  found_by:
+  - spec-found
+  types: []
+  serves:
+  - spec
+  registrable_domain: githubusercontent.com
+  role: other
+  relation: platform
+- host: support.btse.com
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - Support
+  serves:
+  - support
+  vendor: freshdesk
+  registrable_domain: btse.com
+  role: support
+  relation: own
+- host: www.btse.com
+  found_by:
+  - pointer
+  - probed
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - Website
+  - Login
+  - SignUp
+  - TermsOfService
+  - PrivacyPolicy
+  serves:
+  - cdn
+  vendor: cloudfront
+  registrable_domain: btse.com
+  role: website
+  relation: own

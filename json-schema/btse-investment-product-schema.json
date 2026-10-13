@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-investment-product-schema.json",
+  "title": "InvestmentProduct",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-earn-openapi.yml#/components/schemas/InvestmentProduct",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Product ID"
+    },
+    "name": {
+      "type": "string",
+      "description": "Product name"
+    },
+    "currency": {
+      "type": "string",
+      "description": "Currency"
+    },
+    "type": {
+      "type": "string",
+      "description": "Product type (e.g. Flex)"
+    },
+    "startDate": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Investment start date (Unix ms)"
+    },
+    "interestStartDate": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Interest accrual start date (Unix ms)"
+    },
+    "rates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/RateObject"
+      },
+      "description": "Interest rate tiers"
+    },
+    "compounding": {
+      "type": "boolean",
+      "description": "Whether the product compounds"
+    },
+    "autoRenewSupported": {
+      "type": "boolean",
+      "description": "Whether auto-renew is supported"
+    },
+    "dailyLimit": {
+      "type": "number",
+      "description": "Daily investment limit"
+    },
+    "minSize": {
+      "type": "number",
+      "description": "Minimum investment size"
+    },
+    "incrementalSize": {
+      "type": "number",
+      "description": "Investment step size"
+    }
+  },
+  "$defs": {
+    "RateObject": {
+      "type": "object",
+      "properties": {
+        "days": {
+          "type": "integer",
+          "description": "Duration in days"
+        },
+        "rate": {
+          "type": "number",
+          "description": "Interest rate"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-ticker24-hr-full-array-response-schema.json",
+  "title": "Ticker24HrFullArrayResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-markets-openapi.yml#/components/schemas/Ticker24HrFullArrayResponse",
+  "allOf": [
+    {
+      "$ref": "#/$defs/CommonResponse"
+    },
+    {
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Ticker24HrFullItem"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "CommonResponse": {
+      "type": "object",
+      "required": [
+        "success",
+        "code",
+        "msg",
+        "time"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Whether the request succeeded. `true` when HTTP status is `200`"
+        },
+        "code": {
+          "type": "integer",
+          "description": "Status code. `1` on success"
+        },
+        "msg": {
+          "type": "string",
+          "description": "Status message"
+        },
+        "time": {
+          "type": "number",
+          "description": "Current unix timestamp"
+        }
+      }
+    },
+    "Ticker24HrFullItem": {
+      "type": "object",
+      "required": [
+        "symbol",
+        "lastPrice",
+        "openPrice",
+        "highPrice",
+        "lowPrice",
+        "amount",
+        "volume",
+        "openTime",
+        "closeTime",
+        "priceChange",
+        "priceChangePercent",
+        "prevClosePrice",
+        "bidPrice",
+        "bidQty",
+        "askPrice",
+        "askQty"
+      ],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "description": "Symbol name"
+        },
+        "lastPrice": {
+          "type": "string",
+          "description": "Closing price of the interval"
+        },
+        "openPrice": {
+          "type": "string",
+          "description": "Opening price of the interval"
+        },
+        "highPrice": {
+          "type": "string",
+          "description": "Highest price of the interval"
+        },
+        "lowPrice": {
+          "type": "string",
+          "description": "Lowest price of the interval"
+        },
+        "amount": {
+          "type": "string",
+          "description": "Total base currency amount"
+        },
+        "volume": {
+          "type": "string",
+          "description": "Total quote currency volume"
+        },
+        "openTime": {
+          "type": "number",
+          "description": "Starting time of the interval"
+        },
+        "closeTime": {
+          "type": "number",
+          "description": "Closing time of the interval"
+        },
+        "priceChange": {
+          "type": "string",
+          "description": "Difference between open and last price (`lastPrice` − `openPrice`)"
+        },
+        "priceChangePercent": {
+          "type": "string",
+          "description": "Percentage of price change (`priceChange` / `openPrice`)"
+        },
+        "prevClosePrice": {
+          "type": "string",
+          "description": "Previous close price"
+        },
+        "bidPrice": {
+          "type": "string",
+          "description": "Highest bid price"
+        },
+        "bidQty": {
+          "type": "string",
+          "description": "Quantity at highest bid price"
+        },
+        "askPrice": {
+          "type": "string",
+          "description": "Lowest ask price"
+        },
+        "askQty": {
+          "type": "string",
+          "description": "Quantity at lowest ask price"
+        },
+        "openInterest": {
+          "type": "string",
+          "description": "Open interest in contracts (futures only)"
+        },
+        "fundingRate": {
+          "type": "string",
+          "description": "Funding rate (futures only)"
+        },
+        "nextFundingTime": {
+          "type": "number",
+          "description": "Next funding time (futures only)"
+        },
+        "fundingIntervalMinutes": {
+          "type": "number",
+          "description": "Funding interval in minutes (futures only)"
+        }
+      }
+    }
+  }
+}

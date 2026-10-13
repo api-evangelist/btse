@@ -1,0 +1,10 @@
+generated: '2026-10-13'
+method: searched
+source: https://docs.btse.com/authentication
+description: Testnet endpoints mirror production behaviour, for testing an integration without risking real funds.
+docs: https://docs.btse.com/authentication
+environments:
+- {product: Spot REST, production: https://api.btse.com/spot, testnet: https://testapi.btse.io/spot}
+- {product: Spot WebSocket, production: wss://ws.btse.com/ws/spot, testnet: wss://testws.btse.io/ws/spot}
+- {product: Futures REST, production: https://api.btse.com/futures, testnet: https://testapi.btse.io/futures}
+- {product: Futures WebSocket, production: wss://ws.btse.com/ws/futures, testnet: wss://testws.btse.io/ws/futures}

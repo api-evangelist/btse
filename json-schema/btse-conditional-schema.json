@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-conditional-schema.json",
+  "title": "Conditional",
+  "description": "Conditional (Trigger) order — placed on the book once a trigger price is reached",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-spot-openapi.yml#/components/schemas/Conditional",
+  "allOf": [
+    {
+      "$ref": "#/$defs/PlaceAlgoOrderReq"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "description": "Trading pair, e.g. BTC-USDT"
+        },
+        "orderType": {
+          "type": "string",
+          "description": "CONDITIONAL",
+          "enum": [
+            "LIMIT",
+            "MARKET",
+            "PEG",
+            "OCO",
+            "TWAP",
+            "CONDITIONAL",
+            "TRAILING"
+          ]
+        },
+        "orderSide": {
+          "type": "string",
+          "description": "BUY or SELL",
+          "enum": [
+            "BUY",
+            "SELL"
+          ]
+        },
+        "triggerPrice": {
+          "type": "number",
+          "format": "double",
+          "description": "Price that activates the order"
+        },
+        "triggerOrderType": {
+          "type": "string",
+          "description": "Trigger behavior: STOP_LOSS, TAKE_PROFIT, STOP_LOSS_LIMIT, or TAKE_PROFIT_LIMIT",
+          "enum": [
+            "STOP_LOSS",
+            "TAKE_PROFIT",
+            "STOP_LOSS_LIMIT",
+            "TAKE_PROFIT_LIMIT"
+          ]
+        },
+        "triggerPriceType": {
+          "type": "string",
+          "description": "Reference price for the trigger (LAST_PRICE, MARK_PRICE, or INDEX_PRICE)",
+          "enum": [
+            "INDEX_PRICE",
+            "LAST_PRICE",
+            "MARK_PRICE"
+          ]
+        },
+        "clOrderId": {
+          "type": "string",
+          "description": "Client-supplied order identifier, echoed in the response (max 64 characters)"
+        },
+        "orderSize": {
+          "type": "number",
+          "format": "double",
+          "description": "Order quantity in base currency; required for SELL market and for the STOP_LOSS_LIMIT / TAKE_PROFIT_LIMIT variants"
+        },
+        "quoteOrderSize": {
+          "type": "number",
+          "format": "double",
+          "description": "only for market order in BUY side"
+        },
+        "orderPrice": {
+          "type": "number",
+          "format": "double",
+          "description": "only for limit order"
+        },
+        "timeInForce": {
+          "type": "string",
+          "default": "GTC",
+          "description": "Time-in-force policy for the limit variants (GTC, IOC, FOK)",
+          "enum": [
+            "FOK",
+            "IOC",
+            "GTC",
+            "HALFMIN",
+            "FIVEMIN",
+            "HOUR",
+            "TWELVEHOUR",
+            "DAY",
+            "WEEK",
+            "MONTH"
+          ]
+        },
+        "postOnly": {
+          "type": "boolean",
+          "description": "If true, reject the limit variant if it would immediately match (post-only / maker-only)"
+        }
+      }
+    }
+  ],
+  "required": [
+    "orderSide",
+    "orderType",
+    "symbol",
+    "triggerOrderType",
+    "triggerPrice",
+    "triggerPriceType"
+  ],
+  "$defs": {
+    "PlaceAlgoOrderReq": {
+      "properties": {
+        "orderType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "orderType"
+      ]
+    }
+  }
+}

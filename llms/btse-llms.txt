@@ -1,0 +1,164 @@
+# BTSE API Documentation
+
+> Developer documentation for the BTSE API. Covers REST and WebSocket interfaces for Markets, Spot, Futures, Wallet, Earn, OTC, FIX, Spot (Legacy v3.3), Futures (Legacy v2.3), plus authentication, error handling, and client SDKs.
+
+OpenAPI 3.0.3 (REST) and AsyncAPI 2.6.0 (WebSocket) specs are the single source of truth and are served alongside the docs. Production hosts: `api.btse.com` (REST) and `wss://ws.btse.com` (WebSocket). Testnet hosts: `testapi.btse.io` and `wss://testws.btse.io`.
+
+## Getting Started
+
+- [Quickstart](https://docs.btse.com/quickstart): End-to-end first trade — create API keys, sign a request, place an order.
+- [Authentication](https://docs.btse.com/authentication): HMAC-SHA384 signing scheme with multi-language examples.
+- [Error Codes](https://docs.btse.com/error-codes): HTTP status codes and API-level error reference.
+- [WebSocket Guide](https://docs.btse.com/websocket-guide): Connection lifecycle, authentication, reconnection strategy, and topic index.
+- [Order Lifecycle](https://docs.btse.com/order-lifecycle): Order states, transitions, and event semantics across REST and WebSocket.
+- [Client SDKs](https://docs.btse.com/sdks): Downloadable Python, JavaScript, Java SDKs generated from the OpenAPI specs.
+- [Auth Tester](https://docs.btse.com/auth-tester): Interactive signature generator and live request tool.
+
+## Markets
+
+REST base: `https://api.btse.com`
+
+- [Overview](https://docs.btse.com/markets/overview)
+- [Exchange Rule and Symbol Information](https://docs.btse.com/markets/rest/get-exchange-info)
+- [Markets Information](https://docs.btse.com/markets/rest/get-markets)
+- [Order Book](https://docs.btse.com/markets/rest/get-orderbook)
+- [Recent Trades List](https://docs.btse.com/markets/rest/get-recent-trades)
+- [Klines (OHLCV)](https://docs.btse.com/markets/rest/get-klines)
+- [24hr Ticker Price Change](https://docs.btse.com/markets/rest/get-24-hr-ticker)
+- [Price Ticker](https://docs.btse.com/markets/rest/get-price-ticker)
+- [Ticker Indices](https://docs.btse.com/markets/rest/get-indices-ticker)
+- [Ticker Order Book Level 1](https://docs.btse.com/markets/rest/get-level-1-ticker)
+- [Funding Rate History](https://docs.btse.com/markets/rest/get-funding-rate-history)
+- [Market Risk Limits](https://docs.btse.com/markets/rest/get-market-risk-limits)
+
+## Spot
+
+REST base: `https://api.btse.com`
+
+- [Overview](https://docs.btse.com/spot/overview)
+- [Changelog](https://docs.btse.com/spot/changelog)
+- [List orders](https://docs.btse.com/spot/rest/get-orders)
+- [Amend order](https://docs.btse.com/spot/rest/amend-order)
+- [Place order](https://docs.btse.com/spot/rest/place-order)
+- [Cancel order](https://docs.btse.com/spot/rest/cancel-order)
+- [Cancel all orders after](https://docs.btse.com/spot/rest/cancel-all-after)
+- [Place algo order](https://docs.btse.com/spot/rest/place-algo-order)
+- [Trade history](https://docs.btse.com/spot/rest/get-trade-history)
+- [Get order](https://docs.btse.com/spot/rest/get-order)
+- [Get fees](https://docs.btse.com/spot/rest/get-fees)
+- [Cancel all orders](https://docs.btse.com/spot/rest/cancel-all-orders)
+
+WebSocket: `wss://ws.btse.com/ws/spot`
+
+- [Ping / Pong](https://docs.btse.com/spot/websocket/ping-pong)
+- [Subscription](https://docs.btse.com/spot/websocket/subscription)
+- [WebSocket Authentication](https://docs.btse.com/spot/websocket/websocket-authentication)
+- [OSS L1 Snapshot](https://docs.btse.com/spot/websocket/oss-l1-snapshot)
+- [Orderbook Incremental Updates](https://docs.btse.com/spot/websocket/orderbook-incremental-updates)
+- [Public Trade Fills](https://docs.btse.com/spot/websocket/public-trade-fills)
+- [Notifications](https://docs.btse.com/spot/websocket/notifications)
+- [User Trade Fills](https://docs.btse.com/spot/websocket/user-trade-fills)
+
+## Futures
+
+REST base: `https://api.btse.com/futures/api`
+
+- [Overview](https://docs.btse.com/futures/overview)
+- [Changelog](https://docs.btse.com/futures/changelog)
+- [Get orders](https://docs.btse.com/futures/rest/get-orders)
+- [Amend an order](https://docs.btse.com/futures/rest/amend-order)
+- [Place an order](https://docs.btse.com/futures/rest/place-order)
+- [Cancel an order](https://docs.btse.com/futures/rest/cancel-order)
+- [Change settlement currency](https://docs.btse.com/futures/rest/settle-in)
+- [Get risk limit](https://docs.btse.com/futures/rest/get-risk-limit)
+- [Change risk limit](https://docs.btse.com/futures/rest/change-risk-limit)
+- [Bind take-profit / stop-loss to a position](https://docs.btse.com/futures/rest/bind-position-tp-sl)
+- [Get position mode](https://docs.btse.com/futures/rest/get-position-mode)
+- [Change position mode](https://docs.btse.com/futures/rest/change-position-mode)
+- [Cancel all after (dead man's switch)](https://docs.btse.com/futures/rest/cancel-all-after)
+- [Place an algo order](https://docs.btse.com/futures/rest/place-algo-order)
+- [Get leverage settings](https://docs.btse.com/futures/rest/get-leverage)
+- [Set leverage](https://docs.btse.com/futures/rest/change-leverage)
+- [Get trade history](https://docs.btse.com/futures/rest/get-trade-history)
+- [Get open positions](https://docs.btse.com/futures/rest/get-positions)
+- [Close a position](https://docs.btse.com/futures/rest/close-position)
+- [Get margin settings](https://docs.btse.com/futures/rest/get-margin-setting)
+
+WebSocket: `wss://ws.btse.com/ws/futures`
+
+- [Ping / Pong](https://docs.btse.com/futures/websocket/ping-pong)
+- [Subscription](https://docs.btse.com/futures/websocket/subscription)
+- [WebSocket Authentication](https://docs.btse.com/futures/websocket/websocket-authentication)
+- [OSS L1 Snapshot](https://docs.btse.com/futures/websocket/oss-l1-snapshot)
+- [Orderbook Incremental Updates](https://docs.btse.com/futures/websocket/orderbook-incremental-updates)
+- [Public Trade Fills](https://docs.btse.com/futures/websocket/public-trade-fills)
+- [Notifications](https://docs.btse.com/futures/websocket/notifications)
+- [User Trade Fills](https://docs.btse.com/futures/websocket/user-trade-fills)
+- [All Position](https://docs.btse.com/futures/websocket/all-position)
+- [Positions](https://docs.btse.com/futures/websocket/positions)
+
+## Wallet
+
+REST base: `https://api.btse.com`
+
+- [Overview](https://docs.btse.com/wallet/overview)
+- [Changelog](https://docs.btse.com/wallet/changelog)
+- [Assets](https://docs.btse.com/wallet/rest/get-assets)
+- [Crypto List](https://docs.btse.com/wallet/rest/get-crypto-list)
+- [Crypto Networks](https://docs.btse.com/wallet/rest/get-crypto-networks)
+- [Get Asset Exchange Rate](https://docs.btse.com/wallet/rest/get-asset-exchange-rate)
+- [User Wallet](https://docs.btse.com/wallet/rest/get-user-assets)
+- [User Wallet History](https://docs.btse.com/wallet/rest/get-user-wallet-history)
+- [Query Address](https://docs.btse.com/wallet/rest/get-address)
+- [Create Address](https://docs.btse.com/wallet/rest/create-address)
+- [Delete Address](https://docs.btse.com/wallet/rest/delete-address)
+- [Withdraw](https://docs.btse.com/wallet/rest/withdraw)
+- [Send To (transfer to user)](https://docs.btse.com/wallet/rest/send-to)
+- [Convert](https://docs.btse.com/wallet/rest/convert)
+
+## Earn
+
+REST base: `https://api.btse.com/spot`
+
+- [Overview](https://docs.btse.com/earn/overview)
+- [Changelog](https://docs.btse.com/earn/changelog)
+- [Query Investment Products](https://docs.btse.com/earn/rest/get-investment-products)
+- [Deposit Investment](https://docs.btse.com/earn/rest/deposit-investment)
+- [Renew Investment](https://docs.btse.com/earn/rest/renew-investment)
+- [Redeem Investment](https://docs.btse.com/earn/rest/redeem-investment)
+- [Query Investment Orders](https://docs.btse.com/earn/rest/get-investment-orders)
+- [Query Investment History](https://docs.btse.com/earn/rest/get-investment-history)
+
+## OTC
+
+REST base: `https://api.btse.com`
+
+- [Overview](https://docs.btse.com/otc/overview)
+- [Changelog](https://docs.btse.com/otc/changelog)
+- [Get OTC Markets](https://docs.btse.com/otc/rest/get-otc-markets)
+- [Request Quote](https://docs.btse.com/otc/rest/request-quote)
+- [Query Quote](https://docs.btse.com/otc/rest/get-quote)
+- [Accept Quote](https://docs.btse.com/otc/rest/accept-quote)
+
+WebSocket: `wss://ws.btse.com/ws/otc`
+
+- [WebSocket Authentication](https://docs.btse.com/otc/websocket/websocket-authentication)
+- [Quote Stream](https://docs.btse.com/otc/websocket/quote-stream)
+
+## FIX
+
+- [Overview](https://docs.btse.com/fix/overview)
+- [Changelog](https://docs.btse.com/fix/changelog)
+
+## Optional
+
+- [Markets REST OpenAPI Spec](https://docs.btse.com/specs/markets-rest.openapi.yaml)
+- [Spot REST OpenAPI Spec](https://docs.btse.com/specs/spot_openapi_v4.yaml)
+- [Futures REST OpenAPI Spec](https://docs.btse.com/specs/futures_openapi_v3.yaml)
+- [Wallet REST OpenAPI Spec](https://docs.btse.com/specs/wallet-rest.openapi.yaml)
+- [Earn REST OpenAPI Spec](https://docs.btse.com/specs/earn-rest.openapi.yaml)
+- [OTC REST OpenAPI Spec](https://docs.btse.com/specs/otc-rest.openapi.yaml)
+- [Spot WebSocket AsyncAPI Spec](https://docs.btse.com/specs/spot-websocket.asyncapi.yaml)
+- [Futures WebSocket AsyncAPI Spec](https://docs.btse.com/specs/futures-websocket.asyncapi.yaml)
+- [OTC WebSocket AsyncAPI Spec](https://docs.btse.com/specs/otc-websocket.asyncapi.yaml)
+- [API Explorer (interactive)](https://docs.btse.com/api-explorer)

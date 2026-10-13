@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-order-resp-schema.json",
+  "title": "OrderResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-futures-openapi.yml#/components/schemas/OrderResp",
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "description": "Server-assigned order id."
+    },
+    "clOrderId": {
+      "type": "string",
+      "description": "Client-assigned order id echoed from placement."
+    },
+    "symbol": {
+      "type": "string",
+      "description": "Trading pair symbol."
+    },
+    "orderSide": {
+      "type": "string",
+      "description": "Order side: BUY or SELL.",
+      "enum": [
+        "BUY",
+        "SELL"
+      ]
+    },
+    "type": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Order type code."
+    },
+    "orderPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Limit price of the order."
+    },
+    "originalOrderSize": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Original order size in number of contracts at placement."
+    },
+    "currentOrderSize": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Current remaining order size in number of contracts after fills and amendments."
+    },
+    "totalFilledSize": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Cumulative filled size in number of contracts."
+    },
+    "remainingSize": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Remaining unfilled size in number of contracts."
+    },
+    "averageFillPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Average fill price across executions so far."
+    },
+    "orderState": {
+      "type": "string",
+      "description": "Human-readable order state name."
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Server timestamp of the last state change, in milliseconds since epoch."
+    },
+    "reduceOnly": {
+      "type": "boolean",
+      "description": "True if the order can only reduce an existing position."
+    },
+    "positionMode": {
+      "type": "string",
+      "description": "Position mode this order applies to (one-way or hedge).",
+      "enum": [
+        "ONE_WAY",
+        "HEDGE",
+        "ISOLATED"
+      ]
+    },
+    "positionDirection": {
+      "type": "string",
+      "description": "Position direction the order affects: LONG or SHORT.",
+      "enum": [
+        "LONG",
+        "SHORT"
+      ]
+    },
+    "positionId": {
+      "type": "string",
+      "description": "Identifier of the position the order is bound to."
+    },
+    "closeOrder": {
+      "type": "boolean",
+      "description": "True if the order is a close-position order."
+    },
+    "pegPriceMin": {
+      "type": "number",
+      "format": "double",
+      "description": "Lower bound of the peg order price band."
+    },
+    "pegPriceMax": {
+      "type": "number",
+      "format": "double",
+      "description": "Upper bound of the peg order price band."
+    },
+    "pegPriceDeviation": {
+      "type": "number",
+      "format": "double",
+      "description": "Offset applied to the pegged reference price."
+    },
+    "currentPegPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Current pegged working price."
+    },
+    "triggerOrder": {
+      "type": "boolean",
+      "description": "True if this order is a conditional trigger order that has not yet fired."
+    },
+    "triggered": {
+      "type": "boolean",
+      "description": "True once the trigger condition has fired."
+    },
+    "triggerPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Configured trigger price."
+    },
+    "triggerOriginalPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Original submitted trigger price prior to any amendment."
+    },
+    "triggerOrderType": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Order type code the trigger will submit once fired."
+    },
+    "triggerTrailingStopDeviation": {
+      "type": "number",
+      "format": "double",
+      "description": "Trailing distance for the trigger's trailing-stop behavior."
+    },
+    "triggerStopPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Stop price used by the triggered order once activated."
+    },
+    "triggerUseLastPrice": {
+      "type": "boolean",
+      "description": "True if last-traded-price is used as the trigger reference, otherwise mark price is used."
+    },
+    "trailValue": {
+      "type": "number",
+      "format": "double",
+      "description": "Trailing distance the stop maintains from the best reached reference price."
+    },
+    "trailValueType": {
+      "type": "string",
+      "description": "How trailValue is interpreted (absolute price offset or percentage).",
+      "enum": [
+        "DISTANCE",
+        "PERCENTAGE"
+      ]
+    },
+    "activationPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Price at which trailing or scheduled logic activates."
+    },
+    "activationPriceType": {
+      "type": "string",
+      "description": "Reference price type used to evaluate the activation price.",
+      "enum": [
+        "INDEX_PRICE",
+        "LAST_PRICE",
+        "MARK_PRICE"
+      ]
+    },
+    "takeProfitOrder": {
+      "$ref": "#/$defs/TriggerOrderResp",
+      "description": "Attached take-profit trigger, if any."
+    },
+    "stopLossOrder": {
+      "$ref": "#/$defs/TriggerOrderResp",
+      "description": "Attached stop-loss trigger, if any."
+    },
+    "cancelDuration": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Cancel duration in milliseconds derived from time-in-force. Zero for GTC."
+    },
+    "timeInForce": {
+      "type": "string",
+      "description": "Time-in-force policy applied to the order (e.g. GTC, IOC, FOK)."
+    },
+    "stealth": {
+      "type": "number",
+      "format": "double",
+      "description": "Portion of the order size displayed on the book; the remainder is hidden."
+    },
+    "contractSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Contract size (units of underlying per contract) for this symbol."
+    },
+    "wrapperOrder": {
+      "type": "boolean",
+      "description": "True if the order is a wrapper that spawns child orders (e.g. activation wrappers)."
+    },
+    "ocoPeerOrderId": {
+      "type": "string",
+      "description": "Order id of the peer OCO leg, if this order is part of an OCO pair."
+    },
+    "orderDetailType": {
+      "type": "string",
+      "description": "Fine-grained order detail type classification.",
+      "enum": [
+        "TWAP",
+        "PARTIAL_LIQUIDATION",
+        "FORCED_MARKET_BUY",
+        "FORCED_MARKET_SELL"
+      ]
+    },
+    "originalOrderValue": {
+      "type": "number",
+      "format": "double",
+      "description": "Notional value at placement, computed from original size, contract size and reference price."
+    },
+    "currentOrderValue": {
+      "type": "number",
+      "format": "double",
+      "description": "Current notional value, computed from remaining size, contract size and current working price."
+    }
+  },
+  "$defs": {
+    "TriggerOrderResp": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "description": "Server-assigned order id of the attached trigger order."
+        },
+        "side": {
+          "type": "string",
+          "description": "Order side of the trigger leg: BUY or SELL.",
+          "enum": [
+            "BUY",
+            "SELL"
+          ]
+        },
+        "triggerPrice": {
+          "type": "number",
+          "format": "double",
+          "description": "Price at which this trigger fires."
+        },
+        "triggerUseLastPrice": {
+          "type": "boolean",
+          "description": "True if last-traded-price is used as the trigger reference, otherwise mark price is used."
+        }
+      }
+    }
+  }
+}

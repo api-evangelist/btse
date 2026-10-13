@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-position-resp-schema.json",
+  "title": "PositionResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-futures-openapi.yml#/components/schemas/PositionResp",
+  "type": "object",
+  "properties": {
+    "marginType": {
+      "type": "string",
+      "description": "Margin mode of the position (e.g. CROSS or ISOLATED).",
+      "enum": [
+        "CROSS",
+        "SPOT",
+        "ISOLATED",
+        "LEAD",
+        "COPY",
+        "ALL"
+      ]
+    },
+    "entryPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Average entry price of the position."
+    },
+    "markPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Latest mark price used to value the position."
+    },
+    "symbol": {
+      "type": "string",
+      "description": "Market symbol of the position (e.g. BTC-PERP)."
+    },
+    "side": {
+      "type": "string",
+      "description": "Side of the position (BUY for long, SELL for short).",
+      "enum": [
+        "BUY",
+        "SELL"
+      ]
+    },
+    "notionalValue": {
+      "type": "number",
+      "format": "double",
+      "description": "Notional value of the position, in the settlement currency."
+    },
+    "settleWithAsset": {
+      "type": "string",
+      "description": "Asset used to settle PnL and fees for this position."
+    },
+    "unrealizedProfitLoss": {
+      "type": "number",
+      "format": "double",
+      "description": "Unrealized profit or loss at the latest mark price."
+    },
+    "totalMaintenanceMargin": {
+      "type": "number",
+      "format": "double",
+      "description": "Total maintenance margin currently required for the position."
+    },
+    "size": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Position size, in contracts."
+    },
+    "liquidationPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Estimated liquidation price based on the current margin and mark price."
+    },
+    "isolatedLeverage": {
+      "type": "number",
+      "format": "double",
+      "description": "Isolated leverage configured on the position; only applicable in isolated margin mode."
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Server timestamp of the position snapshot, in milliseconds since epoch."
+    },
+    "takeProfitOrder": {
+      "$ref": "#/$defs/TPSLObject",
+      "description": "Take-profit trigger currently attached to the position, if any."
+    },
+    "stopLossOrder": {
+      "$ref": "#/$defs/TPSLObject",
+      "description": "Stop-loss trigger currently attached to the position, if any."
+    },
+    "positionMode": {
+      "type": "string",
+      "description": "Position mode: ONE_WAY (net position) or HEDGE (independent long and short positions).",
+      "enum": [
+        "ONE_WAY",
+        "HEDGE",
+        "ISOLATED"
+      ]
+    },
+    "positionDirection": {
+      "type": "string",
+      "description": "Position direction in hedge mode (LONG or SHORT).",
+      "enum": [
+        "LONG",
+        "SHORT"
+      ]
+    },
+    "positionId": {
+      "type": "string",
+      "description": "Unique identifier of the position."
+    },
+    "walletName": {
+      "type": "string",
+      "description": "Name of the wallet holding the position."
+    },
+    "currentLeverage": {
+      "type": "number",
+      "format": "double",
+      "description": "Effective leverage currently applied to the position."
+    },
+    "minimumRequiredMargin": {
+      "type": "number",
+      "format": "double",
+      "description": "Minimum initial margin required to hold the position at its current size."
+    }
+  },
+  "$defs": {
+    "TPSLObject": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "side": {
+          "type": "string",
+          "enum": [
+            "BUY",
+            "SELL"
+          ]
+        },
+        "triggerPrice": {
+          "type": "number",
+          "format": "double"
+        },
+        "triggerUseLastPrice": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

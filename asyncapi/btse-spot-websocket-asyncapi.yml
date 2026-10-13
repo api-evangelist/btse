@@ -1,0 +1,771 @@
+asyncapi: 2.6.0
+info:
+  title: Spot WebSocket API
+  version: 3.2.0
+  description: 'Spot WebSocket streams for real-time market data and private user
+    events.
+
+
+    **OSS Endpoint (Orderbook):** `wss://ws.btse.com/ws/oss/spot`
+
+    **Main Endpoint:** `wss://ws.btse.com/ws/spot`
+
+    **Testnet OSS:** `wss://testws.btse.io/ws/oss/spot`
+
+    **Testnet Main:** `wss://testws.btse.io/ws/spot`
+
+
+    **Authentication:** Private topics require sending an `authKeyExpires` message
+
+    with HMAC-SHA384 signature: `HMAC-SHA384(secret, "/ws/spot" + nonce)`
+
+    '
+servers:
+  oss-production:
+    url: wss://ws.btse.com/ws/oss/spot
+    protocol: wss
+    description: Production — Order Stream Service (orderbook data)
+  oss-testnet:
+    url: wss://testws.btse.io/ws/oss/spot
+    protocol: wss
+    description: Testnet — Order Stream Service
+  main-production:
+    url: wss://ws.btse.com/ws/spot
+    protocol: wss
+    description: Production — Main WebSocket (trades, auth, notifications)
+  main-testnet:
+    url: wss://testws.btse.io/ws/spot
+    protocol: wss
+    description: Testnet — Main WebSocket
+channels:
+  ping:
+    description: 'Send a plain text `ping` to keep the connection alive. The server
+      responds with `pong`.
+
+      '
+    servers:
+    - main-production
+    - main-testnet
+    - oss-production
+    - oss-testnet
+    publish:
+      operationId: sendPing
+      summary: Ping
+      message:
+        payload:
+          type: string
+          const: ping
+    subscribe:
+      operationId: receivePong
+      summary: Pong
+      message:
+        payload:
+          type: string
+          const: pong
+  subscription:
+    description: Subscribe or unsubscribe from any topic.
+    servers:
+    - main-production
+    - main-testnet
+    - oss-production
+    - oss-testnet
+    publish:
+      operationId: subscribe
+      summary: Subscribe / Unsubscribe
+      message:
+        payload:
+          $ref: '#/components/schemas/SubscriptionRequest'
+    subscribe:
+      operationId: subscriptionAck
+      summary: Subscription Acknowledgement
+      message:
+        payload:
+          $ref: '#/components/schemas/SubscriptionResponse'
+  auth:
+    description: 'Authenticate the session to access private topics (Notifications,
+      User Trade Fills).
+
+      Signature: `HMAC-SHA384(secret, "/ws/spot" + nonce)`
+
+      '
+    servers:
+    - main-production
+    - main-testnet
+    publish:
+      operationId: authenticate
+      summary: WebSocket Authentication
+      message:
+        payload:
+          $ref: '#/components/schemas/AuthRequest'
+  snapshotL1:{symbol}:
+    description: 'Subscribe to the best bid / best ask (Level 1) for a market.
+
+      **Topic format:** `snapshotL1:<symbol>` (e.g. `snapshotL1:BTC-USD`)
+
+
+      Each message is a full snapshot of the current best bid / best ask. The `bids`
+      and `asks` arrays
+
+      each contain a single `[price, size]` tuple representing the top of book, and
+      the `type` field
+
+      is always `snapshotL1`.
+
+
+      Bids and asks are sent in `price` and `size` tuples as strings to preserve precision;
+
+      clients should parse them with a high-precision type (e.g. `BigDecimal`, `decimal.js`)
+
+      before performing arithmetic.
+
+
+      Because every push is a full snapshot, clients can simply overwrite the local
+      copy on each
+
+      message — there is no sequence number, and no delta merging is required. If
+      the connection
+
+      drops, re-subscribe to the topic to resume receiving updates.
+
+      '
+    parameters:
+      symbol:
+        description: Market symbol (e.g. BTC-USD)
+        schema:
+          type: string
+    servers:
+    - oss-production
+    - oss-testnet
+    publish:
+      operationId: subscribeL1Snapshot
+      message:
+        oneOf:
+        - $ref: '#/components/messages/L1Subscribe'
+        - $ref: '#/components/messages/L1Unsubscribe'
+    subscribe:
+      operationId: receiveL1Snapshot
+      summary: OSS L1 Snapshot
+      message:
+        payload:
+          $ref: '#/components/schemas/L1SnapshotMessage'
+  update:{symbol}_{grouping}:
+    description: 'Subscribe to orderbook incremental updates through the `update`
+      topic.
+
+      **Topic format:** `update:<symbol>_<grouping>` (e.g. `update:BTC-USD_0`)
+
+
+      The `_grouping` suffix represents the granularity of price-level aggregation.
+
+      Valid values are `0` to `8`. If the suffix is omitted (e.g. `update:BTC-USD`),
+
+      `_0` is used by default. Different grouping values produce independent topic
+
+      subscriptions and caches.
+
+
+      The first response received will be a snapshot of the current orderbook
+
+      (indicated by the `type` field) with up to 50 levels. Incremental updates
+
+      will be sent in subsequent packets with type `delta`.
+
+
+      Bids and asks will be sent in `price` and `size` tuples. The size sent will
+
+      be the new updated size for the price. If a value of `"0"` is sent, the price
+
+      should be removed from the local copy of the orderbook.
+
+
+      To ensure that the updates are received in sequence, `seqNum` indicates the
+
+      current sequence and `prevSeqNum` refers to the packet before. `seqNum` will
+
+      always be one after the `prevSeqNum`. If the sequence is out of order,
+
+      unsubscribe and re-subscribe to the topic again.
+
+
+      Also, if a [crossed orderbook](https://en.wikipedia.org/wiki/Order_book#Crossed_book)
+
+      ever occurs (best bid is higher than or equal to best ask), unsubscribe and
+
+      re-subscribe to the topic again.
+
+      '
+    parameters:
+      symbol:
+        description: Market symbol
+        schema:
+          type: string
+      grouping:
+        description: 'Price-tick grouping level. `0` is the finest grouping (raw book);
+
+          higher values aggregate into wider price buckets.
+
+          '
+        schema:
+          type: integer
+          enum:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+          - 8
+    servers:
+    - oss-production
+    - oss-testnet
+    publish:
+      operationId: subscribeOrderbookUpdate
+      message:
+        oneOf:
+        - $ref: '#/components/messages/L2Subscribe'
+        - $ref: '#/components/messages/L2Unsubscribe'
+    subscribe:
+      operationId: receiveOrderbookUpdate
+      summary: Orderbook Incremental Updates
+      message:
+        oneOf:
+        - $ref: '#/components/messages/OrderbookSnapshot'
+        - $ref: '#/components/messages/OrderbookDelta'
+  tradeHistoryApi:{symbol}:
+    description: 'Real-time public trade feed for a market.
+
+      **Topic:** `tradeHistoryApi:<symbol>` — no authentication required.
+
+      '
+    parameters:
+      symbol:
+        description: Market symbol
+        schema:
+          type: string
+    servers:
+    - main-production
+    - main-testnet
+    subscribe:
+      operationId: receivePublicTrades
+      summary: Public Trade Fills
+      message:
+        payload:
+          $ref: '#/components/schemas/PublicTradeMessage'
+  notificationApiV3:
+    description: 'Real-time order status updates. Requires WebSocket authentication.
+
+      **Topic:** `notificationApiV3`
+
+
+      Includes both base and quote currency size fields (`originalOrderBaseSize`,
+
+      `originalOrderQuoteSize`, `currentOrderBaseSize`, `currentOrderQuoteSize`,
+
+      `filledBaseSize`, `totalFilledBaseSize`, `remainingBaseSize`, `remainingQuoteSize`)
+
+      so that quote-denominated market orders are represented faithfully.
+
+      '
+    servers:
+    - main-production
+    - main-testnet
+    subscribe:
+      operationId: receiveNotifications
+      summary: Notifications
+      message:
+        payload:
+          $ref: '#/components/schemas/NotificationMessage'
+  fills:
+    description: 'Notification whenever an order is filled. Requires WebSocket authentication.
+
+      **Topic:** `fills`
+
+      '
+    servers:
+    - main-production
+    - main-testnet
+    subscribe:
+      operationId: receiveUserFills
+      summary: User Trade Fills
+      message:
+        payload:
+          $ref: '#/components/schemas/UserFillMessage'
+components:
+  schemas:
+    SubscriptionRequest:
+      type: object
+      required:
+      - op
+      - args
+      properties:
+        op:
+          type: string
+          enum:
+          - subscribe
+          - unsubscribe
+          description: Operation
+        args:
+          type: array
+          items:
+            type: string
+          description: Array of topic strings
+      example:
+        op: subscribe
+        args:
+        - tradeHistoryApi:BTC-USD
+    SubscriptionResponse:
+      type: object
+      properties:
+        event:
+          type: string
+          description: Echo of the event type
+        channel:
+          type: array
+          items:
+            type: string
+          description: Successfully subscribed topics
+      example:
+        event: subscribe
+        channel:
+        - tradeHistoryApi:BTC-USD
+    AuthRequest:
+      type: object
+      required:
+      - op
+      - args
+      properties:
+        op:
+          type: string
+          const: authKeyExpires
+          description: Operation — fixed value `authKeyExpires`
+        args:
+          type: array
+          items:
+            type: string
+          minItems: 3
+          maxItems: 3
+          description: '[API_KEY, NONCE, HMAC-SHA384_SIGNATURE]'
+      example:
+        op: authKeyExpires
+        args:
+        - <API_KEY>
+        - <NONCE>
+        - <SIGNATURE>
+    L1SnapshotMessage:
+      type: object
+      properties:
+        topic:
+          type: string
+          description: WebSocket topic
+        data:
+          type: object
+          properties:
+            bids:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+              description: Best bid [price, size]
+            asks:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+              description: Best ask [price, size]
+            symbol:
+              type: string
+              description: Market symbol
+            type:
+              type: string
+              const: snapshotL1
+              description: Always `snapshotL1`
+            timestamp:
+              type: integer
+              format: int64
+              description: Orderbook timestamp (ms)
+      example:
+        topic: snapshotL1:BTC-USD
+        data:
+          bids:
+          - - '28016.7'
+            - '1.48063'
+          asks:
+          - - '28033.6'
+            - '1.34133'
+          type: snapshotL1
+          symbol: BTC-USD
+          timestamp: 1680750154232
+    OrderbookUpdateSchema:
+      type: object
+      properties:
+        topic:
+          type: string
+          description: WebSocket topic
+        data:
+          type: object
+          properties:
+            bids:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+              description: Bid quotes
+            asks:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+              description: Ask quotes
+            seqNum:
+              type: integer
+              description: Current sequence number
+            prevSeqNum:
+              type: integer
+              description: Previous sequence number
+            type:
+              type: string
+              enum:
+              - snapshot
+              - delta
+              description: '`snapshot` — Snapshot of the orderbook with a maximum
+                of 50 levels; `delta` — Updates of the orderbook'
+            timestamp:
+              type: integer
+              format: int64
+              description: Timestamp of the orderbook
+            symbol:
+              type: string
+              description: Orderbook symbol
+  messages:
+    L1Subscribe:
+      examples:
+      - payload:
+          op: subscribe
+          args:
+          - snapshotL1:BTC-USD
+    L1Unsubscribe:
+      examples:
+      - payload:
+          op: unsubscribe
+          args:
+          - snapshotL1:BTC-USD
+    L2Subscribe:
+      examples:
+      - payload:
+          op: subscribe
+          args:
+          - update:BTC-USD_0
+    L2Unsubscribe:
+      examples:
+      - payload:
+          op: unsubscribe
+          args:
+          - update:BTC-USD_0
+    OrderbookSnapshot:
+      payload:
+        $ref: '#/components/schemas/OrderbookUpdateSchema'
+      examples:
+      - payload:
+          topic: update:BTC-USD_0
+          data:
+            bids:
+            - - '59252.5'
+              - '0.06865'
+            - - '59249.0'
+              - '0.24000'
+            - - '59235.5'
+              - '0.16073'
+            - - '59235.0'
+              - '0.26626'
+            - - '59233.0'
+              - '0.50000'
+            asks:
+            - - '59292.0'
+              - '0.50000'
+            - - '59285.5'
+              - '0.24000'
+            - - '59285.0'
+              - '0.15598'
+            - - '59282.5'
+              - '0.06829'
+            - - '59278.5'
+              - '0.01472'
+            seqNum: 628282
+            prevSeqNum: 628281
+            type: snapshot
+            timestamp: 1565135165600
+            symbol: BTC-USD
+    OrderbookDelta:
+      payload:
+        $ref: '#/components/schemas/OrderbookUpdateSchema'
+      examples:
+      - payload:
+          topic: update:BTC-USD_0
+          data:
+            bids: []
+            asks:
+            - - '59367.5'
+              - '2.15622'
+            - - '59325.5'
+              - '0'
+            seqNum: 628283
+            prevSeqNum: 628282
+            type: delta
+            timestamp: 1565135165600
+            symbol: BTC-USD
+    PublicTradeMessage:
+      payload:
+        type: object
+        properties:
+          topic:
+            type: string
+            description: WebSocket topic
+          data:
+            type: array
+            items:
+              type: object
+              properties:
+                symbol:
+                  type: string
+                  description: Market symbol
+                side:
+                  type: string
+                  enum:
+                  - BUY
+                  - SELL
+                  description: Trade side
+                size:
+                  type: number
+                  description: Transacted size
+                price:
+                  type: number
+                  description: Transacted price
+                tradeId:
+                  type: integer
+                  format: int64
+                  description: Trade sequence ID
+                timestamp:
+                  type: integer
+                  format: int64
+                  description: Trade timestamp
+        examples:
+        - payload:
+            topic: tradeHistoryApi:BTC-USD
+            data:
+            - symbol: BTC-USD
+              side: SELL
+              size: 0.007
+              price: 5302.8
+              tradeId: 118974855
+              timestamp: 1584446020295
+    NotificationMessage:
+      payload:
+        type: object
+        properties:
+          topic:
+            type: string
+            const: notificationApiV3
+          data:
+            type: object
+            properties:
+              symbol:
+                type: string
+                description: Market symbol
+              orderID:
+                type: string
+                description: Internal order ID
+              side:
+                type: string
+                description: Trade direction (BUY or SELL)
+              orderType:
+                type: integer
+                description: 'Order classification — `76`: Limit · `77`: Market ·
+                  `80`: Peg/Algo'
+              txType:
+                type: integer
+                description: 'Transaction type — `0`: LIMIT · `1`: STOP · `2`: TRIGGER
+                  · `3`: OCO'
+              price:
+                type: number
+                description: Order price or executed transaction price
+              triggerPrice:
+                type: number
+                description: Activation price for conditional orders
+              pegPriceDeviation:
+                type: number
+                description: Deviation percentage (Algo orders only)
+              stealth:
+                type: number
+                description: Order visibility percentage on orderbook (Algo orders
+                  only)
+              status:
+                type: integer
+                description: Current order state — `1` (MARKET_UNAVAILABLE) · `2`
+                  (ORDER_INSERTED) · `4` (ORDER_FULLY_TRANSACTED) · `5` (ORDER_PARTIALLY_TRANSACTED)
+                  · `6` (ORDER_CANCELLED) · `8` (INSUFFICIENT_BALANCE) · `9` (TRIGGER_INSERTED)
+                  · `10` (TRIGGER_ACTIVATED) · `12` (ERROR_UPDATE_RISK_LIMIT) · `15`
+                  (ORDER_REJECTED) · `27` (TRANSFER_SUCCESSFUL) · `28` (TRANSFER_UNSUCCESSFUL)
+                  · `41` (ERROR_INVALID_RISK_LIMIT) · `64` (STATUS_LIQUIDATION) ·
+                  `101` (FUTURES_ORDER_PRICE_OUTSIDE_LIQUIDATION_PRICE) · `1003` (ORDER_LIQUIDATION)
+                  · `1004` (ORDER_ADL)
+              timestamp:
+                type: integer
+                format: int64
+                description: Order or transaction timestamp (ms)
+              avgFilledPrice:
+                type: number
+                description: Mean execution price across fills
+              clOrderID:
+                type: string
+                description: User-supplied order identifier
+              maker:
+                type: boolean
+                description: Whether this fill was on the maker side
+              postOnly:
+                type: boolean
+                description: Resting order without aggressive matching
+              orderUserInitiated:
+                type: boolean
+                description: Manual (true) vs. automated (false) order origin
+              originalOrderBaseSize:
+                type: number
+                description: Initial base currency quantity
+              originalOrderQuoteSize:
+                type: number
+                description: Initial quote currency quantity
+              currentOrderBaseSize:
+                type: number
+                description: Latest base currency quantity
+              currentOrderQuoteSize:
+                type: number
+                description: Latest quote currency quantity
+              filledBaseSize:
+                type: number
+                description: Base currency amount executed on this event
+              totalFilledBaseSize:
+                type: number
+                description: Cumulative base currency fills
+              remainingBaseSize:
+                type: number
+                description: Unfilled base currency portion
+              remainingQuoteSize:
+                type: number
+                description: Unfilled quote currency portion
+              orderCurrency:
+                type: string
+                description: Size denomination of the order (`base` or `quote`)
+              time_in_force:
+                type: string
+                description: 'Time in force: `GTC` · `IOC` · `FOK` · `HALFMIN` · `FIVEMIN`
+                  · `HOUR` · `TWELVEHOUR` · `DAY` · `WEEK` · `MONTH`'
+        examples:
+        - payload:
+            topic: notificationApiV3
+            data:
+              symbol: BTC-USDT
+              orderID: 789b05fa-dd43-43e8-8626-e229ae216ead
+              side: BUY
+              orderType: 77
+              txType: 0
+              price: 111131
+              triggerPrice: 0
+              pegPriceDeviation: 1
+              stealth: 1
+              status: 5
+              timestamp: 1752147703368
+              avgFilledPrice: 111131
+              clOrderID: _W_bjvf1752147703280
+              maker: false
+              postOnly: false
+              orderUserInitiated: true
+              originalOrderBaseSize: 0
+              originalOrderQuoteSize: 1000
+              currentOrderBaseSize: 0
+              currentOrderQuoteSize: 1000
+              filledBaseSize: 0.00899
+              totalFilledBaseSize: 0.00899
+              remainingBaseSize: 0
+              remainingQuoteSize: 0.93231
+              orderCurrency: quote
+              time_in_force: GTC
+    UserFillMessage:
+      payload:
+        type: object
+        properties:
+          topic:
+            type: string
+            const: fills
+          data:
+            type: array
+            items:
+              type: object
+              properties:
+                symbol:
+                  type: string
+                  description: Market symbol
+                orderId:
+                  type: string
+                  description: Internal order ID
+                clOrderId:
+                  type: string
+                  description: Custom order ID
+                side:
+                  type: string
+                  description: BUY or SELL
+                price:
+                  type: string
+                  description: Fill price
+                size:
+                  type: string
+                  description: Fill size
+                feeAmount:
+                  type: string
+                  description: Fee amount charged
+                feeCurrency:
+                  type: string
+                  description: 'Fee currency (BUY: base, SELL: quote)'
+                base:
+                  type: string
+                  description: Base currency
+                quote:
+                  type: string
+                  description: Quote currency
+                maker:
+                  type: boolean
+                  description: Whether this was a maker trade
+                timestamp:
+                  type: string
+                  description: Fill timestamp
+                tradeId:
+                  type: string
+                  description: Unique trade ID
+        examples:
+        - payload:
+            topic: fills
+            data:
+            - orderId: <order ID>
+              serialId: <serial ID>
+              clOrderId: <custom order ID>
+              type: <order type>
+              symbol: BTC-USD
+              side: BUY
+              price: '34000.0'
+              size: '1.0'
+              feeAmount: '0.01'
+              feeCurrency: USD
+              base: BTC
+              quote: USD
+              maker: false
+              timestamp: '1624985375123'
+              tradeId: <trade unique ID>
+x-ae-normalized:
+  date: '2026-10-13'
+  source: https://docs.btse.com/specs/spot-websocket.asyncapi.yaml
+  note: 9 message-level example keys moved to AsyncAPI 2.6 examples[{payload}]; verbatim
+    copy in asyncapi/_original/; 3 bare-schema messages wrapped as payload

@@ -1,0 +1,478 @@
+openapi: 3.0.3
+info:
+  title: Earn API
+  version: 3.3.0
+  description: |
+    Earn API for investment products — deposit, redeem, and track earnings.
+
+    **Base URL:** `https://api.btse.com/spot`
+    **Testnet:** `https://testapi.btse.io/spot`
+
+    ## Authentication
+
+    Most Earn endpoints require Trading or Read permission with HMAC-SHA384 authentication.
+    The [Query Investment Products](/api-explorer/earn/query-investment-products) endpoint is public.
+
+    See the [Authentication Guide](/authentication) for details.
+  contact:
+    name: Support
+    url: https://support.btse.com
+
+servers:
+  - url: https://api.btse.com/spot
+    description: Production
+  - url: https://testapi.btse.io/spot
+    description: Testnet
+
+tags:
+  - name: Earn
+    description: Investment product endpoints
+
+paths:
+  # ─── Earn Endpoints ────────────────────────────────────────────────────
+
+  /api/v3.3/invest/products:
+    get:
+      operationId: getInvestmentProducts
+      summary: Query Investment Products
+      description: Returns all available investment products.
+      tags: [Earn]
+      security: []
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InvestmentProduct'
+              example:
+                - id: OPENETH00001
+                  name: ETH Flex Savings
+                  currency: ETH
+                  type: Flex
+                  startDate: 1610685918000
+                  interestStartDate: 1610719200000
+                  rates:
+                    - days: 1
+                      rate: 1.15
+                  compounding: true
+                  autoRenewSupported: false
+                  dailyLimit: 10.0
+                  minSize: 1.0
+                  incrementalSize: 1.0
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v3.3/invest/deposit:
+    post:
+      operationId: depositInvestment
+      summary: Deposit Investment
+      description: |
+        Deposit into an investment product.
+
+        > **Note:** Check `minSize` and `incrementalSize` from [Query Investment Products](/api-explorer/earn/query-investment-products) before depositing.
+      tags: [Earn]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositInvestmentRequest'
+            example:
+              productId: OPENETH00001
+              amount: 1.0
+              renew: false
+              day: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositInvestmentResponse'
+              example:
+                success: true
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v3.3/invest/renew:
+    post:
+      operationId: renewInvestment
+      summary: Renew Investment
+      description: Update the auto-renew setting for an investment order.
+      tags: [Earn]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewInvestmentRequest'
+            example:
+              orderId: 12345
+              autoRenew: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenewInvestmentResponse'
+              example:
+                orderId: 12345
+                autoRenew: true
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v3.3/invest/redeem:
+    post:
+      operationId: redeemInvestment
+      summary: Redeem Investment
+      description: |
+        Redeem (withdraw from) an investment order.
+
+        > **Note:** Redemption may take time to process. Check `redemptionProcessing` in [Query Investment Orders](/api-explorer/earn/query-investment-orders) for status.
+      tags: [Earn]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RedeemInvestmentRequest'
+            example:
+              orderId: 12345
+              amount: 1.0
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedeemInvestmentResponse'
+              example:
+                success: true
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v3.3/invest/orders:
+    get:
+      operationId: getInvestmentOrders
+      summary: Query Investment Orders
+      description: Returns all active investment orders for the authenticated user.
+      tags: [Earn]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InvestmentOrder'
+              example:
+                []
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v3.3/invest/history:
+    get:
+      operationId: getInvestmentHistory
+      summary: Query Investment History
+      description: Returns paginated investment transaction history.
+      tags: [Earn]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: pageNumber
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Page number (1-based, default `1`)
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+          description: Records per page (default `10`, max `50`)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestmentHistoryResponse'
+              example:
+                totalRows: 0
+                pageNumber: 1
+                pageSize: 10
+                data:
+                  []
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+# ═════════════════════════════════════════════════════════════════════════
+# Components
+# ═════════════════════════════════════════════════════════════════════════
+
+components:
+  securitySchemes:
+    api:
+      type: apiKey
+      in: header
+      name: request-api
+      description: API key
+    nonce:
+      type: apiKey
+      in: header
+      name: request-nonce
+      description: Current timestamp in milliseconds
+    sign:
+      type: apiKey
+      in: header
+      name: request-sign
+      description: "`HMAC-SHA384(secret, path + nonce + body)`"
+
+  schemas:
+    # ─── Error Responses ───────────────────────────────────────────────────
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:   { type: integer, description: Error status code }
+        error:    { type: string,  description: Error message }
+        code:     { type: integer, description: Internal error code }
+        message:  { type: string,  description: Human-readable error description }
+
+    RateLimitError:
+      type: object
+      properties:
+        status:  { type: integer, description: "HTTP status code (429)" }
+        message: { type: string,  description: Rate limit exceeded message }
+
+    # ─── Products ──────────────────────────────────────────────────────────
+
+    RateObject:
+      type: object
+      properties:
+        days: { type: integer, description: Duration in days }
+        rate: { type: number,  description: Interest rate }
+
+    InvestmentProduct:
+      type: object
+      properties:
+        id:                  { type: string,  description: Product ID }
+        name:                { type: string,  description: Product name }
+        currency:            { type: string,  description: Currency }
+        type:                { type: string,  description: "Product type (e.g. Flex)" }
+        startDate:           { type: integer, format: int64, description: Investment start date (Unix ms) }
+        interestStartDate:   { type: integer, format: int64, description: Interest accrual start date (Unix ms) }
+        rates:               { type: array, items: { $ref: '#/components/schemas/RateObject' }, description: Interest rate tiers }
+        compounding:         { type: boolean, description: Whether the product compounds }
+        autoRenewSupported:  { type: boolean, description: Whether auto-renew is supported }
+        dailyLimit:          { type: number,  description: Daily investment limit }
+        minSize:             { type: number,  description: Minimum investment size }
+        incrementalSize:     { type: number,  description: Investment step size }
+
+    # ─── Deposit ───────────────────────────────────────────────────────────
+
+    DepositInvestmentRequest:
+      type: object
+      required: [productId, amount, renew, day]
+      properties:
+        productId: { type: string,  description: Product ID }
+        amount:    { type: number,  description: Investment amount }
+        renew:     { type: boolean, description: Whether to auto-renew }
+        day:       { type: integer, description: Investment duration in days }
+
+    DepositInvestmentResponse:
+      type: object
+      properties:
+        success: { type: boolean, description: Whether the deposit was processed successfully }
+
+    # ─── Renew ─────────────────────────────────────────────────────────────
+
+    RenewInvestmentRequest:
+      type: object
+      required: [orderId, autoRenew]
+      properties:
+        orderId:   { type: integer, description: Investment order ID }
+        autoRenew: { type: boolean, description: New auto-renew setting }
+
+    RenewInvestmentResponse:
+      type: object
+      properties:
+        orderId:   { type: integer, description: Investment order ID }
+        autoRenew: { type: boolean, description: Updated auto-renew status }
+
+    # ─── Redeem ────────────────────────────────────────────────────────────
+
+    RedeemInvestmentRequest:
+      type: object
+      required: [orderId, amount]
+      properties:
+        orderId: { type: integer, description: Investment order ID }
+        amount:  { type: number,  description: Amount to redeem }
+
+    RedeemInvestmentResponse:
+      type: object
+      properties:
+        success: { type: boolean, description: Whether the redemption was processed successfully }
+
+    # ─── Orders ────────────────────────────────────────────────────────────
+
+    InvestmentOrder:
+      type: object
+      properties:
+        id:                     { type: integer, description: Order ID }
+        name:                   { type: string,  description: Product name }
+        currency:               { type: string,  description: Currency }
+        type:                   { type: string,  description: Product type }
+        rate:                   { type: number,  description: Interest rate }
+        investAmt:              { type: number,  description: Invested amount }
+        interestEarned:         { type: number,  description: Interest earned to date }
+        nextInterestPayoutTime: { type: integer, format: int64, description: Next payout timestamp }
+        startTime:              { type: integer, format: int64, description: Order start time }
+        endTime:                { type: integer, format: int64, description: Order end time }
+        duration:               { type: integer, format: int64, description: Duration in milliseconds }
+        payoutLockTime:         { type: integer, format: int64, description: Lock time before payout }
+        autoRenew:              { type: boolean, description: Auto-renew status }
+        compounding:            { type: boolean, description: Whether compounding is active }
+        autoRenewSupported:     { type: boolean, description: Whether product supports auto-renew }
+        redemptionProcessing:   { type: boolean, description: Whether a redemption is currently processing }
+
+    # ─── History ───────────────────────────────────────────────────────────
+
+    InvestmentHistoryObject:
+      type: object
+      properties:
+        txnTime:       { type: integer, format: int64, description: Transaction time }
+        name:          { type: string,  description: Product name }
+        currency:      { type: string,  description: Currency }
+        rate:          { type: number,  description: Interest rate }
+        type:          { type: string,  description: Product type }
+        txnType:       { type: string,  description: "Transaction type (e.g. INVEST_SERVICE_TYPE_DEPOSIT)" }
+        amount:        { type: number,  description: Transaction amount }
+        totalAmount:   { type: number,  description: Total invested amount }
+        interestEarned: { type: number, description: Interest earned }
+        duration:      { type: integer, format: int64, description: Duration }
+
+    InvestmentHistoryResponse:
+      type: object
+      properties:
+        totalRows:  { type: integer, description: Total records }
+        pageNumber: { type: integer, description: Current page }
+        pageSize:   { type: integer, description: Records per page }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvestmentHistoryObject'
+          description: History entries

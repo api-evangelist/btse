@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-place-order-resp-schema.json",
+  "title": "PlaceOrderResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-spot-openapi.yml#/components/schemas/PlaceOrderResp",
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "description": "Server-assigned order identifier"
+    },
+    "clOrderId": {
+      "type": "string",
+      "description": "Echo of the client-supplied order identifier if one was provided"
+    },
+    "status": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Numeric status code reflecting the current state of the order (e.g. filled, cancelled, rejected)"
+    },
+    "market": {
+      "type": "string",
+      "description": "Trading pair, e.g. BTC-USDT"
+    },
+    "type": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Numeric code identifying the order type (e.g. LIMIT, MARKET, TWAP, PEG)"
+    },
+    "orderSide": {
+      "type": "string",
+      "description": "BUY or SELL"
+    },
+    "orderPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Order price"
+    },
+    "postOnly": {
+      "type": "boolean",
+      "description": "Whether the order was submitted as post-only"
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Server-side event timestamp in epoch milliseconds"
+    },
+    "orderDetailType": {
+      "type": "string",
+      "description": "Detailed order sub-type when applicable (e.g. TWAP for algo TWAP orders)",
+      "enum": [
+        "TWAP",
+        "PARTIAL_LIQUIDATION",
+        "FORCED_MARKET_BUY",
+        "FORCED_MARKET_SELL"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "description": "Optional diagnostic message; present only when one is returned (e.g. rejection reason)"
+    },
+    "userQuoteCurrency": {
+      "type": "string",
+      "description": "Quote currency configured for the user"
+    },
+    "orderCurrency": {
+      "type": "string",
+      "description": "'quote' or 'base'; indicates whether the quote-size or base-size fields below are populated"
+    },
+    "originalOrderBaseSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Original size in base currency; populated when orderCurrency is 'base'"
+    },
+    "originalOrderQuoteSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Original size in quote currency; populated when orderCurrency is 'quote'"
+    },
+    "currentOrderBaseSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Currently active size in base currency; populated when orderCurrency is 'base'"
+    },
+    "currentOrderQuoteSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Currently active size in quote currency; populated when orderCurrency is 'quote'"
+    },
+    "remainingOrderBaseSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Remaining unfilled size in base currency; populated when orderCurrency is 'base'"
+    },
+    "remainingOrderQuoteSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Remaining unfilled size in quote currency; populated when orderCurrency is 'quote'"
+    },
+    "filledBaseSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Size filled by the most recent match, in base currency"
+    },
+    "totalFilledBaseSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Cumulative filled size across all matches, in base currency"
+    },
+    "avgFilledPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Volume-weighted average fill price"
+    },
+    "time_in_force": {
+      "type": "string",
+      "description": "Time-in-force policy (GTC, IOC, FOK); null when not applicable to the order type"
+    }
+  }
+}

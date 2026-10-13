@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-withdraw-request-schema.json",
+  "title": "WithdrawRequest",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-wallet-openapi.yml#/components/schemas/WithdrawRequest",
+  "type": "object",
+  "required": [
+    "crypto",
+    "network",
+    "address",
+    "amount"
+  ],
+  "properties": {
+    "crypto": {
+      "type": "string",
+      "description": "Crypto to withdraw"
+    },
+    "network": {
+      "type": "string",
+      "description": "Crypto network to withdraw"
+    },
+    "address": {
+      "type": "string",
+      "description": "Withdrawal address"
+    },
+    "addressExtension": {
+      "type": "string",
+      "description": "Address extension (e.g. XRP tag, EOS memo). Required for networks where `needAddressExtension` is `true` in the [Crypto Networks](../query-crypto-networks) response"
+    },
+    "amount": {
+      "type": "string",
+      "description": "Withdraw amount"
+    },
+    "amountIncludeFee": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the fee is included in the amount or not. The default value is set to `true`.\n"
+    },
+    "webhookUrl": {
+      "type": "string",
+      "description": "If you wish to receive notifications, please fill in the 'webhookUrl' parameter. Also, kindly notify us so that we can add the 'webhookUrl' to the whitelist."
+    }
+  }
+}

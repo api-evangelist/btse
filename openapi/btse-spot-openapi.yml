@@ -1,0 +1,1889 @@
+openapi: 3.1.0
+info:
+  title: Spot API
+  description: External API Documentation
+  version: v1
+servers:
+- url: https://api.btse.com
+  description: Production
+security:
+- APIKey: []
+  Nonce: []
+  Signature: []
+paths:
+  /spot/api/v4/trade/orders:
+    get:
+      tags:
+      - Trade V4
+      summary: List orders
+      description: List the caller's open orders, optionally filtered by symbol, a
+        set of order IDs, or a client order ID.
+      operationId: getOrders
+      parameters:
+      - name: symbol
+        in: query
+        description: Trading pair to filter by
+        required: false
+        schema:
+          type: string
+          description: Trading pair to filter by
+        examples:
+          default:
+            value: BTC-USD
+      - name: orderIds
+        in: query
+        description: Order IDs to filter by
+        required: false
+        schema:
+          type: array
+          description: Order IDs to filter by
+          items:
+            type: string
+            description: Order IDs to filter by
+      - name: clOrderId
+        in: query
+        description: Client-supplied order ID to filter by
+        required: false
+        schema:
+          type: string
+          description: Client-supplied order ID to filter by
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QueryOrderResp'
+              examples:
+                default:
+                  value:
+                  - requestId: 4268545858604010293
+                    orderId: 4eca2eb4-e6ad-4355-ae12-5ce757b105b3
+                    clOrderId: null
+                    symbol: BTC-USD
+                    quote: USD
+                    orderState: STATUS_ACTIVE
+                    orderType: 76
+                    orderSide: BUY
+                    orderPrice: 60413.8
+                    orderValue: 0.604138
+                    timestamp: 1784891308061
+                    timeInForce: GTC
+                    orderCurrency: base
+                    originalOrderBaseSize: 1.0e-05
+                    originalOrderQuoteSize: null
+                    currentOrderBaseSize: 1.0e-05
+                    currentOrderQuoteSize: null
+                    remainingOrderBaseSize: 1.0e-05
+                    remainingOrderQuoteSize: null
+                    totalFilledBaseSize: 0
+                    avgFilledPrice: 0
+                    orderDetailType: null
+                    orderDetail: null
+                    triggerOrder: false
+                    triggered: false
+                    triggerUseLastPrice: false
+                    triggerPrice: 0
+                    triggerOriginalPrice: 0
+                    triggerOrderType: 0
+                    triggerStopPrice: 0
+                    triggerTrailingStopDeviation: 0
+                    trailValue: 0
+                    trailValueType: DISTANCE
+                    pegPriceMin: 0
+                    pegPriceMax: 0
+                    pegPriceDeviation: 0
+                    currentPegPrice: 60413.8
+                    wrapperOrder: false
+                    activationPrice: null
+                    activationPriceType: null
+    put:
+      tags:
+      - Trade V4
+      summary: Amend order
+      description: Amend an open order's price, size, and/or trigger price.
+      operationId: amendOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AmendOrderReq'
+            examples:
+              default:
+                value:
+                  symbol: BTC-USD
+                  orderId: 4eca2eb4-e6ad-4355-ae12-5ce757b105b3
+                  orderPrice: 60413.8
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AmendOrderResp'
+              examples:
+                default:
+                  value:
+                  - orderId: 4eca2eb4-e6ad-4355-ae12-5ce757b105b3
+                    clOrderId: ''
+                    status: 123
+                    market: BTC-USD
+                    type: 76
+                    orderSide: BUY
+                    orderPrice: 60413.8
+                    postOnly: false
+                    timestamp: 1784891308178
+                    orderDetailType: null
+                    message: null
+                    userQuoteCurrency: USD
+                    orderCurrency: base
+                    originalOrderBaseSize: 1.0e-05
+                    originalOrderQuoteSize: null
+                    currentOrderBaseSize: 1.0e-05
+                    currentOrderQuoteSize: null
+                    remainingOrderBaseSize: 1.0e-05
+                    remainingOrderQuoteSize: null
+                    filledBaseSize: 0
+                    totalFilledBaseSize: 0
+                    avgFilledPrice: 0
+                    originalPrice: 60413.8
+                    time_in_force: GTC
+    post:
+      tags:
+      - Trade V4
+      summary: Place order
+      description: Places a normal spot order (MARKET or LIMIT) on the given trading
+        pair.
+      operationId: placeOrder
+      parameters:
+      - name: BROKER-ID
+        in: header
+        description: Optional broker/partner identifier to tag orders placed through
+          them
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/Limit'
+              - $ref: '#/components/schemas/Market'
+            examples:
+              Limit:
+                value:
+                  symbol: BTC-USD
+                  orderType: LIMIT
+                  orderSide: BUY
+                  orderSize: 1.0e-05
+                  orderPrice: 61024.1
+              Market:
+                value:
+                  symbol: BTC-USD
+                  orderType: MARKET
+                  orderSide: BUY
+                  quoteOrderSize: 1.9
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlaceOrderResp'
+              examples:
+                Limit:
+                  value:
+                  - orderId: 4eca2eb4-e6ad-4355-ae12-5ce757b105b3
+                    clOrderId: ''
+                    status: 2
+                    market: BTC-USD
+                    type: 76
+                    orderSide: BUY
+                    orderPrice: 61024.1
+                    postOnly: false
+                    timestamp: 1784891308063
+                    orderDetailType: null
+                    message: null
+                    userQuoteCurrency: USD
+                    orderCurrency: base
+                    originalOrderBaseSize: 1.0e-05
+                    originalOrderQuoteSize: null
+                    currentOrderBaseSize: 1.0e-05
+                    currentOrderQuoteSize: null
+                    remainingOrderBaseSize: 1.0e-05
+                    remainingOrderQuoteSize: null
+                    filledBaseSize: 0
+                    totalFilledBaseSize: 0
+                    avgFilledPrice: 0
+                    time_in_force: GTC
+                Market:
+                  value:
+                  - orderId: 859af358-c6d2-49c3-a2cf-48ba5b74b968
+                    clOrderId: ''
+                    status: 5
+                    market: BTC-USD
+                    type: 77
+                    orderSide: BUY
+                    orderPrice: 64235.9701
+                    postOnly: false
+                    timestamp: 1784891308215
+                    orderDetailType: null
+                    message: null
+                    userQuoteCurrency: USD
+                    orderCurrency: quote
+                    originalOrderBaseSize: null
+                    originalOrderQuoteSize: 1.9
+                    currentOrderBaseSize: null
+                    currentOrderQuoteSize: 1.9
+                    remainingOrderBaseSize: null
+                    remainingOrderQuoteSize: 0.61528059
+                    filledBaseSize: 2.0e-05
+                    totalFilledBaseSize: 2.0e-05
+                    avgFilledPrice: 64235.9701
+                    time_in_force: GTC
+    delete:
+      tags:
+      - Trade V4
+      summary: Cancel order
+      description: Cancel a single open order identified by orderId or clOrderId on
+        the given trading pair.
+      operationId: cancelOrder
+      parameters:
+      - name: symbol
+        in: query
+        description: Trading pair
+        required: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: BTC-USD
+      - name: orderId
+        in: query
+        description: Order ID to cancel; at least one of orderId or clOrderId is required
+        required: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: 4eca2eb4-e6ad-4355-ae12-5ce757b105b3
+      - name: clOrderId
+        in: query
+        description: Client-supplied order ID to cancel; at least one of orderId or
+          clOrderId is required
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlaceOrderResp'
+              examples:
+                default:
+                  value:
+                  - orderId: 4eca2eb4-e6ad-4355-ae12-5ce757b105b3
+                    clOrderId: ''
+                    status: 6
+                    market: BTC-USD
+                    type: 76
+                    orderSide: BUY
+                    orderPrice: 0
+                    postOnly: false
+                    timestamp: 1784891308981
+                    orderDetailType: null
+                    message: null
+                    userQuoteCurrency: USD
+                    orderCurrency: base
+                    originalOrderBaseSize: 1.0e-05
+                    originalOrderQuoteSize: null
+                    currentOrderBaseSize: 1.0e-05
+                    currentOrderQuoteSize: null
+                    remainingOrderBaseSize: 1.0e-05
+                    remainingOrderQuoteSize: null
+                    filledBaseSize: 0
+                    totalFilledBaseSize: 0
+                    avgFilledPrice: 0
+                    time_in_force: GTC
+  /spot/api/v4/trade/orders/cancel_all_after:
+    post:
+      tags:
+      - Trade V4
+      summary: Cancel all orders after
+      description: Arm a dead-man switch that cancels all open orders after the given
+        timeout unless another request resets it first.
+      operationId: cancelAllAfter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelAllAfterReq'
+            examples:
+              default:
+                value:
+                  timeout: 86400000
+        required: true
+      responses:
+        '200':
+          description: OK
+  /spot/api/v4/trade/orders/algo:
+    post:
+      tags:
+      - Trade V4
+      summary: Place algo order
+      description: Places an algorithmic spot order (TWAP, PEG, OCO, TRAILING, or
+        CONDITIONAL) on the given trading pair.
+      operationId: placeAlgoOrder
+      parameters:
+      - name: BROKER-ID
+        in: header
+        description: Optional broker/partner identifier to tag orders placed through
+          them
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/Conditional'
+              - $ref: '#/components/schemas/Oco'
+              - $ref: '#/components/schemas/Peg'
+              - $ref: '#/components/schemas/Trailing'
+              - $ref: '#/components/schemas/Twap'
+            examples:
+              Oco:
+                value:
+                  symbol: BTC-USD
+                  orderType: OCO
+                  orderSide: SELL
+                  orderSize: 1.0e-05
+                  takeProfitOrderPrice: 67447.7
+                  stopLossOrderPrice: 61024.1
+                  stopLossTriggerPrice: 61024.1
+                  stopLossTriggerPriceType: MARK_PRICE
+              Trailing:
+                value:
+                  symbol: BTC-USD
+                  orderType: TRAILING
+                  orderSide: SELL
+                  orderSize: 1.0e-05
+                  trailValue: 3211.7
+                  trailValueType: DISTANCE
+                  triggerPriceType: LAST_PRICE
+                  activationTriggerPrice: 67447.7
+                  activationTriggerPriceType: LAST_PRICE
+              Conditional:
+                value:
+                  symbol: BTC-USD
+                  orderType: CONDITIONAL
+                  orderSide: SELL
+                  orderSize: 1.0e-05
+                  triggerPrice: 67447.7
+                  triggerOrderType: TAKE_PROFIT
+                  triggerPriceType: LAST_PRICE
+              Peg:
+                value:
+                  symbol: BTC-USD
+                  orderType: PEG
+                  orderSide: BUY
+                  orderPrice: 61024.1
+                  orderSize: 1.0e-05
+                  stealth: 50
+              Twap:
+                value:
+                  symbol: BTC-USD
+                  orderType: TWAP
+                  orderSide: BUY
+                  orderSize: 0.1
+                  timePeriod: 3600
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlaceOrderResp'
+              examples:
+                Oco:
+                  value:
+                  - orderId: 1d3b52ca-3dd0-45ed-8819-141e7f2c2cc5
+                    clOrderId: ''
+                    status: 2
+                    market: BTC-USD
+                    type: 76
+                    orderSide: SELL
+                    orderPrice: 67447.7
+                    postOnly: false
+                    timestamp: 1784891308363
+                    orderDetailType: null
+                    message: null
+                    userQuoteCurrency: USD
+                    orderCurrency: base
+                    originalOrderBaseSize: 1.0e-05
+                    originalOrderQuoteSize: null
+                    currentOrderBaseSize: 1.0e-05
+                    currentOrderQuoteSize: null
+                    remainingOrderBaseSize: 1.0e-05
+                    remainingOrderQuoteSize: null
+                    filledBaseSize: 0
+                    totalFilledBaseSize: 0
+                    avgFilledPrice: 0
+                    time_in_force: GTC
+                  - orderId: 98ed2026-55eb-4e0f-ba05-7f19818b6ed8
+                    clOrderId: ''
+                    status: 9
+                    market: BTC-USD
+                    type: 76
+                    orderSide: SELL
+                    orderPrice: 61024.1
+                    postOnly: false
+                    timestamp: 1784891308364
+                    orderDetailType: null
+                    message: null
+                    userQuoteCurrency: USD
+                    orderCurrency: base
+                    originalOrderBaseSize: 1.0e-05
+                    originalOrderQuoteSize: null
+                    currentOrderBaseSize: 1.0e-05
+                    currentOrderQuoteSize: null
+                    remainingOrderBaseSize: 1.0e-05
+                    remainingOrderQuoteSize: null
+                    filledBaseSize: 0
+                    totalFilledBaseSize: 0
+                    avgFilledPrice: 0
+                    time_in_force: GTC
+                Trailing:
+                  value:
+                  - orderId: 9d5561c6-b603-4ee4-919c-2f0eb657f9b3
+                    clOrderId: 9d5561c6-b603-4ee4-919c-2f0eb657f9b3
+                    status: 9
+                    market: BTC-USD
+                    type: 84
+                    orderSide: SELL
+                    orderPrice: 1.0e-05
+                    postOnly: false
+                    timestamp: 1784891308521
+                    orderDetailType: null
+                    message: null
+                    userQuoteCurrency: USD
+                    orderCurrency: base
+                    originalOrderBaseSize: 1.0e-05
+                    originalOrderQuoteSize: null
+                    currentOrderBaseSize: 1.0e-05
+                    currentOrderQuoteSize: null
+                    remainingOrderBaseSize: 1.0e-05
+                    remainingOrderQuoteSize: null
+                    filledBaseSize: 0
+                    totalFilledBaseSize: 0
+                    avgFilledPrice: 0
+                    time_in_force: GTC
+                Conditional:
+                  value:
+                  - orderId: 90858596-f2b4-452b-bf23-4eee25d2a449
+                    clOrderId: ''
+                    status: 9
+                    market: BTC-USD
+                    type: 77
+                    orderSide: SELL
+                    orderPrice: 1.0e-05
+                    postOnly: false
+                    timestamp: 1784891308660
+                    orderDetailType: null
+                    message: null
+                    userQuoteCurrency: USD
+                    orderCurrency: base
+                    originalOrderBaseSize: 1.0e-05
+                    originalOrderQuoteSize: null
+                    currentOrderBaseSize: 1.0e-05
+                    currentOrderQuoteSize: null
+                    remainingOrderBaseSize: 1.0e-05
+                    remainingOrderQuoteSize: null
+                    filledBaseSize: 0
+                    totalFilledBaseSize: 0
+                    avgFilledPrice: 0
+                    time_in_force: GTC
+                Peg:
+                  value:
+                  - orderId: 9ca3a6bc-0576-4af1-8ba5-d6fcab8971b1
+                    clOrderId: ''
+                    status: 2
+                    market: BTC-USD
+                    type: 80
+                    orderSide: BUY
+                    orderPrice: 61024.1
+                    postOnly: false
+                    timestamp: 1784891308825
+                    orderDetailType: null
+                    message: null
+                    userQuoteCurrency: USD
+                    orderCurrency: base
+                    originalOrderBaseSize: 1.0e-05
+                    originalOrderQuoteSize: null
+                    currentOrderBaseSize: 1.0e-05
+                    currentOrderQuoteSize: null
+                    remainingOrderBaseSize: 1.0e-05
+                    remainingOrderQuoteSize: null
+                    filledBaseSize: 0
+                    totalFilledBaseSize: 0
+                    avgFilledPrice: 0
+                    time_in_force: GTC
+                Twap:
+                  value:
+                  - orderId: 7a53ea0a-131d-4807-b0fd-05a6a63e3114
+                    clOrderId: ''
+                    status: 2
+                    market: BTC-USD
+                    type: 82
+                    orderSide: BUY
+                    orderPrice: 0
+                    postOnly: false
+                    timestamp: 1784891308867
+                    orderDetailType: null
+                    message: null
+                    userQuoteCurrency: USD
+                    orderCurrency: base
+                    originalOrderBaseSize: 0.1
+                    originalOrderQuoteSize: null
+                    currentOrderBaseSize: 0.1
+                    currentOrderQuoteSize: null
+                    remainingOrderBaseSize: 0
+                    remainingOrderQuoteSize: null
+                    filledBaseSize: 0
+                    totalFilledBaseSize: 0
+                    avgFilledPrice: 0
+                    time_in_force: GTC
+  /spot/api/v4/trade/trade_history:
+    get:
+      tags:
+      - Trade V4
+      summary: Trade history
+      description: Return the caller's recent trade executions for a trading pair,
+        optionally filtered by time range, count, order ID, or client order ID.
+      operationId: getTradeHistory
+      parameters:
+      - name: symbol
+        in: query
+        description: Trading pair
+        required: true
+        schema:
+          type: string
+          description: Trading pair
+        examples:
+          default:
+            value: BTC-USD
+      - name: startTime
+        in: query
+        description: Only include trades at or after this Unix timestamp in milliseconds
+        required: false
+        schema:
+          type: integer
+          format: int64
+          description: Only include trades at or after this Unix timestamp in milliseconds
+      - name: endTime
+        in: query
+        description: Only include trades at or before this Unix timestamp in milliseconds
+        required: false
+        schema:
+          type: integer
+          format: int64
+          description: Only include trades at or before this Unix timestamp in milliseconds
+      - name: count
+        in: query
+        description: Maximum number of trades to return, defaults to 10
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+          description: Maximum number of trades to return, defaults to 10
+      - name: clOrderId
+        in: query
+        description: Client-supplied order ID to filter by
+        required: false
+        schema:
+          type: string
+          description: Client-supplied order ID to filter by
+      - name: orderId
+        in: query
+        description: Order ID to filter by
+        required: false
+        schema:
+          type: string
+          description: Order ID to filter by
+      - name: isMatchSymbol
+        in: query
+        description: If true, match trades by base/quote currency rather than the
+          exact symbol string, to also cover alias symbols for the same pair
+        required: false
+        schema:
+          type: boolean
+          default: false
+          description: If true, match trades by base/quote currency rather than the
+            exact symbol string, to also cover alias symbols for the same pair
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TradeHistoryResp'
+              examples:
+                default:
+                  value:
+                  - serialId: 375599088
+                    tradeId: de1a79b8-f408-4e05-b8b7-7ed3c4e86542
+                    orderId: 6c72d906-cb8f-469c-8ab0-b97bc8dff9c2
+                    clOrderId: null
+                    symbol: BTC-USD
+                    base: BTC
+                    quote: USD
+                    orderSide: BUY
+                    orderType: 77
+                    triggerType: 0
+                    triggerPrice: 0
+                    price: 64235.97008
+                    size: 1.9
+                    filledSize: 2.0e-05
+                    feeCurrency: BTC
+                    feeAmount: 1.0e-08
+                    timestamp: 1784890959551
+                  - serialId: 375599086
+                    tradeId: 7ed825de-1903-4020-b74f-e04cdce835b9
+                    orderId: 1ec3cc46-928a-4cbe-8683-852bc5de7f9f
+                    clOrderId: null
+                    symbol: BTC-USD
+                    base: BTC
+                    quote: USD
+                    orderSide: BUY
+                    orderType: 77
+                    triggerType: 0
+                    triggerPrice: 0
+                    price: 64234.684332
+                    size: 1.9
+                    filledSize: 2.0e-05
+                    feeCurrency: BTC
+                    feeAmount: 1.0e-08
+                    timestamp: 1784890649859
+                  - serialId: 375599084
+                    tradeId: 68ec4220-4e9b-4d7a-a0c6-560b46f7605a
+                    orderId: ca099453-6553-4eae-b696-26f59c50c3b2
+                    clOrderId: null
+                    symbol: BTC-USD
+                    base: BTC
+                    quote: USD
+                    orderSide: BUY
+                    orderType: 77
+                    triggerType: 0
+                    triggerPrice: 0
+                    price: 64234.684332
+                    size: 1.9
+                    filledSize: 2.0e-05
+                    feeCurrency: BTC
+                    feeAmount: 1.0e-08
+                    timestamp: 1784890619788
+  /spot/api/v4/trade/order:
+    get:
+      tags:
+      - Trade V4
+      summary: Get order
+      description: Retrieve a single order by orderId or clOrderId. Returns 404 if
+        the order does not exist or is inactive.
+      operationId: getOrder
+      parameters:
+      - name: orderId
+        in: query
+        description: Order ID to look up; at least one of orderId or clOrderId is
+          required
+        required: false
+        schema:
+          type: string
+          description: Order ID to look up; at least one of orderId or clOrderId is
+            required
+        examples:
+          default:
+            value: 4eca2eb4-e6ad-4355-ae12-5ce757b105b3
+      - name: clOrderId
+        in: query
+        description: Client-supplied order ID to look up; at least one of orderId
+          or clOrderId is required
+        required: false
+        schema:
+          type: string
+          description: Client-supplied order ID to look up; at least one of orderId
+            or clOrderId is required
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryOrderResp'
+              examples:
+                default:
+                  value:
+                    requestId: 5219582705252737931
+                    orderId: 4eca2eb4-e6ad-4355-ae12-5ce757b105b3
+                    clOrderId: null
+                    symbol: BTC-USD
+                    quote: USD
+                    orderState: ORDER_INSERTED
+                    orderType: 76
+                    orderSide: BUY
+                    orderPrice: 60413.8
+                    orderValue: 0.604138
+                    timestamp: 1784891308061
+                    timeInForce: GTC
+                    orderCurrency: base
+                    originalOrderBaseSize: 1.0e-05
+                    originalOrderQuoteSize: null
+                    currentOrderBaseSize: 1.0e-05
+                    currentOrderQuoteSize: null
+                    remainingOrderBaseSize: 1.0e-05
+                    remainingOrderQuoteSize: null
+                    totalFilledBaseSize: 0
+                    avgFilledPrice: 0
+                    orderDetailType: null
+                    orderDetail: null
+                    triggerOrder: false
+                    triggered: false
+                    triggerUseLastPrice: false
+                    triggerPrice: 0
+                    triggerOriginalPrice: 0
+                    triggerOrderType: 0
+                    triggerStopPrice: 0
+                    triggerTrailingStopDeviation: 0
+                    trailValue: 0
+                    trailValueType: DISTANCE
+                    pegPriceMin: 0
+                    pegPriceMax: 0
+                    pegPriceDeviation: 0
+                    currentPegPrice: 60413.8
+                    wrapperOrder: false
+                    activationPrice: null
+                    activationPriceType: null
+  /spot/api/v4/trade/fees:
+    get:
+      tags:
+      - Trade V4
+      summary: Get fees
+      description: Return the caller's maker and taker fee rates, optionally scoped
+        to a single trading pair.
+      operationId: getFees
+      parameters:
+      - name: symbol
+        in: query
+        description: Trading pair to filter by
+        required: false
+        schema:
+          type: string
+          description: Trading pair to filter by
+        examples:
+          default:
+            value: BTC-USD
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QueryFeesResp'
+              examples:
+                default:
+                  value:
+                  - symbol: BTC-USD
+                    makerFee: 0.0005
+                    takerFee: 0.0006
+  /spot/api/v4/trade/orders/all:
+    delete:
+      tags:
+      - Trade V4
+      summary: Cancel all orders
+      description: Cancel all open orders for the given trading pair. Pass the literal
+        value "ALL" as symbol to cancel every open order across all trading pairs.
+      operationId: cancelAllOrders
+      parameters:
+      - name: symbol
+        in: query
+        description: Trading pair, or "ALL" to cancel every open order across all
+          pairs
+        required: true
+        schema:
+          type: string
+        examples:
+          bySymbol:
+            value: BTC-USD
+          all:
+            value: ALL
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    AmendOrderReq:
+      type: object
+      description: Amend order
+      properties:
+        orderId:
+          type: string
+          description: Order ID identifying the order to amend; at least one of orderId
+            or clOrderId is required
+        clOrderId:
+          type: string
+          description: Client-assigned order ID identifying the order to amend; at
+            least one of orderId or clOrderId is required
+        symbol:
+          type: string
+          description: Trading pair, e.g. BTC-USDT
+        orderPrice:
+          type: number
+          format: double
+          description: New limit price; omit to leave unchanged. At least one of orderPrice,
+            orderSize or triggerPrice is required.
+        orderSize:
+          type: number
+          format: double
+          description: New order size; omit to leave unchanged. At least one of orderPrice,
+            orderSize or triggerPrice is required.
+        triggerPrice:
+          type: number
+          format: double
+          description: New trigger price; omit to leave unchanged. At least one of
+            orderPrice, orderSize or triggerPrice is required.
+        totalAmountMode:
+          type: boolean
+          description: When true, orderSize is interpreted as the new total order
+            quantity (including the already-filled portion); when false (default),
+            orderSize is interpreted as the new remaining quantity.
+      required:
+      - symbol
+    AmendOrderResp:
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: Server-assigned order identifier
+        clOrderId:
+          type: string
+          description: Echo of the client-supplied order identifier if one was provided
+        status:
+          type: integer
+          format: int32
+          description: Numeric status code reflecting the current state of the order
+            (e.g. filled, cancelled, rejected)
+        market:
+          type: string
+          description: Trading pair, e.g. BTC-USDT
+        type:
+          type: integer
+          format: int32
+          description: Numeric code identifying the order type (e.g. LIMIT, MARKET,
+            TWAP, PEG)
+        orderSide:
+          type: string
+          description: BUY or SELL
+        orderPrice:
+          type: number
+          format: double
+          description: Order price
+        postOnly:
+          type: boolean
+          description: Whether the order was submitted as post-only
+        timestamp:
+          type: integer
+          format: int64
+          description: Server-side event timestamp in epoch milliseconds
+        orderDetailType:
+          type: string
+          description: Detailed order sub-type when applicable (e.g. TWAP for algo
+            TWAP orders)
+          enum:
+          - TWAP
+          - PARTIAL_LIQUIDATION
+          - FORCED_MARKET_BUY
+          - FORCED_MARKET_SELL
+        message:
+          type: string
+          description: Optional diagnostic message; present only when one is returned
+            (e.g. rejection reason)
+        userQuoteCurrency:
+          type: string
+          description: Quote currency configured for the user
+        orderCurrency:
+          type: string
+          description: '''quote'' or ''base''; indicates whether the quote-size or
+            base-size fields below are populated'
+        originalOrderBaseSize:
+          type: number
+          format: double
+          description: Original size in base currency; populated when orderCurrency
+            is 'base'
+        originalOrderQuoteSize:
+          type: number
+          format: double
+          description: Original size in quote currency; populated when orderCurrency
+            is 'quote'
+        currentOrderBaseSize:
+          type: number
+          format: double
+          description: Currently active size in base currency; populated when orderCurrency
+            is 'base'
+        currentOrderQuoteSize:
+          type: number
+          format: double
+          description: Currently active size in quote currency; populated when orderCurrency
+            is 'quote'
+        remainingOrderBaseSize:
+          type: number
+          format: double
+          description: Remaining unfilled size in base currency; populated when orderCurrency
+            is 'base'
+        remainingOrderQuoteSize:
+          type: number
+          format: double
+          description: Remaining unfilled size in quote currency; populated when orderCurrency
+            is 'quote'
+        filledBaseSize:
+          type: number
+          format: double
+          description: Size filled by the most recent match, in base currency
+        totalFilledBaseSize:
+          type: number
+          format: double
+          description: Cumulative filled size across all matches, in base currency
+        avgFilledPrice:
+          type: number
+          format: double
+          description: Volume-weighted average fill price
+        originalPrice:
+          type: number
+          format: double
+          description: The order's limit price before this amendment was applied.
+        time_in_force:
+          type: string
+          description: Time-in-force policy (GTC, IOC, FOK); null when not applicable
+            to the order type
+    Limit:
+      allOf:
+      - $ref: '#/components/schemas/PlaceOrderReq'
+      - type: object
+        properties:
+          symbol:
+            type: string
+            description: Trading pair, e.g. BTC-USDT
+          orderType:
+            type: string
+            description: LIMIT
+            enum:
+            - LIMIT
+            - MARKET
+            - PEG
+            - OCO
+            - TWAP
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: BUY or SELL
+            enum:
+            - BUY
+            - SELL
+          orderPrice:
+            type: number
+            format: double
+            description: Limit price to trade at
+          orderSize:
+            type: number
+            format: double
+            description: Order quantity in base currency
+          timeInForce:
+            type: string
+            default: GTC
+            description: Time-in-force policy (GTC, IOC, FOK)
+            enum:
+            - FOK
+            - IOC
+            - GTC
+            - HALFMIN
+            - FIVEMIN
+            - HOUR
+            - TWELVEHOUR
+            - DAY
+            - WEEK
+            - MONTH
+          clOrderId:
+            type: string
+            description: Client-supplied order identifier, echoed in the response
+              (max 64 characters)
+          postOnly:
+            type: boolean
+            description: If true, reject the order if it would immediately match (post-only
+              / maker-only)
+      description: Limit order — executes at the specified price or better
+      required:
+      - orderPrice
+      - orderSide
+      - orderSize
+      - orderType
+      - symbol
+    Market:
+      allOf:
+      - $ref: '#/components/schemas/PlaceOrderReq'
+      - type: object
+        properties:
+          symbol:
+            type: string
+            description: Trading pair, e.g. BTC-USDT
+          orderType:
+            type: string
+            description: MARKET
+            enum:
+            - LIMIT
+            - MARKET
+            - PEG
+            - OCO
+            - TWAP
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: BUY or SELL
+            enum:
+            - BUY
+            - SELL
+          clOrderId:
+            type: string
+            description: Client-supplied order identifier, echoed in the response
+              (max 64 characters)
+          quoteOrderSize:
+            type: number
+            format: double
+            description: Order amount in quote currency; only for BUY side
+          orderSize:
+            type: number
+            format: double
+            description: Order quantity in base currency; only for SELL side
+      description: Market order — executes immediately at the best available prices
+      required:
+      - orderSide
+      - orderType
+      - symbol
+    PlaceOrderReq:
+      discriminator:
+        propertyName: orderType
+      properties:
+        orderType:
+          type: string
+      required:
+      - orderType
+    PlaceOrderResp:
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: Server-assigned order identifier
+        clOrderId:
+          type: string
+          description: Echo of the client-supplied order identifier if one was provided
+        status:
+          type: integer
+          format: int32
+          description: Numeric status code reflecting the current state of the order
+            (e.g. filled, cancelled, rejected)
+        market:
+          type: string
+          description: Trading pair, e.g. BTC-USDT
+        type:
+          type: integer
+          format: int32
+          description: Numeric code identifying the order type (e.g. LIMIT, MARKET,
+            TWAP, PEG)
+        orderSide:
+          type: string
+          description: BUY or SELL
+        orderPrice:
+          type: number
+          format: double
+          description: Order price
+        postOnly:
+          type: boolean
+          description: Whether the order was submitted as post-only
+        timestamp:
+          type: integer
+          format: int64
+          description: Server-side event timestamp in epoch milliseconds
+        orderDetailType:
+          type: string
+          description: Detailed order sub-type when applicable (e.g. TWAP for algo
+            TWAP orders)
+          enum:
+          - TWAP
+          - PARTIAL_LIQUIDATION
+          - FORCED_MARKET_BUY
+          - FORCED_MARKET_SELL
+        message:
+          type: string
+          description: Optional diagnostic message; present only when one is returned
+            (e.g. rejection reason)
+        userQuoteCurrency:
+          type: string
+          description: Quote currency configured for the user
+        orderCurrency:
+          type: string
+          description: '''quote'' or ''base''; indicates whether the quote-size or
+            base-size fields below are populated'
+        originalOrderBaseSize:
+          type: number
+          format: double
+          description: Original size in base currency; populated when orderCurrency
+            is 'base'
+        originalOrderQuoteSize:
+          type: number
+          format: double
+          description: Original size in quote currency; populated when orderCurrency
+            is 'quote'
+        currentOrderBaseSize:
+          type: number
+          format: double
+          description: Currently active size in base currency; populated when orderCurrency
+            is 'base'
+        currentOrderQuoteSize:
+          type: number
+          format: double
+          description: Currently active size in quote currency; populated when orderCurrency
+            is 'quote'
+        remainingOrderBaseSize:
+          type: number
+          format: double
+          description: Remaining unfilled size in base currency; populated when orderCurrency
+            is 'base'
+        remainingOrderQuoteSize:
+          type: number
+          format: double
+          description: Remaining unfilled size in quote currency; populated when orderCurrency
+            is 'quote'
+        filledBaseSize:
+          type: number
+          format: double
+          description: Size filled by the most recent match, in base currency
+        totalFilledBaseSize:
+          type: number
+          format: double
+          description: Cumulative filled size across all matches, in base currency
+        avgFilledPrice:
+          type: number
+          format: double
+          description: Volume-weighted average fill price
+        time_in_force:
+          type: string
+          description: Time-in-force policy (GTC, IOC, FOK); null when not applicable
+            to the order type
+    CancelAllAfterReq:
+      type: object
+      description: 'Dead-man switch: cancel all orders if no further request is received
+        within timeout'
+      properties:
+        timeout:
+          type: integer
+          format: int64
+          description: 'Countdown in milliseconds; all open orders are cancelled once
+            this window elapses. Send another request before it expires to reset or
+            replace the pending switch. Example: 60000.'
+    Conditional:
+      allOf:
+      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
+      - type: object
+        properties:
+          symbol:
+            type: string
+            description: Trading pair, e.g. BTC-USDT
+          orderType:
+            type: string
+            description: CONDITIONAL
+            enum:
+            - LIMIT
+            - MARKET
+            - PEG
+            - OCO
+            - TWAP
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: BUY or SELL
+            enum:
+            - BUY
+            - SELL
+          triggerPrice:
+            type: number
+            format: double
+            description: Price that activates the order
+          triggerOrderType:
+            type: string
+            description: 'Trigger behavior: STOP_LOSS, TAKE_PROFIT, STOP_LOSS_LIMIT,
+              or TAKE_PROFIT_LIMIT'
+            enum:
+            - STOP_LOSS
+            - TAKE_PROFIT
+            - STOP_LOSS_LIMIT
+            - TAKE_PROFIT_LIMIT
+          triggerPriceType:
+            type: string
+            description: Reference price for the trigger (LAST_PRICE, MARK_PRICE,
+              or INDEX_PRICE)
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+          clOrderId:
+            type: string
+            description: Client-supplied order identifier, echoed in the response
+              (max 64 characters)
+          orderSize:
+            type: number
+            format: double
+            description: Order quantity in base currency; required for SELL market
+              and for the STOP_LOSS_LIMIT / TAKE_PROFIT_LIMIT variants
+          quoteOrderSize:
+            type: number
+            format: double
+            description: only for market order in BUY side
+          orderPrice:
+            type: number
+            format: double
+            description: only for limit order
+          timeInForce:
+            type: string
+            default: GTC
+            description: Time-in-force policy for the limit variants (GTC, IOC, FOK)
+            enum:
+            - FOK
+            - IOC
+            - GTC
+            - HALFMIN
+            - FIVEMIN
+            - HOUR
+            - TWELVEHOUR
+            - DAY
+            - WEEK
+            - MONTH
+          postOnly:
+            type: boolean
+            description: If true, reject the limit variant if it would immediately
+              match (post-only / maker-only)
+      description: Conditional (Trigger) order — placed on the book once a trigger
+        price is reached
+      required:
+      - orderSide
+      - orderType
+      - symbol
+      - triggerOrderType
+      - triggerPrice
+      - triggerPriceType
+    Oco:
+      allOf:
+      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
+      - type: object
+        properties:
+          symbol:
+            type: string
+            description: Trading pair, e.g. BTC-USDT
+          orderType:
+            type: string
+            description: OCO
+            enum:
+            - LIMIT
+            - MARKET
+            - PEG
+            - OCO
+            - TWAP
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: BUY or SELL
+            enum:
+            - BUY
+            - SELL
+          orderSize:
+            type: number
+            format: double
+            description: Order quantity in base currency
+          takeProfitOrderPrice:
+            type: number
+            format: double
+            description: Limit price of the take-profit leg
+          stopLossOrderPrice:
+            type: number
+            format: double
+            description: Limit price used once the stop-loss trigger fires
+          stopLossTriggerPrice:
+            type: number
+            format: double
+            description: Price that activates the stop-loss leg
+          stopLossTriggerPriceType:
+            type: string
+            description: Reference price for the stop-loss trigger (LAST_PRICE, MARK_PRICE,
+              or INDEX_PRICE)
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+          clOrderId:
+            type: string
+            description: Client-supplied order identifier, echoed in the response
+              (max 64 characters)
+          timeInForce:
+            type: string
+            default: GTC
+            description: Time-in-force policy for the take-profit leg (GTC, IOC, FOK)
+            enum:
+            - FOK
+            - IOC
+            - GTC
+            - HALFMIN
+            - FIVEMIN
+            - HOUR
+            - TWELVEHOUR
+            - DAY
+            - WEEK
+            - MONTH
+          postOnly:
+            type: boolean
+            description: If true, reject the take-profit leg if it would immediately
+              match (post-only / maker-only)
+      description: 'One-Cancels-the-Other: If you submit this request, this would
+        place a take-profit limit order and a stop-loss trigger-limit order'
+      required:
+      - orderSide
+      - orderSize
+      - orderType
+      - stopLossOrderPrice
+      - stopLossTriggerPrice
+      - stopLossTriggerPriceType
+      - symbol
+      - takeProfitOrderPrice
+    Peg:
+      allOf:
+      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
+      - type: object
+        properties:
+          symbol:
+            type: string
+            description: Trading pair, e.g. BTC-USDT
+          orderType:
+            type: string
+            description: PEG
+            enum:
+            - LIMIT
+            - MARKET
+            - PEG
+            - OCO
+            - TWAP
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: BUY or SELL
+            enum:
+            - BUY
+            - SELL
+          orderPrice:
+            type: number
+            format: double
+            description: Base price the order is pegged to
+          orderSize:
+            type: number
+            format: double
+            description: Order quantity in base currency
+          clOrderId:
+            type: string
+            description: Client-supplied order identifier, echoed in the response
+              (max 64 characters)
+          stealth:
+            type: number
+            format: double
+            description: between 1 and 100
+          deviation:
+            type: number
+            format: double
+            description: between -10 and 10, defaults to 0
+      description: Peg order — a limit order whose price tracks the top of the book
+      required:
+      - orderPrice
+      - orderSide
+      - orderSize
+      - orderType
+      - stealth
+      - symbol
+    PlaceAlgoOrderReq:
+      discriminator:
+        propertyName: orderType
+      properties:
+        orderType:
+          type: string
+      required:
+      - orderType
+    Trailing:
+      allOf:
+      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
+      - type: object
+        properties:
+          symbol:
+            type: string
+            description: Trading pair, e.g. BTC-USDT
+          orderType:
+            type: string
+            description: TRAILING
+            enum:
+            - LIMIT
+            - MARKET
+            - PEG
+            - OCO
+            - TWAP
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: BUY or SELL
+            enum:
+            - BUY
+            - SELL
+          trailValue:
+            type: number
+            format: double
+            description: Distance the trigger price trails the extreme price; must
+              be positive
+          trailValueType:
+            type: string
+            description: Whether trailValue is an absolute distance (DISTANCE) or
+              a percentage (PERCENTAGE)
+            enum:
+            - DISTANCE
+            - PERCENTAGE
+          triggerPriceType:
+            type: string
+            default: LAST_PRICE
+            description: Reference price used to update the trailing trigger (LAST_PRICE,
+              MARK_PRICE, or INDEX_PRICE)
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+          clOrderId:
+            type: string
+            description: Client-supplied order identifier, echoed in the response
+              (max 64 characters)
+          orderSize:
+            type: number
+            format: double
+            description: Order quantity in base currency; only for SELL side
+          quoteOrderSize:
+            type: number
+            format: double
+            description: Order amount in quote currency; only for BUY side
+          activationTriggerPrice:
+            type: number
+            format: double
+            description: Only arm the trailing stop after the market price reaches
+              this level
+          activationTriggerPriceType:
+            type: string
+            description: Reference price for the activation trigger (LAST_PRICE, MARK_PRICE,
+              or INDEX_PRICE)
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+      description: Trailing stop order — the trigger price follows the market at a
+        fixed distance
+      required:
+      - orderSide
+      - orderType
+      - symbol
+      - trailValue
+      - trailValueType
+    Twap:
+      allOf:
+      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
+      - type: object
+        properties:
+          symbol:
+            type: string
+            description: Trading pair, e.g. BTC-USDT
+          orderType:
+            type: string
+            description: TWAP
+            enum:
+            - LIMIT
+            - MARKET
+            - PEG
+            - OCO
+            - TWAP
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: BUY or SELL
+            enum:
+            - BUY
+            - SELL
+          orderSize:
+            type: number
+            format: double
+            description: Total order quantity in base currency
+          timePeriod:
+            type: integer
+            format: int64
+            description: Total execution window in seconds
+          clOrderId:
+            type: string
+            description: Client-supplied order identifier, echoed in the response
+              (max 64 characters)
+          makerFirst:
+            type: boolean
+            description: If true, place child orders as post-only first before falling
+              back to taker
+          randomizeSize:
+            type: boolean
+            description: If true, randomize child order sizes to reduce predictability
+          subTwapMaxOrderSize:
+            type: number
+            format: double
+            description: Maximum size of each child order, in base currency
+          maxSpread:
+            type: number
+            format: double
+            description: Pause execution while the bid-ask spread exceeds this value
+          maxDistanceThroughBook:
+            type: number
+            format: double
+            default: -1
+            description: 0 to 1; omit or set negative to disable, defaults to -1 (disabled)
+          pausePrice:
+            type: number
+            format: double
+            description: Pause execution when the reference price crosses this level
+          activationTriggerPrice:
+            type: number
+            format: double
+            description: Delay execution until the market price reaches this level
+          activationTriggerPriceType:
+            type: string
+            description: Reference price for the activation trigger (LAST_PRICE, MARK_PRICE,
+              or INDEX_PRICE)
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+      description: TWAP order — slices a large order into smaller child orders spread
+        across a time window
+      required:
+      - orderSide
+      - orderSize
+      - orderType
+      - symbol
+      - timePeriod
+    TradeHistoryResp:
+      type: object
+      properties:
+        serialId:
+          type: integer
+          format: int64
+          description: Monotonic sequence identifier for this trade record.
+        tradeId:
+          type: string
+          description: Unique trade identifier.
+        orderId:
+          type: string
+          description: Identifier of the order this trade was executed against.
+        clOrderId:
+          type: string
+          description: Client-supplied order identifier of the originating order.
+        symbol:
+          type: string
+          description: Trading pair, formatted as BASE-QUOTE (e.g. BTC-USDT).
+        base:
+          type: string
+          description: Base currency of the trading pair.
+        quote:
+          type: string
+          description: Quote currency of the trading pair.
+        orderSide:
+          type: string
+          description: 'Order side: BUY or SELL.'
+        orderType:
+          type: integer
+          format: int32
+          description: Numeric order-type code of the originating order (limit, market,
+            peg, TWAP).
+        triggerType:
+          type: integer
+          format: int32
+          description: Numeric trigger order-type code (stop-loss, take-profit, stop-loss-limit,
+            or take-profit-limit). Only meaningful when the originating order was
+            a trigger order.
+        triggerPrice:
+          type: number
+          format: double
+          description: Trigger price of the originating order. Only meaningful when
+            the originating order was a trigger order.
+        price:
+          type: number
+          format: double
+          description: Execution price of this trade.
+        size:
+          type: number
+          format: double
+          description: Original order size of the originating order.
+        filledSize:
+          type: number
+          format: double
+          description: Amount filled by this trade, in base currency.
+        feeCurrency:
+          type: string
+          description: Currency in which the trading fee was charged.
+        feeAmount:
+          type: number
+          format: double
+          description: Trading fee amount charged for this trade, in feeCurrency.
+        timestamp:
+          type: integer
+          format: int64
+          description: Trade execution timestamp in Unix epoch milliseconds.
+    OrderDetail: {}
+    QueryOrderResp:
+      type: object
+      properties:
+        requestId:
+          type: integer
+          format: int64
+          description: Request identifier associated with the order submission.
+        orderId:
+          type: string
+          description: Server-assigned unique order identifier.
+        clOrderId:
+          type: string
+          description: Client-supplied order identifier (custom tag).
+        symbol:
+          type: string
+          description: Trading pair, formatted as BASE-QUOTE (e.g. BTC-USDT).
+        quote:
+          type: string
+          description: Quote currency of the trading pair.
+        orderState:
+          type: string
+          description: Current order status label (e.g. active, inactive, cancelled).
+        orderType:
+          type: integer
+          format: int32
+          description: Numeric order-type code (limit, market, peg, TWAP).
+        orderSide:
+          type: string
+          description: 'Order side: BUY or SELL.'
+        orderPrice:
+          type: number
+          format: double
+          description: Order limit price. Zero for market orders.
+        orderValue:
+          type: number
+          format: double
+          description: Current order value expressed in the user's account currency.
+        timestamp:
+          type: integer
+          format: int64
+          description: Order creation timestamp in Unix epoch milliseconds.
+        timeInForce:
+          type: string
+          description: 'Time-in-force policy: GTC, IOC, FOK, or null if not applicable.'
+        orderCurrency:
+          type: string
+          description: 'Indicates which size fields are populated: "quote" (quote-denominated)
+            or "base" (base-denominated).'
+        originalOrderBaseSize:
+          type: number
+          format: double
+          description: Original order size in base currency. Populated only when orderCurrency
+            is "base".
+        originalOrderQuoteSize:
+          type: number
+          format: double
+          description: Original order size in quote currency. Populated only when
+            orderCurrency is "quote".
+        currentOrderBaseSize:
+          type: number
+          format: double
+          description: Current outstanding order size in base currency. Populated
+            only when orderCurrency is "base".
+        currentOrderQuoteSize:
+          type: number
+          format: double
+          description: Current outstanding order size in quote currency. Populated
+            only when orderCurrency is "quote".
+        remainingOrderBaseSize:
+          type: number
+          format: double
+          description: Remaining unfilled size in base currency. Populated only when
+            orderCurrency is "base".
+        remainingOrderQuoteSize:
+          type: number
+          format: double
+          description: Remaining unfilled size in quote currency. Populated only when
+            orderCurrency is "quote".
+        totalFilledBaseSize:
+          type: number
+          format: double
+          description: Cumulative filled quantity in base currency.
+        avgFilledPrice:
+          type: number
+          format: double
+          description: Volume-weighted average fill price across all executions of
+            this order.
+        orderDetailType:
+          type: string
+          description: Order detail category classifying the order's purpose or subtype.
+          enum:
+          - TWAP
+          - PARTIAL_LIQUIDATION
+          - FORCED_MARKET_BUY
+          - FORCED_MARKET_SELL
+        orderDetail:
+          $ref: '#/components/schemas/OrderDetail'
+          description: Additional order detail metadata associated with orderDetailType.
+        triggerOrder:
+          type: boolean
+          description: True if this is a trigger (conditional) order.
+        triggered:
+          type: boolean
+          description: True once the trigger condition has fired and the underlying
+            order has been released.
+        triggerUseLastPrice:
+          type: boolean
+          description: True if the trigger evaluates against the last-traded price;
+            false if it evaluates against the mark price. Only meaningful for trigger
+            orders.
+        triggerPrice:
+          type: number
+          format: double
+          description: Effective trigger price. Only meaningful for trigger orders.
+        triggerOriginalPrice:
+          type: number
+          format: double
+          description: Trigger price originally submitted by the client. Only meaningful
+            for trigger orders.
+        triggerOrderType:
+          type: integer
+          format: int32
+          description: Numeric trigger order-type code (stop-loss, take-profit, stop-loss-limit,
+            or take-profit-limit). Only meaningful for trigger orders.
+        triggerStopPrice:
+          type: number
+          format: double
+          description: Stop price for the trigger order. Only meaningful for trigger
+            orders.
+        triggerTrailingStopDeviation:
+          type: number
+          format: double
+          description: Trailing stop deviation from the reference price. Only meaningful
+            for trailing-stop trigger orders.
+        trailValue:
+          type: number
+          format: double
+          description: Trailing offset magnitude. Only meaningful for trailing-stop
+            orders.
+        trailValueType:
+          type: string
+          description: Interpretation of trailValue (e.g. absolute amount or percentage).
+            Only meaningful for trailing-stop orders.
+          enum:
+          - DISTANCE
+          - PERCENTAGE
+        pegPriceMin:
+          type: number
+          format: double
+          description: Lower cap of the peg price band. Only meaningful for peg orders.
+        pegPriceMax:
+          type: number
+          format: double
+          description: Upper cap of the peg price band. Only meaningful for peg orders.
+        pegPriceDeviation:
+          type: number
+          format: double
+          description: Offset applied to the reference price when pegging. Only meaningful
+            for peg orders.
+        currentPegPrice:
+          type: number
+          format: double
+          description: Current effective peg price. Only meaningful for peg orders.
+        wrapperOrder:
+          type: boolean
+          description: True if the order is a wrapper for a group of related orders
+            (e.g. bracket/OCO).
+        activationPrice:
+          type: number
+          format: double
+          description: Activation price at which the order becomes eligible for execution.
+            Only present for orders that use an activation-price feature.
+        activationPriceType:
+          type: string
+          description: Reference price type used when evaluating activationPrice.
+            Only present for orders that use an activation-price feature.
+          enum:
+          - INDEX_PRICE
+          - LAST_PRICE
+          - MARK_PRICE
+    QueryFeesResp:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Trading pair, formatted as BASE-QUOTE (e.g. BTC-USDT).
+        makerFee:
+          type: number
+          format: double
+          description: Maker fee rate applied when the order provides liquidity (e.g.
+            0.001 = 0.1%).
+        takerFee:
+          type: number
+          format: double
+          description: Taker fee rate applied when the order takes liquidity (e.g.
+            0.001 = 0.1%).
+  securitySchemes:
+    APIKey:
+      type: apiKey
+      description: API key is obtained from BTSE platform as a string
+      name: request-api
+      in: header
+    Nonce:
+      type: apiKey
+      description: Representation of current timestamp in long format
+      name: request-nonce
+      in: header
+    Signature:
+      type: apiKey
+      description: 'A composite signature produced based on the following algorithm:
+        Signature=HMAC.Sha384 (secretkey, (urlpath + request-nonce + bodyStr)) (note:
+        bodyStr = '''' when no data)'
+      name: request-sign
+      in: header

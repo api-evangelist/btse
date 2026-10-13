@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-futures-order-response-schema.json",
+  "title": "FuturesOrderResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-futures-legacy-openapi.yml#/components/schemas/FuturesOrderResponse",
+  "type": "object",
+  "properties": {
+    "symbol": {
+      "type": "string",
+      "description": "Market symbol"
+    },
+    "orderID": {
+      "type": "string",
+      "description": "Order ID"
+    },
+    "clOrderID": {
+      "type": "string",
+      "description": "Custom order ID"
+    },
+    "orderType": {
+      "type": "integer",
+      "description": "`76`: Limit · `77`: Market · `80`: Algo"
+    },
+    "side": {
+      "type": "string",
+      "description": "Trade side"
+    },
+    "price": {
+      "type": "number",
+      "description": "Order price"
+    },
+    "status": {
+      "type": "integer",
+      "description": "Order status code: `2` (ORDER_INSERTED) · `4` (FULLY_MATCHED) · `5` (PARTIAL_FILL) · `6` (CANCELLED) · `9` (TRIGGER_INSERTED) · `10` (TRIGGER_ACTIVATED) · `15` (REJECTED)"
+    },
+    "time_in_force": {
+      "type": "string",
+      "description": "Time in force: `GTC` · `IOC` · `FOK` · `HALFMIN` · `FIVEMIN` · `HOUR` · `TWELVEHOUR` · `DAY` · `WEEK` · `MONTH`"
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Order timestamp"
+    },
+    "trigger": {
+      "type": "boolean",
+      "description": "Whether order is a trigger order"
+    },
+    "triggerPrice": {
+      "type": "number",
+      "description": "Trigger price (`0` if not a trigger order)"
+    },
+    "avgFilledPrice": {
+      "type": "number",
+      "description": "Average filled price"
+    },
+    "message": {
+      "type": "string",
+      "description": "Trade message"
+    },
+    "stealth": {
+      "type": "number",
+      "description": "Algo orders only"
+    },
+    "deviation": {
+      "type": "number",
+      "description": "Algo orders only"
+    },
+    "remainingSize": {
+      "type": "integer",
+      "description": "Current order size minus filled size"
+    },
+    "originalOrderSize": {
+      "type": "integer",
+      "description": "Original quantity — unchanged after amendments"
+    },
+    "currentOrderSize": {
+      "type": "integer",
+      "description": "Latest quantity (filled + remaining)"
+    },
+    "filledSize": {
+      "type": "integer",
+      "description": "Quantity filled in this update"
+    },
+    "totalFilledSize": {
+      "type": "integer",
+      "description": "Cumulative filled quantity"
+    },
+    "postOnly": {
+      "type": "boolean",
+      "description": "Whether order is post-only"
+    },
+    "positionMode": {
+      "type": "string",
+      "description": "`ONE_WAY` · `HEDGE` · `ISOLATED`"
+    },
+    "positionDirection": {
+      "type": "string",
+      "description": "Position direction: `LONG` · `SHORT` (only present in HEDGE/ISOLATED mode)"
+    },
+    "positionId": {
+      "type": "string",
+      "description": "Position ID"
+    }
+  }
+}

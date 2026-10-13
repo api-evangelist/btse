@@ -1,0 +1,13 @@
+generated: '2026-10-13'
+method: searched
+source: https://docs.btse.com/authentication
+name: BTSE API Rate Limits
+docs: https://docs.btse.com/authentication
+status_code: 429
+headers: [Retry-After]
+limits:
+- {name: Query per API, window: 1 second, max: 15, scope: per-endpoint, limit_text: 15 req/s}
+- {name: Query per User, window: 1 second, max: 30, scope: per-account, limit_text: 30 req/s}
+- {name: Orders per API, window: 1 second, max: 75, scope: per-endpoint, limit_text: 75 req/s}
+- {name: Orders per User, window: 1 second, max: 75, scope: per-account, limit_text: 75 req/s}
+notes: 'Exceeding a rate limit triggers a tiered block: 1st breach 1 second, 2nd breach 5 minutes, 3rd breach 15 minutes.'

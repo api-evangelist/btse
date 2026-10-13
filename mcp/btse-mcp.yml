@@ -1,0 +1,220 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-mcp-candidate.py
+source:
+- openapi/btse-earn-openapi.yml
+- openapi/btse-futures-legacy-openapi.yml
+- openapi/btse-futures-openapi.yml
+- openapi/btse-markets-openapi.yml
+- openapi/btse-otc-openapi.yml
+- openapi/btse-spot-openapi.yml
+- openapi/btse-wallet-openapi.yml
+status: candidate
+deployment:
+  mode: none
+  auth: unknown
+  verified: probed
+note: 'No MCP server was found. The pre-flight posted tools/list to /mcp on www.btse.com, api.btse.com, app.btse.com, docs.btse.com; verdict opaque
+  (https://support.btse.com/mcp answered 401: the edge authenticates before it routes, which proves nothing either way). Candidate tools below
+  are derived from the 70 operation(s) in the provider''s own OpenAPI (40 listed); they describe what a server WOULD expose, not one that exists.'
+tools:
+- name: get_investment_products
+  operationId: getInvestmentProducts
+  method: GET
+  path: /api/v3.3/invest/products
+  description: Query Investment Products
+- name: create_order
+  operationId: createOrder
+  method: POST
+  path: /api/v2.3/order
+  description: Create New Order
+- name: get_orders
+  operationId: getOrders
+  method: GET
+  path: /v3/trade/orders
+  description: Get orders
+- name: get_exchange_info
+  operationId: getExchangeInfo
+  method: GET
+  path: /public-api/market/v1/exchangeInfo
+  description: Exchange Rule and Symbol Information
+- name: get_otc_markets
+  operationId: getOtcMarkets
+  method: GET
+  path: /public-api/otc/v1/markets
+  description: Get OTC Markets
+- name: get_fees
+  operationId: getFees
+  method: GET
+  path: /spot/api/v4/trade/fees
+  description: Get fees
+- name: get_assets
+  operationId: getAssets
+  method: GET
+  path: /public-api/wallet/v1/assets
+  description: Assets
+- name: deposit_investment
+  operationId: depositInvestment
+  method: POST
+  path: /api/v3.3/invest/deposit
+  description: Deposit Investment
+- name: get_order
+  operationId: getOrder
+  method: GET
+  path: /api/v2.3/order
+  description: Query Order
+- name: place_order
+  operationId: placeOrder
+  method: POST
+  path: /v3/trade/orders
+  description: Place an order
+- name: get_markets
+  operationId: getMarkets
+  method: GET
+  path: /public-api/market/v1/markets
+  description: Markets Information
+- name: request_quote
+  operationId: requestQuote
+  method: POST
+  path: /public-api/otc/v1/quotes
+  description: Request Quote
+- name: cancel_all_orders
+  operationId: cancelAllOrders
+  method: DELETE
+  path: /spot/api/v4/trade/orders/all
+  description: Cancel all orders
+- name: get_crypto_list
+  operationId: getCryptoList
+  method: GET
+  path: /public-api/wallet/v1/crypto/list
+  description: Crypto List
+- name: renew_investment
+  operationId: renewInvestment
+  method: POST
+  path: /api/v3.3/invest/renew
+  description: Renew Investment
+- name: amend_order
+  operationId: amendOrder
+  method: PUT
+  path: /api/v2.3/order
+  description: Amend Order
+- name: settle_in
+  operationId: settleIn
+  method: POST
+  path: /v3/trade/settle_in
+  description: Change settlement currency
+- name: get_orderbook
+  operationId: getOrderbook
+  method: GET
+  path: /public-api/market/v1/orderbook
+  description: Order Book
+- name: get_quote
+  operationId: getQuote
+  method: GET
+  path: /public-api/otc/v1/quotes
+  description: Query Quote
+- name: get_crypto_networks
+  operationId: getCryptoNetworks
+  method: GET
+  path: /public-api/wallet/v1/crypto/networks
+  description: Crypto Networks
+- name: redeem_investment
+  operationId: redeemInvestment
+  method: POST
+  path: /api/v3.3/invest/redeem
+  description: Redeem Investment
+- name: cancel_order
+  operationId: cancelOrder
+  method: DELETE
+  path: /api/v2.3/order
+  description: Cancel Order
+- name: change_risk_limit
+  operationId: changeRiskLimit
+  method: POST
+  path: /v3/trade/risk_limit
+  description: Change risk limit
+- name: get_recent_trades
+  operationId: getRecentTrades
+  method: GET
+  path: /public-api/market/v1/trades
+  description: Recent Trades List
+- name: accept_quote
+  operationId: acceptQuote
+  method: POST
+  path: /public-api/otc/v1/quotes/accept
+  description: Accept Quote
+- name: get_asset_exchange_rate
+  operationId: getAssetExchangeRate
+  method: GET
+  path: /public-api/wallet/v1/assets/exchangeRate
+  description: Get Asset Exchange Rate
+- name: get_investment_orders
+  operationId: getInvestmentOrders
+  method: GET
+  path: /api/v3.3/invest/orders
+  description: Query Investment Orders
+- name: create_algo_order
+  operationId: createAlgoOrder
+  method: POST
+  path: /api/v2.3/order/peg
+  description: Create New Algo Order
+- name: bind_position_tp_sl
+  operationId: bindPositionTpSl
+  method: POST
+  path: /v3/trade/positions/tpsl
+  description: Bind take-profit / stop-loss to a position
+- name: get_klines
+  operationId: getKlines
+  method: GET
+  path: /public-api/market/v1/klines
+  description: Klines (OHLCV)
+- name: get_user_assets
+  operationId: getUserAssets
+  method: GET
+  path: /public-api/wallet/v1/user/assets
+  description: User Wallet
+- name: get_investment_history
+  operationId: getInvestmentHistory
+  method: GET
+  path: /api/v3.3/invest/history
+  description: Query Investment History
+- name: cancel_all_after
+  operationId: cancelAllAfter
+  method: POST
+  path: /api/v2.3/order/cancelAllAfter
+  description: Dead Man's Switch (Cancel All After)
+- name: place_algo_order
+  operationId: placeAlgoOrder
+  method: POST
+  path: /v3/trade/orders/algo
+  description: Place an algo order
+- name: get24hr_ticker
+  operationId: get24hrTicker
+  method: GET
+  path: /public-api/market/v1/ticker/24hr
+  description: 24hr Ticker Price Change
+- name: get_user_wallet_history
+  operationId: getUserWalletHistory
+  method: GET
+  path: /public-api/wallet/v1/user/walletHistory
+  description: User Wallet History
+- name: close_position
+  operationId: closePosition
+  method: POST
+  path: /api/v2.3/order/close_position
+  description: Close Position
+- name: change_leverage
+  operationId: changeLeverage
+  method: POST
+  path: /v3/trade/leverage
+  description: Set leverage
+- name: get_price_ticker
+  operationId: getPriceTicker
+  method: GET
+  path: /public-api/market/v1/ticker/price
+  description: Price Ticker
+- name: get_address
+  operationId: getAddress
+  method: GET
+  path: /public-api/wallet/v1/user/crypto/address
+  description: Query Address

@@ -1,0 +1,221 @@
+asyncapi: 2.6.0
+info:
+  title: OTC WebSocket API
+  version: 1.0.0
+  description: |
+    OTC WebSocket stream for real-time OTC quote data.
+
+    **Production Endpoint:** `wss://ws.btse.com/ws/otc`
+    **Testnet Endpoint:** `wss://testws.btse.io/ws/otc`
+
+    **Authentication:** Private topics require sending an `authKeyExpires` message
+    with HMAC-SHA384 signature: `HMAC-SHA384(secret, "/ws/otc" + nonce)`
+
+servers:
+  production:
+    url: wss://ws.btse.com/ws/otc
+    protocol: wss
+    description: Production
+  testnet:
+    url: wss://testws.btse.io/ws/otc
+    protocol: wss
+    description: Testnet
+
+channels:
+  # ─── Authentication ──────────────────────────────────────────────────────
+
+  auth:
+    description: |
+      Authenticate the session to access private topics (Quote Stream).
+      Signature: `HMAC-SHA384(secret, "/ws/otc" + nonce)`
+
+      **Signature example:**
+      ```shell
+      echo -n "/ws/otc1624985375123" | openssl dgst -sha384 -hmac "<your-secret>"
+      ```
+
+      Args array:
+      - Index 0: API key
+      - Index 1: Current timestamp (nonce)
+      - Index 2: HMAC-SHA384 hex signature
+    servers: [production, testnet]
+    publish:
+      operationId: authenticate
+      summary: WebSocket Authentication
+      message:
+        payload:
+          $ref: '#/components/schemas/AuthRequest'
+
+  # ─── Quote Stream ────────────────────────────────────────────────────────
+
+  quote:
+    description: |
+      Subscribe to continuous OTC price quotes. Prices are pushed as market conditions change.
+      Requires WebSocket authentication.
+
+      To **accept** a quote, use the `buyQuoteId` or `sellQuoteId` from the stream
+      with the Accept Quote REST endpoint.
+
+      **REST vs WebSocket — when to use which:**
+      - **REST `POST /public-api/otc/v1/quotes`** — request a single quote with a 5-second TTL.
+        This is the standard one-shot RFQ workflow.
+      - **WebSocket `quote` stream (this channel)** — subscribe to a continuous price feed
+        for high-frequency consumers. Independent of the REST RFQ.
+
+      **Subscribe payload differs from spot/futures.** OTC uses `op: quote` with a top-level
+      `symbol` (and optional `side`, `quantity`); it does **not** use the spot/futures
+      `{op: "subscribe", args: [...]}` form. Sending a spot/futures-style payload is silently
+      acked with `{event: "subscribe", channel: []}` and produces no data.
+
+      ```jsonc
+      // ✅ OTC subscribe
+      { "op": "quote", "symbol": "BTC-USD", "quantity": { "quantity": 1, "currency": "BTC" } }
+
+      // ❌ Spot/futures style — does NOT work for OTC
+      { "op": "subscribe", "args": ["quote"] }
+      ```
+
+      **Operations:**
+      - `quote`: subscribe to quote stream
+      - `unsubscribe-quote`: unsubscribe from a specific quote stream
+      - `unsubscribe-quote-all`: unsubscribe from all quote streams
+    servers: [production, testnet]
+    publish:
+      operationId: subscribeQuote
+      summary: Subscribe / Unsubscribe Quote Stream
+      message:
+        oneOf:
+          - $ref: '#/components/messages/QuoteSubscribeRequest'
+          - $ref: '#/components/messages/QuoteUnsubscribeRequest'
+          - $ref: '#/components/messages/QuoteUnsubscribeAllRequest'
+    subscribe:
+      operationId: receiveQuote
+      summary: Quote Stream Update
+      message:
+        $ref: '#/components/messages/QuoteStreamMessage'
+
+# ═════════════════════════════════════════════════════════════════════════
+# Components
+# ═════════════════════════════════════════════════════════════════════════
+
+components:
+  messages:
+    QuoteSubscribeRequest:
+      summary: Subscribe to quote stream
+      payload:
+        $ref: '#/components/schemas/QuoteSubscribeRequest'
+      example:
+        op: quote
+        symbol: BTC-USD
+        side: buy
+        clOrderId: ClientOrder1
+        quantity:
+          quantity: 1
+          currency: BTC
+
+    QuoteUnsubscribeRequest:
+      summary: Unsubscribe from a specific quote stream
+      payload:
+        $ref: '#/components/schemas/QuoteUnsubscribeRequest'
+      example:
+        op: unsubscribe-quote
+        symbol: BTC-USD
+        clOrderId: ClientOrder1
+        quantity:
+          quantity: 1
+          currency: BTC
+
+    QuoteUnsubscribeAllRequest:
+      summary: Unsubscribe from all quote streams
+      payload:
+        $ref: '#/components/schemas/QuoteUnsubscribeAllRequest'
+      example:
+        op: unsubscribe-quote-all
+
+    QuoteStreamMessage:
+      summary: Real-time OTC quote update
+      payload:
+        $ref: '#/components/schemas/QuoteStreamMessage'
+      example:
+        topic: quote
+        buyQuoteId: "015f05ba-1d55-46d7-94d9-214229414ae7"
+        sellQuoteId: "0683a41a-a2ad-467b-99b3-241f3ab0cec4"
+        clOrderId: null
+        buyQuantity: 10
+        buyUnitPrice: 47865.580838
+        buyTotalAmount: 478655.80838
+        sellQuantity: 10
+        sellUnitPrice: 47649.40351972
+        sellTotalAmount: 476494.0352
+        status: null
+        reason: null
+
+  schemas:
+    # ─── Authentication ────────────────────────────────────────────────────
+
+    AuthRequest:
+      type: object
+      required: [op, args]
+      properties:
+        op:   { type: string, const: authKeyExpires, description: "Operation — fixed value `authKeyExpires`" }
+        args:
+          type: array
+          items: { type: string }
+          minItems: 3
+          maxItems: 3
+          description: "[API_KEY, NONCE, HMAC-SHA384_SIGNATURE]"
+      example:
+        op: authKeyExpires
+        args: ["<API_KEY>", "<NONCE>", "<SIGNATURE>"]
+
+    # ─── Quote Subscription ────────────────────────────────────────────────
+
+    QuantityObject:
+      type: object
+      required: [quantity, currency]
+      properties:
+        quantity: { type: number,  description: Order quantity }
+        currency: { type: string,  description: Currency (base or quote) }
+
+    QuoteSubscribeRequest:
+      type: object
+      required: [op, symbol, quantity]
+      properties:
+        op:        { type: string, const: quote, description: Subscribe operation }
+        symbol:    { type: string, description: "Market symbol (from getMarket)" }
+        side:      { type: string, enum: [buy, sell], description: "`buy` · `sell` (case sensitive). Both sides returned when omitted" }
+        clOrderId: { type: string, description: Custom client order ID }
+        quantity:  { $ref: '#/components/schemas/QuantityObject' }
+
+    QuoteUnsubscribeRequest:
+      type: object
+      required: [op, symbol, quantity]
+      properties:
+        op:        { type: string, const: unsubscribe-quote, description: Unsubscribe operation }
+        symbol:    { type: string, description: Market symbol }
+        clOrderId: { type: string, description: Custom client order ID }
+        quantity:  { $ref: '#/components/schemas/QuantityObject' }
+
+    QuoteUnsubscribeAllRequest:
+      type: object
+      required: [op]
+      properties:
+        op: { type: string, const: unsubscribe-quote-all, description: Unsubscribe all operation }
+
+    # ─── Quote Stream Response ─────────────────────────────────────────────
+
+    QuoteStreamMessage:
+      type: object
+      properties:
+        topic:           { type: string,  const: quote, description: "Always `quote`" }
+        buyQuoteId:      { type: string,  nullable: true, description: "Quote ID for buy side. `null` if not subscribed to buy or not authenticated" }
+        sellQuoteId:     { type: string,  nullable: true, description: "Quote ID for sell side. `null` if not subscribed to sell or not authenticated" }
+        clOrderId:       { type: string,  description: Client order ID }
+        buyQuantity:     { type: number,  nullable: true, description: "Buy quantity. `null` if not subscribed to buy side" }
+        buyUnitPrice:    { type: number,  nullable: true, description: "Unit buy price. `null` if not subscribed to buy side" }
+        buyTotalAmount:  { type: number,  nullable: true, description: "Total buy amount. `null` if not subscribed to buy side" }
+        sellQuantity:    { type: number,  nullable: true, description: "Sell quantity. `null` if not subscribed to sell side" }
+        sellUnitPrice:   { type: number,  nullable: true, description: "Unit sell price. `null` if not subscribed to sell side" }
+        sellTotalAmount: { type: number,  nullable: true, description: "Total sell amount. `null` if not subscribed to sell side" }
+        status:          { type: string,  nullable: true, description: "Response status (`null` on normal updates)" }
+        reason:          { type: string,  nullable: true, description: Error reason if present }

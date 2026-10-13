@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-funding-rate-history-response-schema.json",
+  "title": "FundingRateHistoryResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-markets-openapi.yml#/components/schemas/FundingRateHistoryResponse",
+  "allOf": [
+    {
+      "$ref": "#/$defs/CommonResponse"
+    },
+    {
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FundingRateHistoryItem"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "CommonResponse": {
+      "type": "object",
+      "required": [
+        "success",
+        "code",
+        "msg",
+        "time"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Whether the request succeeded. `true` when HTTP status is `200`"
+        },
+        "code": {
+          "type": "integer",
+          "description": "Status code. `1` on success"
+        },
+        "msg": {
+          "type": "string",
+          "description": "Status message"
+        },
+        "time": {
+          "type": "number",
+          "description": "Current unix timestamp"
+        }
+      }
+    },
+    "FundingRateHistoryItem": {
+      "type": "object",
+      "required": [
+        "timestamp",
+        "rate"
+      ],
+      "properties": {
+        "timestamp": {
+          "type": "number",
+          "description": "Funding timestamp"
+        },
+        "rate": {
+          "type": "string",
+          "description": "Funding rate"
+        }
+      }
+    }
+  }
+}

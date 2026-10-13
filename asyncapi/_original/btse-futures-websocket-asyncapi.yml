@@ -1,0 +1,567 @@
+asyncapi: 2.6.0
+info:
+  title: Futures WebSocket API
+  version: 3.2.0
+  description: |
+    Futures WebSocket streams for real-time market data and private user events.
+
+    **OSS Endpoint (Orderbook):** `wss://ws.btse.com/ws/oss/futures`
+    **Main Endpoint:** `wss://ws.btse.com/ws/futures`
+    **Testnet OSS:** `wss://testws.btse.io/ws/oss/futures`
+    **Testnet Main:** `wss://testws.btse.io/ws/futures`
+
+    **Authentication:** Private topics require sending an `authKeyExpires` message
+    with HMAC-SHA384 signature: `HMAC-SHA384(secret, "/ws/futures" + nonce)`
+
+servers:
+  oss-production:
+    url: wss://ws.btse.com/ws/oss/futures
+    protocol: wss
+    description: Production — Order Stream Service (orderbook data)
+  oss-testnet:
+    url: wss://testws.btse.io/ws/oss/futures
+    protocol: wss
+    description: Testnet — Order Stream Service
+  main-production:
+    url: wss://ws.btse.com/ws/futures
+    protocol: wss
+    description: Production — Main WebSocket (trades, auth, notifications)
+  main-testnet:
+    url: wss://testws.btse.io/ws/futures
+    protocol: wss
+    description: Testnet — Main WebSocket
+
+channels:
+  # ─── Heartbeat ───────────────────────────────────────────────────────────
+
+  ping:
+    description: |
+      Send a plain text `ping` to keep the connection alive. The server responds with `pong`.
+    servers: [main-production, main-testnet, oss-production, oss-testnet]
+    publish:
+      operationId: sendPing
+      summary: Ping
+      message:
+        payload:
+          type: string
+          const: ping
+    subscribe:
+      operationId: receivePong
+      summary: Pong
+      message:
+        payload:
+          type: string
+          const: pong
+
+  # ─── Subscription Management ─────────────────────────────────────────────
+
+  subscription:
+    description: Subscribe or unsubscribe from any topic.
+    servers: [main-production, main-testnet, oss-production, oss-testnet]
+    publish:
+      operationId: subscribe
+      summary: Subscribe / Unsubscribe
+      message:
+        payload:
+          $ref: '#/components/schemas/SubscriptionRequest'
+    subscribe:
+      operationId: subscriptionAck
+      summary: Subscription Acknowledgement
+      message:
+        payload:
+          $ref: '#/components/schemas/SubscriptionResponse'
+
+  # ─── Authentication ──────────────────────────────────────────────────────
+
+  auth:
+    description: |
+      Authenticate the session to access private topics (Notifications, User Trade Fills, Positions).
+      Signature: `HMAC-SHA384(secret, "/ws/futures" + nonce)`
+    servers: [main-production, main-testnet]
+    publish:
+      operationId: authenticate
+      summary: WebSocket Authentication
+      message:
+        payload:
+          $ref: '#/components/schemas/AuthRequest'
+
+  # ─── OSS: Order Book Streams ─────────────────────────────────────────────
+
+  "snapshotL1:{symbol}":
+    description: |
+      Subscribe to the best bid / best ask (Level 1) for a market.
+      **Topic format:** `snapshotL1:<symbol>` (e.g. `snapshotL1:BTC-PERP`)
+
+      Each message is a full snapshot of the current best bid / best ask. The `bids` and `asks` arrays
+      each contain a single `[price, size]` tuple representing the top of book, and the `type` field
+      is always `snapshotL1`.
+
+      Bids and asks are sent in `price` and `size` tuples as strings to preserve precision;
+      clients should parse them with a high-precision type (e.g. `BigDecimal`, `decimal.js`)
+      before performing arithmetic.
+
+      Because every push is a full snapshot, clients can simply overwrite the local copy on each
+      message — there is no sequence number, and no delta merging is required. If the connection
+      drops, re-subscribe to the topic to resume receiving updates.
+    parameters:
+      symbol:
+        description: Market symbol (e.g. BTC-PERP)
+        schema:
+          type: string
+    servers: [oss-production, oss-testnet]
+    publish:
+      operationId: subscribeL1Snapshot
+      message:
+        oneOf:
+          - $ref: '#/components/messages/L1Subscribe'
+          - $ref: '#/components/messages/L1Unsubscribe'
+    subscribe:
+      operationId: receiveL1Snapshot
+      summary: OSS L1 Snapshot
+      message:
+        payload:
+          $ref: '#/components/schemas/L1SnapshotMessage'
+
+  "update:{symbol}_{grouping}":
+    description: |
+      Subscribe to orderbook incremental updates through the `update` topic.
+      **Topic format:** `update:<symbol>_<grouping>` (e.g. `update:BTC-PERP_0`)
+
+      The `_grouping` suffix represents the granularity of price-level aggregation.
+      Valid values are `0` to `8`. If the suffix is omitted (e.g. `update:BTC-PERP`),
+      `_0` is used by default. Different grouping values produce independent topic
+      subscriptions and caches.
+
+      The first response received will be a snapshot of the current orderbook
+      (indicated by the `type` field) with up to 50 levels. Incremental updates
+      will be sent in subsequent packets with type `delta`.
+
+      Bids and asks will be sent in `price` and `size` tuples. The size sent will
+      be the new updated size for the price. If a value of `"0"` is sent, the price
+      should be removed from the local copy of the orderbook.
+
+      To ensure that the updates are received in sequence, `seqNum` indicates the
+      current sequence and `prevSeqNum` refers to the packet before. `seqNum` will
+      always be one after the `prevSeqNum`. If the sequence is out of order,
+      unsubscribe and re-subscribe to the topic again.
+
+      Also, if a [crossed orderbook](https://en.wikipedia.org/wiki/Order_book#Crossed_book)
+      ever occurs (best bid is higher than or equal to best ask), unsubscribe and
+      re-subscribe to the topic again.
+    parameters:
+      symbol:
+        description: Market symbol
+        schema:
+          type: string
+      grouping:
+        description: |
+          Price-tick grouping level. `0` is the finest grouping (raw book);
+          higher values aggregate into wider price buckets.
+        schema:
+          type: integer
+          enum: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    servers: [oss-production, oss-testnet]
+    publish:
+      operationId: subscribeOrderbookUpdate
+      message:
+        oneOf:
+          - $ref: '#/components/messages/L2Subscribe'
+          - $ref: '#/components/messages/L2Unsubscribe'
+    subscribe:
+      operationId: receiveOrderbookUpdate
+      summary: Orderbook Incremental Updates
+      message:
+        oneOf:
+          - $ref: '#/components/messages/OrderbookSnapshot'
+          - $ref: '#/components/messages/OrderbookDelta'
+
+  # ─── Main: Public Streams ────────────────────────────────────────────────
+
+  "tradeHistoryApiV3:{symbol}":
+    description: |
+      Real-time public trade feed for a market.
+      **Topic:** `tradeHistoryApiV3:<symbol>` — no authentication required.
+    parameters:
+      symbol:
+        description: Market symbol
+        schema:
+          type: string
+    servers: [main-production, main-testnet]
+    subscribe:
+      operationId: receivePublicTrades
+      summary: Public Trade Fills
+      message:
+        payload:
+          $ref: '#/components/schemas/PublicTradeMessage'
+
+  # ─── Main: Private Streams ──────────────────────────────────────────────
+
+  notificationApiV4:
+    description: |
+      Real-time order status updates. Requires WebSocket authentication.
+      **Topic:** `notificationApiV4`
+
+      Carries the full v2.3 size set (`originalOrderSize`, `currentOrderSize`,
+      `filledSize`, `totalFilledSize`, `remainingSize`) plus `positionId` and
+      `postOnly`, so partial fills and post-only orders are represented faithfully.
+    servers: [main-production, main-testnet]
+    subscribe:
+      operationId: receiveNotifications
+      summary: Notifications
+      message:
+        payload:
+          $ref: '#/components/schemas/NotificationMessage'
+
+  fillsV2:
+    description: |
+      Notification whenever a trade is executed for the authenticated user. Requires WebSocket authentication.
+      **Topic:** `fillsV2`
+    servers: [main-production, main-testnet]
+    subscribe:
+      operationId: receiveUserFills
+      summary: User Trade Fills
+      message:
+        payload:
+          $ref: '#/components/schemas/UserFillMessage'
+
+  allPositionV4:
+    description: |
+      Pushed whenever any position changes. Requires WebSocket authentication.
+      **Topic:** `allPositionV4`
+    servers: [main-production, main-testnet]
+    subscribe:
+      operationId: receiveAllPositions
+      summary: All Position
+      message:
+        payload:
+          $ref: '#/components/schemas/AllPositionMessage'
+
+  positionsV3:
+    description: |
+      Pushed when a position changes. Includes a zero-value snapshot when a position is closed.
+      Requires WebSocket authentication.
+      **Topic:** `positionsV3`
+
+      Response structure is the same as All Position with additional raw internal fields.
+    servers: [main-production, main-testnet]
+    subscribe:
+      operationId: receivePositions
+      summary: Positions
+      message:
+        payload:
+          $ref: '#/components/schemas/AllPositionMessage'
+
+# ═════════════════════════════════════════════════════════════════════════
+# Components
+# ═════════════════════════════════════════════════════════════════════════
+
+components:
+  schemas:
+    # ─── Subscription ──────────────────────────────────────────────────────
+
+    SubscriptionRequest:
+      type: object
+      required: [op, args]
+      properties:
+        op:   { type: string, enum: [subscribe, unsubscribe], description: Operation }
+        args: { type: array, items: { type: string }, description: Array of topic strings }
+      example:
+        op: subscribe
+        args: ["tradeHistoryApiV3:BTC-PERP"]
+
+    SubscriptionResponse:
+      type: object
+      properties:
+        event:   { type: string, description: Echo of the event type }
+        channel: { type: array, items: { type: string }, description: Successfully subscribed topics }
+      example:
+        event: subscribe
+        channel: ["tradeHistoryApiV3:BTC-PERP"]
+
+    # ─── Authentication ────────────────────────────────────────────────────
+
+    AuthRequest:
+      type: object
+      required: [op, args]
+      properties:
+        op:   { type: string, const: authKeyExpires, description: "Operation — fixed value `authKeyExpires`" }
+        args:
+          type: array
+          items: { type: string }
+          minItems: 3
+          maxItems: 3
+          description: "[API_KEY, NONCE, HMAC-SHA384_SIGNATURE]"
+      example:
+        op: authKeyExpires
+        args: ["<API_KEY>", "<NONCE>", "<SIGNATURE>"]
+
+    # ─── OSS Orderbook ─────────────────────────────────────────────────────
+
+    L1SnapshotMessage:
+      type: object
+      properties:
+        topic: { type: string, description: WebSocket topic }
+        data:
+          type: object
+          properties:
+            bids:      { type: array, items: { type: array, items: { type: string } }, description: "Best bid [price, size]" }
+            asks:      { type: array, items: { type: array, items: { type: string } }, description: "Best ask [price, size]" }
+            symbol:    { type: string, description: Market symbol }
+            type:      { type: string, const: snapshotL1, description: "Always `snapshotL1`" }
+            timestamp: { type: integer, format: int64, description: Orderbook timestamp (ms) }
+      example:
+        topic: "snapshotL1:BTC-PERP"
+        data:
+          bids: [["122160.1", "69350"]]
+          asks: [["122133.3", "1000"]]
+          type: snapshotL1
+          symbol: BTC-PERP
+          timestamp: 1565135165600
+
+    OrderbookUpdateSchema:
+      type: object
+      properties:
+        topic: { type: string, description: WebSocket topic }
+        data:
+          type: object
+          properties:
+            bids:       { type: array, items: { type: array, items: { type: string } }, description: "Bid quotes" }
+            asks:       { type: array, items: { type: array, items: { type: string } }, description: "Ask quotes" }
+            seqNum:     { type: integer, description: Current sequence number }
+            prevSeqNum: { type: integer, description: Previous sequence number }
+            type:       { type: string, enum: [snapshot, delta], description: "`snapshot` — Snapshot of the orderbook with a maximum of 50 levels; `delta` — Updates of the orderbook" }
+            timestamp:  { type: integer, format: int64, description: Timestamp of the orderbook }
+            symbol:     { type: string, description: Orderbook symbol }
+
+  messages:
+    L1Subscribe:
+      example:
+        op: subscribe
+        args: ["snapshotL1:BTC-PERP"]
+
+    L1Unsubscribe:
+      example:
+        op: unsubscribe
+        args: ["snapshotL1:BTC-PERP"]
+
+    L2Subscribe:
+      example:
+        op: subscribe
+        args: ["update:BTC-PERP_0"]
+
+    L2Unsubscribe:
+      example:
+        op: unsubscribe
+        args: ["update:BTC-PERP_0"]
+
+    OrderbookSnapshot:
+      payload:
+        $ref: '#/components/schemas/OrderbookUpdateSchema'
+      example:
+        topic: "update:BTC-PERP_0"
+        data:
+          bids: [["122160.1", "69350"], ["122159.9", "226150"], ["122159.5", "63050"], ["122159.3", "109800"], ["122159.2", "104050"]]
+          asks: [["122133.3", "1000"], ["122124.0", "343410"], ["122123.9", "78500"], ["122123.8", "98500"]]
+          seqNum: 628282
+          prevSeqNum: 628281
+          type: snapshot
+          timestamp: 1565135165600
+          symbol: BTC-PERP
+
+    OrderbookDelta:
+      payload:
+        $ref: '#/components/schemas/OrderbookUpdateSchema'
+      example:
+        topic: "update:BTC-PERP_0"
+        data:
+          bids: []
+          asks: [["122123.9", "78500"], ["122123.8", "98500"]]
+          seqNum: 628283
+          prevSeqNum: 628282
+          type: delta
+          timestamp: 1565135165600
+          symbol: BTC-PERP
+
+    # ─── Public Trades ─────────────────────────────────────────────────────
+
+    PublicTradeMessage:
+      type: object
+      properties:
+        topic: { type: string, description: WebSocket topic }
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              symbol:    { type: string,  description: Market symbol }
+              side:      { type: string,  enum: [BUY, SELL], description: Trade side }
+              size:      { type: integer, description: Transacted size }
+              price:     { type: number,  description: Transacted price }
+              tradeId:   { type: integer, format: int64, description: Trade sequence ID }
+              timestamp: { type: integer, format: int64, description: Trade timestamp }
+      example:
+        topic: "tradeHistoryApiV3:BTC-PERP"
+        data:
+          - symbol: BTC-PERP
+            side: SELL
+            size: 152
+            price: 111144.8
+            tradeId: 927002515
+            timestamp: 1752129545326
+
+    # ─── Notifications ─────────────────────────────────────────────────────
+
+    NotificationMessage:
+      type: object
+      properties:
+        topic: { type: string, const: notificationApiV4 }
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              symbol:             { type: string,  description: Market symbol }
+              orderID:            { type: string,  description: Internal order ID }
+              side:               { type: string,  description: BUY or SELL }
+              type:               { type: integer, description: "76: Limit · 77: Market · 80: Algo" }
+              price:              { type: number,  description: Order price or transacted price }
+              originalOrderSize:  { type: integer, description: Original order quantity }
+              currentOrderSize:   { type: integer, description: Latest order quantity }
+              filledSize:         { type: integer, description: Quantity filled in this update }
+              totalFilledSize:    { type: integer, description: Cumulative filled quantity }
+              remainingSize:      { type: integer, description: Remaining quantity }
+              avgFilledPrice:     { type: number,  description: Average filled price }
+              status:             { type: integer, description: "Order status code: `2` (ORDER_INSERTED) · `4` (FULLY_MATCHED) · `5` (PARTIAL_FILL) · `6` (CANCELLED) · `9` (TRIGGER_INSERTED) · `10` (TRIGGER_ACTIVATED) · `15` (REJECTED)" }
+              clOrderID:          { type: string,  description: Custom order ID }
+              maker:              { type: boolean, description: Whether this was a maker trade }
+              time_in_force:      { type: string,  description: "Time in force: `GTC` · `IOC` · `FOK` · `HALFMIN` · `FIVEMIN` · `HOUR` · `TWELVEHOUR` · `DAY` · `WEEK` · `MONTH`" }
+              timestamp:          { type: integer, format: int64, description: Order/trade timestamp }
+              txType:             { type: string,  description: "STOP · TAKEPROFIT · LIMIT" }
+              triggerPrice:       { type: number,  description: Trigger price }
+              stealth:            { type: number,  description: Algo orders only }
+              pegPriceDeviation:  { type: number,  description: Algo orders only }
+              positionId:         { type: string,  description: Position ID }
+              postOnly:           { type: boolean, description: Whether post-only order }
+      example:
+        topic: notificationApiV4
+        data:
+          - symbol: BTC-PERP
+            orderID: "45e8bb8d-d708-4a90-a428-c61583f90efe"
+            side: BUY
+            orderType: 77
+            type: 0
+            price: 111085.1
+            triggerPrice: 0
+            status: 4
+            timestamp: 1752147101805
+            avgFilledPrice: 111085.1
+            clOrderID: ""
+            postOnly: false
+            maker: false
+            positionId: BTC-PERP-USDT
+            originalOrderSize: 900
+            currentOrderSize: 900
+            filledSize: 900
+            totalFilledSize: 900
+            remainingSize: 0
+            time_in_force: GTC
+
+    # ─── User Trade Fills ──────────────────────────────────────────────────
+
+    UserFillMessage:
+      type: object
+      properties:
+        topic: { type: string, const: fillsV2 }
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              symbol:       { type: string,  description: Market symbol }
+              orderId:      { type: string,  description: Internal order ID }
+              clOrderId:    { type: string,  description: Custom order ID }
+              serialId:     { type: integer, format: int64, description: Trade sequence ID }
+              tradeId:      { type: string,  description: Trade unique identifier }
+              type:         { type: string,  description: "76: Limit · 77: Market · 80: Algo" }
+              side:         { type: string,  description: BUY or SELL }
+              price:        { type: string,  description: Transacted price }
+              size:         { type: string,  description: Transacted size }
+              feeAmount:    { type: string,  description: Fee amount }
+              feeCurrency:  { type: string,  description: Fee currency }
+              base:         { type: string,  description: Base currency }
+              quote:        { type: string,  description: Quote currency }
+              maker:        { type: boolean, description: Whether maker trade }
+              timestamp:    { type: integer, format: int64, description: Trade timestamp }
+              contractSize: { type: number,  description: Contract size }
+      example:
+        topic: fillsV2
+        data:
+          - orderId: "6aa36da1-0ed8-46c1-9327-c9d6313b3d12"
+            serialId: 189349157
+            clOrderId: "_W_ekxogc1711427518228"
+            type: "77"
+            symbol: BTC-PERP
+            side: BUY
+            price: "69704.4"
+            size: "1.0"
+            feeAmount: "0.0348522"
+            feeCurrency: USDT
+            base: BTC-PERP
+            quote: USDT
+            maker: false
+            timestamp: 1711427518338
+            contractSize: 0.0001
+            tradeId: "e094117f-9f84-4c82-b55d-d3d2a54d0dca"
+
+    # ─── All Position ──────────────────────────────────────────────────────
+
+    AllPositionMessage:
+      type: object
+      properties:
+        topic: { type: string, description: "allPositionV4 or positionsV3" }
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              marketName:              { type: string,  description: Market name }
+              orderType:               { type: integer, description: "90: Futures position" }
+              orderMode:               { type: integer, description: "66: BUY · 83: SELL" }
+              entryPrice:              { type: number,  description: Entry price }
+              liquidationPrice:        { type: number,  description: Liquidation price }
+              markPrice:               { type: number,  description: Mark price }
+              unrealizedProfitLoss:    { type: number,  description: Unrealized P&L }
+              totalMaintenanceMargin:  { type: number,  description: Maintenance margin }
+              totalContracts:          { type: number,  description: Contract size }
+              marginType:              { type: integer, description: "91: CROSS · 92: ISOLATED" }
+              closeOrder:              { type: boolean, description: Whether a close order exists }
+              liquidationInProgress:   { type: boolean, description: Whether in liquidation }
+              currentLeverage:         { type: number,  description: Current leverage }
+              adlScoreBucket:          { type: number,  description: ADL probability score }
+              takeProfitOrder:         { type: object,  description: Take profit order info }
+              stopLossOrder:           { type: object,  description: Stop loss order info }
+              positionMode:            { type: string,  description: "ONE_WAY · HEDGE · ISOLATED" }
+              positionDirection:       { type: string,  description: "Position direction: `LONG` · `SHORT` (only present in HEDGE/ISOLATED mode)" }
+              positionId:              { type: string,  description: Position ID }
+              contractSize:            { type: number,  description: The position contract size }
+      example:
+        topic: allPositionV4
+        data:
+          - marketName: BTC-PERP
+            orderType: 90
+            orderMode: 66
+            entryPrice: 111085.1
+            liquidationPrice: 0.0
+            markPrice: 111100.0
+            unrealizedProfitLoss: 0.01
+            totalMaintenanceMargin: 5.5
+            totalContracts: 1.0
+            marginType: 91
+            closeOrder: false
+            liquidationInProgress: false
+            currentLeverage: 10.0
+            adlScoreBucket: 2.0
+            positionMode: ONE_WAY
+            positionDirection: LONG
+            positionId: BTC-PERP-USDT
+            contractSize: 0.0001

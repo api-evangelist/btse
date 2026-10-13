@@ -1,0 +1,1254 @@
+{
+  "@context": {
+    "@vocab": "https://btse.com/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "btse": "https://btse.com/schema#",
+    "ErrorResponse": "btse:ErrorResponse",
+    "status": {
+      "@id": "btse:status",
+      "@type": "xsd:integer"
+    },
+    "error": {
+      "@id": "btse:error",
+      "@type": "xsd:string"
+    },
+    "code": {
+      "@id": "btse:code",
+      "@type": "xsd:integer"
+    },
+    "message": {
+      "@id": "btse:message",
+      "@type": "xsd:string"
+    },
+    "RateLimitError": "btse:RateLimitError",
+    "RateObject": "btse:RateObject",
+    "days": {
+      "@id": "btse:days",
+      "@type": "xsd:integer"
+    },
+    "rate": {
+      "@id": "btse:rate",
+      "@type": "xsd:decimal"
+    },
+    "InvestmentProduct": "btse:InvestmentProduct",
+    "id": {
+      "@id": "btse:id",
+      "@type": "xsd:string"
+    },
+    "name": {
+      "@id": "btse:name",
+      "@type": "xsd:string"
+    },
+    "currency": {
+      "@id": "btse:currency",
+      "@type": "xsd:string"
+    },
+    "type": {
+      "@id": "btse:type",
+      "@type": "xsd:string"
+    },
+    "startDate": {
+      "@id": "btse:startDate",
+      "@type": "xsd:integer"
+    },
+    "interestStartDate": {
+      "@id": "btse:interestStartDate",
+      "@type": "xsd:integer"
+    },
+    "rates": {
+      "@id": "btse:rates",
+      "@container": "@list"
+    },
+    "compounding": {
+      "@id": "btse:compounding",
+      "@type": "xsd:boolean"
+    },
+    "autoRenewSupported": {
+      "@id": "btse:autoRenewSupported",
+      "@type": "xsd:boolean"
+    },
+    "dailyLimit": {
+      "@id": "btse:dailyLimit",
+      "@type": "xsd:decimal"
+    },
+    "minSize": {
+      "@id": "btse:minSize",
+      "@type": "xsd:decimal"
+    },
+    "incrementalSize": {
+      "@id": "btse:incrementalSize",
+      "@type": "xsd:decimal"
+    },
+    "DepositInvestmentRequest": "btse:DepositInvestmentRequest",
+    "productId": {
+      "@id": "btse:productId",
+      "@type": "xsd:string"
+    },
+    "amount": {
+      "@id": "btse:amount",
+      "@type": "xsd:decimal"
+    },
+    "renew": {
+      "@id": "btse:renew",
+      "@type": "xsd:boolean"
+    },
+    "day": {
+      "@id": "btse:day",
+      "@type": "xsd:integer"
+    },
+    "DepositInvestmentResponse": "btse:DepositInvestmentResponse",
+    "success": {
+      "@id": "btse:success",
+      "@type": "xsd:boolean"
+    },
+    "RenewInvestmentRequest": "btse:RenewInvestmentRequest",
+    "orderId": {
+      "@id": "btse:orderId",
+      "@type": "xsd:integer"
+    },
+    "autoRenew": {
+      "@id": "btse:autoRenew",
+      "@type": "xsd:boolean"
+    },
+    "RenewInvestmentResponse": "btse:RenewInvestmentResponse",
+    "RedeemInvestmentRequest": "btse:RedeemInvestmentRequest",
+    "RedeemInvestmentResponse": "btse:RedeemInvestmentResponse",
+    "InvestmentOrder": "btse:InvestmentOrder",
+    "investAmt": {
+      "@id": "btse:investAmt",
+      "@type": "xsd:decimal"
+    },
+    "interestEarned": {
+      "@id": "btse:interestEarned",
+      "@type": "xsd:decimal"
+    },
+    "nextInterestPayoutTime": {
+      "@id": "btse:nextInterestPayoutTime",
+      "@type": "xsd:integer"
+    },
+    "startTime": {
+      "@id": "btse:startTime",
+      "@type": "xsd:integer"
+    },
+    "endTime": {
+      "@id": "btse:endTime",
+      "@type": "xsd:integer"
+    },
+    "duration": {
+      "@id": "btse:duration",
+      "@type": "xsd:integer"
+    },
+    "payoutLockTime": {
+      "@id": "btse:payoutLockTime",
+      "@type": "xsd:integer"
+    },
+    "redemptionProcessing": {
+      "@id": "btse:redemptionProcessing",
+      "@type": "xsd:boolean"
+    },
+    "InvestmentHistoryObject": "btse:InvestmentHistoryObject",
+    "txnTime": {
+      "@id": "btse:txnTime",
+      "@type": "xsd:integer"
+    },
+    "txnType": {
+      "@id": "btse:txnType",
+      "@type": "xsd:string"
+    },
+    "totalAmount": {
+      "@id": "btse:totalAmount",
+      "@type": "xsd:decimal"
+    },
+    "InvestmentHistoryResponse": "btse:InvestmentHistoryResponse",
+    "totalRows": {
+      "@id": "btse:totalRows",
+      "@type": "xsd:integer"
+    },
+    "pageNumber": {
+      "@id": "btse:pageNumber",
+      "@type": "xsd:integer"
+    },
+    "pageSize": {
+      "@id": "btse:pageSize",
+      "@type": "xsd:integer"
+    },
+    "data": {
+      "@id": "btse:data",
+      "@container": "@list"
+    },
+    "CreateOrderRequest": "btse:CreateOrderRequest",
+    "symbol": {
+      "@id": "btse:symbol",
+      "@type": "xsd:string"
+    },
+    "size": {
+      "@id": "btse:size",
+      "@type": "xsd:integer"
+    },
+    "side": {
+      "@id": "btse:side",
+      "@type": "xsd:string"
+    },
+    "price": {
+      "@id": "btse:price",
+      "@type": "xsd:decimal"
+    },
+    "time_in_force": {
+      "@id": "btse:time_in_force",
+      "@type": "xsd:string"
+    },
+    "txType": {
+      "@id": "btse:txType",
+      "@type": "xsd:string"
+    },
+    "stopPrice": {
+      "@id": "btse:stopPrice",
+      "@type": "xsd:decimal"
+    },
+    "triggerPrice": {
+      "@id": "btse:triggerPrice",
+      "@type": "xsd:decimal"
+    },
+    "trailValue": {
+      "@id": "btse:trailValue",
+      "@type": "xsd:decimal"
+    },
+    "postOnly": {
+      "@id": "btse:postOnly",
+      "@type": "xsd:boolean"
+    },
+    "reduceOnly": {
+      "@id": "btse:reduceOnly",
+      "@type": "xsd:boolean"
+    },
+    "clOrderID": {
+      "@id": "btse:clOrderID",
+      "@type": "xsd:string"
+    },
+    "trigger": {
+      "@id": "btse:trigger",
+      "@type": "xsd:string"
+    },
+    "takeProfitPrice": {
+      "@id": "btse:takeProfitPrice",
+      "@type": "xsd:decimal"
+    },
+    "takeProfitTrigger": {
+      "@id": "btse:takeProfitTrigger",
+      "@type": "xsd:string"
+    },
+    "stopLossPrice": {
+      "@id": "btse:stopLossPrice",
+      "@type": "xsd:decimal"
+    },
+    "stopLossTrigger": {
+      "@id": "btse:stopLossTrigger",
+      "@type": "xsd:string"
+    },
+    "positionMode": {
+      "@id": "btse:positionMode",
+      "@type": "xsd:string"
+    },
+    "CreateAlgoOrderRequest": "btse:CreateAlgoOrderRequest",
+    "deviation": {
+      "@id": "btse:deviation",
+      "@type": "xsd:decimal"
+    },
+    "stealth": {
+      "@id": "btse:stealth",
+      "@type": "xsd:decimal"
+    },
+    "AmendOrderRequest": "btse:AmendOrderRequest",
+    "orderID": {
+      "@id": "btse:orderID",
+      "@type": "xsd:string"
+    },
+    "value": {
+      "@id": "btse:value",
+      "@type": "xsd:decimal"
+    },
+    "orderPrice": {
+      "@id": "btse:orderPrice",
+      "@type": "xsd:decimal"
+    },
+    "orderSize": {
+      "@id": "btse:orderSize",
+      "@type": "xsd:integer"
+    },
+    "ClosePositionRequest": "btse:ClosePositionRequest",
+    "positionId": {
+      "@id": "btse:positionId",
+      "@type": "xsd:string"
+    },
+    "BindTpSlRequest": "btse:BindTpSlRequest",
+    "SetRiskLimitRequest": "btse:SetRiskLimitRequest",
+    "riskLimitLevel": {
+      "@id": "btse:riskLimitLevel",
+      "@type": "xsd:integer"
+    },
+    "SetLeverageRequest": "btse:SetLeverageRequest",
+    "leverage": {
+      "@id": "btse:leverage",
+      "@type": "xsd:decimal"
+    },
+    "marginMode": {
+      "@id": "btse:marginMode",
+      "@type": "xsd:string"
+    },
+    "SettlementCurrencyRequest": "btse:SettlementCurrencyRequest",
+    "ChangePositionModeRequest": "btse:ChangePositionModeRequest",
+    "WalletTransferRequest": "btse:WalletTransferRequest",
+    "walletSrc": {
+      "@id": "btse:walletSrc",
+      "@type": "xsd:string"
+    },
+    "walletSrcType": {
+      "@id": "btse:walletSrcType",
+      "@type": "xsd:string"
+    },
+    "walletDest": {
+      "@id": "btse:walletDest",
+      "@type": "xsd:string"
+    },
+    "walletDestType": {
+      "@id": "btse:walletDestType",
+      "@type": "xsd:string"
+    },
+    "apiWallets": {
+      "@id": "btse:apiWallets",
+      "@container": "@list"
+    },
+    "WalletTransferDetail": "btse:WalletTransferDetail",
+    "allBalance": {
+      "@id": "btse:allBalance",
+      "@type": "xsd:boolean"
+    },
+    "balance": {
+      "@id": "btse:balance",
+      "@type": "xsd:decimal"
+    },
+    "SubAccountTransferRequest": "btse:SubAccountTransferRequest",
+    "fromUser": {
+      "@id": "btse:fromUser",
+      "@type": "xsd:string"
+    },
+    "receiver": {
+      "@id": "btse:receiver",
+      "@type": "xsd:string"
+    },
+    "FuturesOrderResponse": "btse:FuturesOrderResponse",
+    "orderType": {
+      "@id": "btse:orderType",
+      "@type": "xsd:integer"
+    },
+    "timestamp": {
+      "@id": "btse:timestamp",
+      "@type": "xsd:integer"
+    },
+    "avgFilledPrice": {
+      "@id": "btse:avgFilledPrice",
+      "@type": "xsd:decimal"
+    },
+    "remainingSize": {
+      "@id": "btse:remainingSize",
+      "@type": "xsd:integer"
+    },
+    "originalOrderSize": {
+      "@id": "btse:originalOrderSize",
+      "@type": "xsd:integer"
+    },
+    "currentOrderSize": {
+      "@id": "btse:currentOrderSize",
+      "@type": "xsd:integer"
+    },
+    "filledSize": {
+      "@id": "btse:filledSize",
+      "@type": "xsd:integer"
+    },
+    "totalFilledSize": {
+      "@id": "btse:totalFilledSize",
+      "@type": "xsd:integer"
+    },
+    "positionDirection": {
+      "@id": "btse:positionDirection",
+      "@type": "xsd:string"
+    },
+    "QueryOrderResponse": "btse:QueryOrderResponse",
+    "orderValue": {
+      "@id": "btse:orderValue",
+      "@type": "xsd:decimal"
+    },
+    "pegPriceMin": {
+      "@id": "btse:pegPriceMin",
+      "@type": "xsd:decimal"
+    },
+    "pegPriceMax": {
+      "@id": "btse:pegPriceMax",
+      "@type": "xsd:decimal"
+    },
+    "pegPriceDeviation": {
+      "@id": "btse:pegPriceDeviation",
+      "@type": "xsd:decimal"
+    },
+    "triggerOrder": {
+      "@id": "btse:triggerOrder",
+      "@type": "xsd:boolean"
+    },
+    "triggerOriginalPrice": {
+      "@id": "btse:triggerOriginalPrice",
+      "@type": "xsd:decimal"
+    },
+    "triggerOrderType": {
+      "@id": "btse:triggerOrderType",
+      "@type": "xsd:integer"
+    },
+    "triggerTrailingStopDeviation": {
+      "@id": "btse:triggerTrailingStopDeviation",
+      "@type": "xsd:decimal"
+    },
+    "triggerStopPrice": {
+      "@id": "btse:triggerStopPrice",
+      "@type": "xsd:decimal"
+    },
+    "triggered": {
+      "@id": "btse:triggered",
+      "@type": "xsd:boolean"
+    },
+    "takeProfitOrder": {
+      "@id": "btse:takeProfitOrder"
+    },
+    "stopLossOrder": {
+      "@id": "btse:stopLossOrder"
+    },
+    "closeOrder": {
+      "@id": "btse:closeOrder",
+      "@type": "xsd:boolean"
+    },
+    "timeInForce": {
+      "@id": "btse:timeInForce",
+      "@type": "xsd:string"
+    },
+    "contractSize": {
+      "@id": "btse:contractSize",
+      "@type": "xsd:decimal"
+    },
+    "OpenOrderResponse": "btse:OpenOrderResponse",
+    "orderState": {
+      "@id": "btse:orderState",
+      "@type": "xsd:string"
+    },
+    "FuturesUserTrade": "btse:FuturesUserTrade",
+    "serialId": {
+      "@id": "btse:serialId",
+      "@type": "xsd:integer"
+    },
+    "tradeId": {
+      "@id": "btse:tradeId",
+      "@type": "xsd:string"
+    },
+    "base": {
+      "@id": "btse:base",
+      "@type": "xsd:string"
+    },
+    "quote": {
+      "@id": "btse:quote",
+      "@type": "xsd:string"
+    },
+    "wallet": {
+      "@id": "btse:wallet",
+      "@type": "xsd:string"
+    },
+    "feeCurrency": {
+      "@id": "btse:feeCurrency",
+      "@type": "xsd:string"
+    },
+    "feeAmount": {
+      "@id": "btse:feeAmount",
+      "@type": "xsd:decimal"
+    },
+    "filledPrice": {
+      "@id": "btse:filledPrice",
+      "@type": "xsd:decimal"
+    },
+    "realizedPnL": {
+      "@id": "btse:realizedPnL",
+      "@type": "xsd:decimal"
+    },
+    "Position": "btse:Position",
+    "entryPrice": {
+      "@id": "btse:entryPrice",
+      "@type": "xsd:decimal"
+    },
+    "markPrice": {
+      "@id": "btse:markPrice",
+      "@type": "xsd:decimal"
+    },
+    "marginType": {
+      "@id": "btse:marginType",
+      "@type": "xsd:integer"
+    },
+    "settleWithAsset": {
+      "@id": "btse:settleWithAsset",
+      "@type": "xsd:string"
+    },
+    "totalMaintenanceMargin": {
+      "@id": "btse:totalMaintenanceMargin",
+      "@type": "xsd:decimal"
+    },
+    "unrealizedProfitLoss": {
+      "@id": "btse:unrealizedProfitLoss",
+      "@type": "xsd:decimal"
+    },
+    "liquidationPrice": {
+      "@id": "btse:liquidationPrice",
+      "@type": "xsd:decimal"
+    },
+    "isolatedLeverage": {
+      "@id": "btse:isolatedLeverage",
+      "@type": "xsd:decimal"
+    },
+    "adlScoreBucket": {
+      "@id": "btse:adlScoreBucket",
+      "@type": "xsd:decimal"
+    },
+    "liquidationInProgress": {
+      "@id": "btse:liquidationInProgress",
+      "@type": "xsd:boolean"
+    },
+    "currentLeverage": {
+      "@id": "btse:currentLeverage",
+      "@type": "xsd:decimal"
+    },
+    "RiskLimitStatus": "btse:RiskLimitStatus",
+    "riskLimit": {
+      "@id": "btse:riskLimit",
+      "@type": "xsd:integer"
+    },
+    "RiskLimitUpdateResponse": "btse:RiskLimitUpdateResponse",
+    "LeverageStatus": "btse:LeverageStatus",
+    "LeverageUpdateResponse": "btse:LeverageUpdateResponse",
+    "PositionMode": "btse:PositionMode",
+    "PositionModeUpdateResponse": "btse:PositionModeUpdateResponse",
+    "AccountFee": "btse:AccountFee",
+    "makerFee": {
+      "@id": "btse:makerFee",
+      "@type": "xsd:decimal"
+    },
+    "takerFee": {
+      "@id": "btse:takerFee",
+      "@type": "xsd:decimal"
+    },
+    "MarginSetting": "btse:MarginSetting",
+    "initialMarginPercentage": {
+      "@id": "btse:initialMarginPercentage",
+      "@type": "xsd:decimal"
+    },
+    "maintenanceMarginPercentage": {
+      "@id": "btse:maintenanceMarginPercentage",
+      "@type": "xsd:decimal"
+    },
+    "WalletAsset": "btse:WalletAsset",
+    "assetPrice": {
+      "@id": "btse:assetPrice",
+      "@type": "xsd:decimal"
+    },
+    "WalletBalance": "btse:WalletBalance",
+    "activeWalletName": {
+      "@id": "btse:activeWalletName",
+      "@type": "xsd:string"
+    },
+    "queryType": {
+      "@id": "btse:queryType",
+      "@type": "xsd:integer"
+    },
+    "trackingID": {
+      "@id": "btse:trackingID",
+      "@type": "xsd:integer"
+    },
+    "walletTotalValue": {
+      "@id": "btse:walletTotalValue",
+      "@type": "xsd:decimal"
+    },
+    "totalValue": {
+      "@id": "btse:totalValue",
+      "@type": "xsd:decimal"
+    },
+    "marginBalance": {
+      "@id": "btse:marginBalance",
+      "@type": "xsd:decimal"
+    },
+    "availableBalance": {
+      "@id": "btse:availableBalance",
+      "@type": "xsd:decimal"
+    },
+    "unrealisedProfitLoss": {
+      "@id": "btse:unrealisedProfitLoss",
+      "@type": "xsd:decimal"
+    },
+    "maintenanceMargin": {
+      "@id": "btse:maintenanceMargin",
+      "@type": "xsd:decimal"
+    },
+    "openMargin": {
+      "@id": "btse:openMargin",
+      "@type": "xsd:decimal"
+    },
+    "assets": {
+      "@id": "btse:assets",
+      "@container": "@list"
+    },
+    "assetsInUse": {
+      "@id": "btse:assetsInUse",
+      "@container": "@list"
+    },
+    "WalletHistoryEntry": "btse:WalletHistoryEntry",
+    "fees": {
+      "@id": "btse:fees",
+      "@type": "xsd:decimal"
+    },
+    "description": {
+      "@id": "btse:description",
+      "@type": "xsd:string"
+    },
+    "WalletDetail": "btse:WalletDetail",
+    "UnifiedWalletMargin": "btse:UnifiedWalletMargin",
+    "walletTotalUnrealizedProfitLoss": {
+      "@id": "btse:walletTotalUnrealizedProfitLoss",
+      "@type": "xsd:decimal"
+    },
+    "futuresTotalAvailableBalance": {
+      "@id": "btse:futuresTotalAvailableBalance",
+      "@type": "xsd:decimal"
+    },
+    "wallets": {
+      "@id": "btse:wallets",
+      "@container": "@list"
+    },
+    "SubAccountTransferResponse": "btse:SubAccountTransferResponse",
+    "msg": {
+      "@id": "btse:msg",
+      "@type": "xsd:string"
+    },
+    "time": {
+      "@id": "btse:time",
+      "@type": "xsd:integer"
+    },
+    "AmendOrderReq": "btse:AmendOrderReq",
+    "clOrderId": {
+      "@id": "btse:clOrderId",
+      "@type": "xsd:string"
+    },
+    "amendType": {
+      "@id": "btse:amendType",
+      "@type": "xsd:string"
+    },
+    "slide": {
+      "@id": "btse:slide",
+      "@type": "xsd:boolean"
+    },
+    "totalAmountMode": {
+      "@id": "btse:totalAmountMode",
+      "@type": "xsd:boolean"
+    },
+    "AmendOrderResp": "btse:AmendOrderResp",
+    "orderSide": {
+      "@id": "btse:orderSide",
+      "@type": "xsd:string"
+    },
+    "SettleInReq": "btse:SettleInReq",
+    "SettleInResp": "btse:SettleInResp",
+    "SetRiskLimitReq": "btse:SetRiskLimitReq",
+    "ChangeRiskLimitResp": "btse:ChangeRiskLimitResp",
+    "BindPositionTpSlReq": "btse:BindPositionTpSlReq",
+    "takeProfitTriggerType": {
+      "@id": "btse:takeProfitTriggerType",
+      "@type": "xsd:string"
+    },
+    "takeProfitTriggerPrice": {
+      "@id": "btse:takeProfitTriggerPrice",
+      "@type": "xsd:decimal"
+    },
+    "stopLossTriggerType": {
+      "@id": "btse:stopLossTriggerType",
+      "@type": "xsd:string"
+    },
+    "stopLossTriggerPrice": {
+      "@id": "btse:stopLossTriggerPrice",
+      "@type": "xsd:decimal"
+    },
+    "BindPositionTpSlResp": "btse:BindPositionTpSlResp",
+    "ChangePositionModeReq": "btse:ChangePositionModeReq",
+    "ChangePositionModeResp": "btse:ChangePositionModeResp",
+    "PlaceOrderReq": "btse:PlaceOrderReq",
+    "PlaceOrderResp": "btse:PlaceOrderResp",
+    "CancelAllAfterReq": "btse:CancelAllAfterReq",
+    "timeoutMs": {
+      "@id": "btse:timeoutMs",
+      "@type": "xsd:integer"
+    },
+    "CancelAllAfterResp": "btse:CancelAllAfterResp",
+    "PlaceAlgoOrderReq": "btse:PlaceAlgoOrderReq",
+    "ChangeLeverageReq": "btse:ChangeLeverageReq",
+    "ChangeLeverageResp": "btse:ChangeLeverageResp",
+    "TradeHistoryResp": "btse:TradeHistoryResp",
+    "orderDetailType": {
+      "@id": "btse:orderDetailType",
+      "@type": "xsd:string"
+    },
+    "realizedPnl": {
+      "@id": "btse:realizedPnl",
+      "@type": "xsd:decimal"
+    },
+    "total": {
+      "@id": "btse:total",
+      "@type": "xsd:decimal"
+    },
+    "GetRiskLimitResp": "btse:GetRiskLimitResp",
+    "PositionResp": "btse:PositionResp",
+    "notionalValue": {
+      "@id": "btse:notionalValue",
+      "@type": "xsd:decimal"
+    },
+    "walletName": {
+      "@id": "btse:walletName",
+      "@type": "xsd:string"
+    },
+    "minimumRequiredMargin": {
+      "@id": "btse:minimumRequiredMargin",
+      "@type": "xsd:decimal"
+    },
+    "TPSLObject": "btse:TPSLObject",
+    "triggerUseLastPrice": {
+      "@id": "btse:triggerUseLastPrice",
+      "@type": "xsd:boolean"
+    },
+    "PositionModeResp": "btse:PositionModeResp",
+    "OrderResp": "btse:OrderResp",
+    "averageFillPrice": {
+      "@id": "btse:averageFillPrice",
+      "@type": "xsd:decimal"
+    },
+    "currentPegPrice": {
+      "@id": "btse:currentPegPrice",
+      "@type": "xsd:decimal"
+    },
+    "trailValueType": {
+      "@id": "btse:trailValueType",
+      "@type": "xsd:string"
+    },
+    "activationPrice": {
+      "@id": "btse:activationPrice",
+      "@type": "xsd:decimal"
+    },
+    "activationPriceType": {
+      "@id": "btse:activationPriceType",
+      "@type": "xsd:string"
+    },
+    "cancelDuration": {
+      "@id": "btse:cancelDuration",
+      "@type": "xsd:integer"
+    },
+    "wrapperOrder": {
+      "@id": "btse:wrapperOrder",
+      "@type": "xsd:boolean"
+    },
+    "ocoPeerOrderId": {
+      "@id": "btse:ocoPeerOrderId",
+      "@type": "xsd:string"
+    },
+    "originalOrderValue": {
+      "@id": "btse:originalOrderValue",
+      "@type": "xsd:decimal"
+    },
+    "currentOrderValue": {
+      "@id": "btse:currentOrderValue",
+      "@type": "xsd:decimal"
+    },
+    "TriggerOrderResp": "btse:TriggerOrderResp",
+    "MarginSettingResp": "btse:MarginSettingResp",
+    "LeverageResp": "btse:LeverageResp",
+    "ClosePositionReq": "btse:ClosePositionReq",
+    "ClosePositionResp": "btse:ClosePositionResp",
+    "CancelOrderReq": "btse:CancelOrderReq",
+    "CancelOrderResp": "btse:CancelOrderResp",
+    "CommonResponse": "btse:CommonResponse",
+    "RateLimitItem": "btse:RateLimitItem",
+    "interval": {
+      "@id": "btse:interval",
+      "@type": "xsd:string"
+    },
+    "intervalNum": {
+      "@id": "btse:intervalNum",
+      "@type": "xsd:decimal"
+    },
+    "limit": {
+      "@id": "btse:limit",
+      "@type": "xsd:decimal"
+    },
+    "ExchangeInfoSymbolItem": "btse:ExchangeInfoSymbolItem",
+    "category": {
+      "@id": "btse:category",
+      "@type": "xsd:string"
+    },
+    "tradeCurrency": {
+      "@id": "btse:tradeCurrency",
+      "@type": "xsd:string"
+    },
+    "baseCurrency": {
+      "@id": "btse:baseCurrency",
+      "@type": "xsd:string"
+    },
+    "quoteCurrency": {
+      "@id": "btse:quoteCurrency",
+      "@type": "xsd:string"
+    },
+    "active": {
+      "@id": "btse:active",
+      "@type": "xsd:boolean"
+    },
+    "minOrderPrice": {
+      "@id": "btse:minOrderPrice",
+      "@type": "xsd:string"
+    },
+    "minPriceIncrement": {
+      "@id": "btse:minPriceIncrement",
+      "@type": "xsd:string"
+    },
+    "pricePrecision": {
+      "@id": "btse:pricePrecision",
+      "@type": "xsd:integer"
+    },
+    "minOrderSize": {
+      "@id": "btse:minOrderSize",
+      "@type": "xsd:string"
+    },
+    "maxOrderSize": {
+      "@id": "btse:maxOrderSize",
+      "@type": "xsd:string"
+    },
+    "minSizeIncrement": {
+      "@id": "btse:minSizeIncrement",
+      "@type": "xsd:string"
+    },
+    "sizePrecision": {
+      "@id": "btse:sizePrecision",
+      "@type": "xsd:integer"
+    },
+    "inactiveTime": {
+      "@id": "btse:inactiveTime",
+      "@type": "xsd:decimal"
+    },
+    "availableSettlement": {
+      "@id": "btse:availableSettlement",
+      "@container": "@list"
+    },
+    "contractStartTime": {
+      "@id": "btse:contractStartTime",
+      "@type": "xsd:decimal"
+    },
+    "contractEndTime": {
+      "@id": "btse:contractEndTime",
+      "@type": "xsd:decimal"
+    },
+    "matchingStartTime": {
+      "@id": "btse:matchingStartTime",
+      "@type": "xsd:decimal"
+    },
+    "becomeInactiveTime": {
+      "@id": "btse:becomeInactiveTime",
+      "@type": "xsd:decimal"
+    },
+    "RecentTradeItem": "btse:RecentTradeItem",
+    "quoteSize": {
+      "@id": "btse:quoteSize",
+      "@type": "xsd:string"
+    },
+    "Ticker24HrItem": "btse:Ticker24HrItem",
+    "lastPrice": {
+      "@id": "btse:lastPrice",
+      "@type": "xsd:string"
+    },
+    "openPrice": {
+      "@id": "btse:openPrice",
+      "@type": "xsd:string"
+    },
+    "highPrice": {
+      "@id": "btse:highPrice",
+      "@type": "xsd:string"
+    },
+    "lowPrice": {
+      "@id": "btse:lowPrice",
+      "@type": "xsd:string"
+    },
+    "volume": {
+      "@id": "btse:volume",
+      "@type": "xsd:string"
+    },
+    "openTime": {
+      "@id": "btse:openTime",
+      "@type": "xsd:decimal"
+    },
+    "closeTime": {
+      "@id": "btse:closeTime",
+      "@type": "xsd:decimal"
+    },
+    "Ticker24HrFullItem": "btse:Ticker24HrFullItem",
+    "priceChange": {
+      "@id": "btse:priceChange",
+      "@type": "xsd:string"
+    },
+    "priceChangePercent": {
+      "@id": "btse:priceChangePercent",
+      "@type": "xsd:string"
+    },
+    "prevClosePrice": {
+      "@id": "btse:prevClosePrice",
+      "@type": "xsd:string"
+    },
+    "bidPrice": {
+      "@id": "btse:bidPrice",
+      "@type": "xsd:string"
+    },
+    "bidQty": {
+      "@id": "btse:bidQty",
+      "@type": "xsd:string"
+    },
+    "askPrice": {
+      "@id": "btse:askPrice",
+      "@type": "xsd:string"
+    },
+    "askQty": {
+      "@id": "btse:askQty",
+      "@type": "xsd:string"
+    },
+    "openInterest": {
+      "@id": "btse:openInterest",
+      "@type": "xsd:string"
+    },
+    "fundingRate": {
+      "@id": "btse:fundingRate",
+      "@type": "xsd:string"
+    },
+    "nextFundingTime": {
+      "@id": "btse:nextFundingTime",
+      "@type": "xsd:decimal"
+    },
+    "fundingIntervalMinutes": {
+      "@id": "btse:fundingIntervalMinutes",
+      "@type": "xsd:decimal"
+    },
+    "PriceTickerItem": "btse:PriceTickerItem",
+    "IndicesTickerItem": "btse:IndicesTickerItem",
+    "indexPrice": {
+      "@id": "btse:indexPrice",
+      "@type": "xsd:string"
+    },
+    "Level1TickerItem": "btse:Level1TickerItem",
+    "FundingRateHistoryItem": "btse:FundingRateHistoryItem",
+    "MarketRiskLimitConfig": "btse:MarketRiskLimitConfig",
+    "level": {
+      "@id": "btse:level",
+      "@type": "xsd:integer"
+    },
+    "MarketRiskLimitItem": "btse:MarketRiskLimitItem",
+    "riskLimits": {
+      "@id": "btse:riskLimits",
+      "@container": "@list"
+    },
+    "OrderBookData": "btse:OrderBookData",
+    "bids": {
+      "@id": "btse:bids",
+      "@container": "@list"
+    },
+    "asks": {
+      "@id": "btse:asks",
+      "@container": "@list"
+    },
+    "TxnSideEnum": "btse:TxnSideEnum",
+    "OTCQuoteStatusEnum": "btse:OTCQuoteStatusEnum",
+    "OTCMarketItem": "btse:OTCMarketItem",
+    "asset": {
+      "@id": "btse:asset",
+      "@type": "xsd:string"
+    },
+    "minBaseSize": {
+      "@id": "btse:minBaseSize",
+      "@type": "xsd:string"
+    },
+    "maxBaseSize": {
+      "@id": "btse:maxBaseSize",
+      "@type": "xsd:string"
+    },
+    "quoteCurrencies": {
+      "@id": "btse:quoteCurrencies",
+      "@container": "@list"
+    },
+    "minQuoteSizes": {
+      "@id": "btse:minQuoteSizes",
+      "@container": "@list"
+    },
+    "maxQuoteSizes": {
+      "@id": "btse:maxQuoteSizes",
+      "@container": "@list"
+    },
+    "OTCRequestQuoteRequest": "btse:OTCRequestQuoteRequest",
+    "baseSize": {
+      "@id": "btse:baseSize",
+      "@type": "xsd:string"
+    },
+    "OTCAcceptQuoteRequest": "btse:OTCAcceptQuoteRequest",
+    "quoteId": {
+      "@id": "btse:quoteId",
+      "@type": "xsd:string"
+    },
+    "OTCQuoteItem": "btse:OTCQuoteItem",
+    "ratio": {
+      "@id": "btse:ratio",
+      "@type": "xsd:string"
+    },
+    "expireTime": {
+      "@id": "btse:expireTime",
+      "@type": "xsd:decimal"
+    },
+    "ttl": {
+      "@id": "btse:ttl",
+      "@type": "xsd:decimal"
+    },
+    "OrderResponse": "btse:OrderResponse",
+    "originalOrderBaseSize": {
+      "@id": "btse:originalOrderBaseSize",
+      "@type": "xsd:decimal"
+    },
+    "originalOrderQuoteSize": {
+      "@id": "btse:originalOrderQuoteSize",
+      "@type": "xsd:decimal"
+    },
+    "currentOrderBaseSize": {
+      "@id": "btse:currentOrderBaseSize",
+      "@type": "xsd:decimal"
+    },
+    "currentOrderQuoteSize": {
+      "@id": "btse:currentOrderQuoteSize",
+      "@type": "xsd:decimal"
+    },
+    "remainingOrderBaseSize": {
+      "@id": "btse:remainingOrderBaseSize",
+      "@type": "xsd:decimal"
+    },
+    "remainingOrderQuoteSize": {
+      "@id": "btse:remainingOrderQuoteSize",
+      "@type": "xsd:decimal"
+    },
+    "filledBaseSize": {
+      "@id": "btse:filledBaseSize",
+      "@type": "xsd:decimal"
+    },
+    "totalFilledBaseSize": {
+      "@id": "btse:totalFilledBaseSize",
+      "@type": "xsd:decimal"
+    },
+    "orderCurrency": {
+      "@id": "btse:orderCurrency",
+      "@type": "xsd:string"
+    },
+    "fillSize": {
+      "@id": "btse:fillSize",
+      "@type": "xsd:decimal"
+    },
+    "originalSize": {
+      "@id": "btse:originalSize",
+      "@type": "xsd:decimal"
+    },
+    "UserTrade": "btse:UserTrade",
+    "QueryOrderResp": "btse:QueryOrderResp",
+    "requestId": {
+      "@id": "btse:requestId",
+      "@type": "xsd:integer"
+    },
+    "orderDetail": {
+      "@id": "btse:orderDetail",
+      "@type": "@id"
+    },
+    "QueryFeesResp": "btse:QueryFeesResp",
+    "SupportCryptoActionEnum": "btse:SupportCryptoActionEnum",
+    "AssetActionEnum": "btse:AssetActionEnum",
+    "AssetTypeEnum": "btse:AssetTypeEnum",
+    "WalletTypeEnum": "btse:WalletTypeEnum",
+    "WalletTransactionTypeEnum": "btse:WalletTransactionTypeEnum",
+    "WalletTransactionStatusEnum": "btse:WalletTransactionStatusEnum",
+    "DefaultResponse": "btse:DefaultResponse",
+    "QueryAssetsResponse": "btse:QueryAssetsResponse",
+    "AssetItem": "btse:AssetItem",
+    "precision": {
+      "@id": "btse:precision",
+      "@type": "xsd:integer"
+    },
+    "tradeScale": {
+      "@id": "btse:tradeScale",
+      "@type": "xsd:integer"
+    },
+    "CryptoListResponse": "btse:CryptoListResponse",
+    "CryptoNetworksResponse": "btse:CryptoNetworksResponse",
+    "CryptoNetworkItem": "btse:CryptoNetworkItem",
+    "network": {
+      "@id": "btse:network",
+      "@type": "xsd:string"
+    },
+    "depositEnable": {
+      "@id": "btse:depositEnable",
+      "@type": "xsd:boolean"
+    },
+    "withdrawEnable": {
+      "@id": "btse:withdrawEnable",
+      "@type": "xsd:boolean"
+    },
+    "confirmationTime": {
+      "@id": "btse:confirmationTime",
+      "@type": "xsd:integer"
+    },
+    "depositAmtMin": {
+      "@id": "btse:depositAmtMin",
+      "@type": "xsd:string"
+    },
+    "depositFeeMin": {
+      "@id": "btse:depositFeeMin",
+      "@type": "xsd:string"
+    },
+    "depositFeeRate": {
+      "@id": "btse:depositFeeRate",
+      "@type": "xsd:string"
+    },
+    "depositExtFees": {
+      "@id": "btse:depositExtFees",
+      "@type": "xsd:string"
+    },
+    "depositExtFeeRate": {
+      "@id": "btse:depositExtFeeRate",
+      "@type": "xsd:string"
+    },
+    "needAddressExtension": {
+      "@id": "btse:needAddressExtension",
+      "@type": "xsd:boolean"
+    },
+    "addressExtensionTypeName": {
+      "@id": "btse:addressExtensionTypeName",
+      "@type": "xsd:string"
+    },
+    "withdrawAmtMin": {
+      "@id": "btse:withdrawAmtMin",
+      "@type": "xsd:string"
+    },
+    "withdrawFeeMin": {
+      "@id": "btse:withdrawFeeMin",
+      "@type": "xsd:string"
+    },
+    "withdrawFeeRate": {
+      "@id": "btse:withdrawFeeRate",
+      "@type": "xsd:string"
+    },
+    "withdrawExtFees": {
+      "@id": "btse:withdrawExtFees",
+      "@type": "xsd:string"
+    },
+    "withdrawExtFeeRate": {
+      "@id": "btse:withdrawExtFeeRate",
+      "@type": "xsd:string"
+    },
+    "AssetExchangeRateResponse": "btse:AssetExchangeRateResponse",
+    "QueryUserAssetsResponse": "btse:QueryUserAssetsResponse",
+    "UserAssetItem": "btse:UserAssetItem",
+    "availableAmount": {
+      "@id": "btse:availableAmount",
+      "@type": "xsd:string"
+    },
+    "availableActions": {
+      "@id": "btse:availableActions",
+      "@container": "@list"
+    },
+    "cryptoNetwork": {
+      "@id": "btse:cryptoNetwork",
+      "@type": "@id"
+    },
+    "UserAssetCryptoNetwork": "btse:UserAssetCryptoNetwork",
+    "depositNetworks": {
+      "@id": "btse:depositNetworks",
+      "@container": "@list"
+    },
+    "withdrawalNetworks": {
+      "@id": "btse:withdrawalNetworks",
+      "@container": "@list"
+    },
+    "QueryWalletHistoryResponse": "btse:QueryWalletHistoryResponse",
+    "UserWalletHistoryItem": "btse:UserWalletHistoryItem",
+    "transactionTime": {
+      "@id": "btse:transactionTime",
+      "@type": "xsd:decimal"
+    },
+    "netAmount": {
+      "@id": "btse:netAmount",
+      "@type": "xsd:string"
+    },
+    "transactionRef": {
+      "@id": "btse:transactionRef",
+      "@type": "xsd:string"
+    },
+    "fee": {
+      "@id": "btse:fee",
+      "@type": "xsd:string"
+    },
+    "toAddress": {
+      "@id": "btse:toAddress",
+      "@type": "xsd:string"
+    },
+    "confirmTimes": {
+      "@id": "btse:confirmTimes",
+      "@type": "xsd:string"
+    },
+    "txId": {
+      "@id": "btse:txId",
+      "@type": "xsd:string"
+    },
+    "CreateAddressRequest": "btse:CreateAddressRequest",
+    "crypto": {
+      "@id": "btse:crypto",
+      "@type": "xsd:string"
+    },
+    "webhookUrl": {
+      "@id": "btse:webhookUrl",
+      "@type": "xsd:string"
+    },
+    "CreateAddressResponse": "btse:CreateAddressResponse",
+    "QueryAddressResponse": "btse:QueryAddressResponse",
+    "CryptoAddressItem": "btse:CryptoAddressItem",
+    "address": {
+      "@id": "btse:address",
+      "@type": "xsd:string"
+    },
+    "addressExtension": {
+      "@id": "btse:addressExtension",
+      "@type": "xsd:string"
+    },
+    "createTime": {
+      "@id": "btse:createTime",
+      "@type": "xsd:decimal"
+    },
+    "WithdrawRequest": "btse:WithdrawRequest",
+    "amountIncludeFee": {
+      "@id": "btse:amountIncludeFee",
+      "@type": "xsd:boolean"
+    }
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "BTSE API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects BTSE's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-13) from openapi/btse-earn-openapi.yml, openapi/btse-futures-legacy-openapi.yml, openapi/btse-futures-openapi.yml.",
+  "dcterms:created": "2026-10-13",
+  "dcterms:source": [
+    "openapi/btse-earn-openapi.yml",
+    "openapi/btse-futures-legacy-openapi.yml",
+    "openapi/btse-futures-openapi.yml",
+    "openapi/btse-markets-openapi.yml",
+    "openapi/btse-otc-openapi.yml"
+  ]
+}

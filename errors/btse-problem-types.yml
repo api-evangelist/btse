@@ -1,0 +1,21 @@
+generated: '2026-10-13'
+method: searched
+source: https://docs.btse.com/error-codes
+format: custom-json
+envelope: '{"status": <http status>, "error": <http status text>, "code": <internal error code>, "message": <human-readable description>}'
+problems:
+- {status: 400, title: Bad Request, type: invalid-or-missing-parameters, description: Bad Request — invalid or missing parameters, remediation: Check request params against the endpoint spec}
+- {status: 401, title: Unauthorized, type: invalid-credentials, description: Unauthorized — missing or invalid credentials, remediation: 'Verify API key, nonce freshness, and signature'}
+- {status: 403, title: Forbidden, type: insufficient-permission, description: Forbidden — insufficient permission, remediation: Check your API key has the required permission level}
+- {status: 404, title: Not Found, type: not-found, description: Not Found — resource does not exist, remediation: Verify the endpoint path and any IDs}
+- {status: 405, title: Method Not Allowed, type: method-not-allowed, description: Method Not Allowed — wrong HTTP method, remediation: Use the correct method (GET/POST/PUT/DELETE)}
+- {status: 408, title: Request Timeout, type: request-timeout, description: Request Timeout — exceeded 30 seconds, remediation: 'Retry once; if persistent, check server status'}
+- {status: 429, title: Too Many Requests, type: rate-limit-exceeded, description: Too Many Requests — rate limit exceeded (code 303), remediation: Back off and retry after Retry-After header value}
+- {status: 451, title: Unavailable For Legal Reasons, type: account-banned, description: Unavailable For Legal Reasons — account banned, remediation: Contact support}
+- {status: 500, title: Internal Server Error, type: internal-error, description: Internal Server Error, remediation: Retry with backoff; report if persistent}
+- {status: 400, title: Invalid order size, type: code-301, description: Size below the symbol's minimum or above the maximum., remediation: Check minOrderSize / maxOrderSize}
+- {status: 400, title: Invalid order price, type: code-302, description: Price outside the contract's tick-size grid, or price filter (PRICE_FILTER)., remediation: Round price to the symbol's tick size before submitting.}
+- {status: 400, title: Maximum open orders exceeded, type: code-304, description: Per-user or per-symbol open-order limit reached., remediation: Cancel stale orders or use cancelAllAfter (dead-man's switch).}
+- {status: 404, title: Order not found, type: code-16, description: The orderID / clOrderID doesn't match any active or recent order., remediation: Verify the ID.}
+- {status: 400, title: Insufficient balance, type: code-8, description: Wallet balance below required amount including fees., remediation: Check available (not total) balance.}
+- {status: 401, title: Authentication Failed, type: code-10002, description: Signature payload mismatch., remediation: See the Signed Request Walkthrough.}

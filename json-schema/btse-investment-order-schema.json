@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-investment-order-schema.json",
+  "title": "InvestmentOrder",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-earn-openapi.yml#/components/schemas/InvestmentOrder",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Order ID"
+    },
+    "name": {
+      "type": "string",
+      "description": "Product name"
+    },
+    "currency": {
+      "type": "string",
+      "description": "Currency"
+    },
+    "type": {
+      "type": "string",
+      "description": "Product type"
+    },
+    "rate": {
+      "type": "number",
+      "description": "Interest rate"
+    },
+    "investAmt": {
+      "type": "number",
+      "description": "Invested amount"
+    },
+    "interestEarned": {
+      "type": "number",
+      "description": "Interest earned to date"
+    },
+    "nextInterestPayoutTime": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Next payout timestamp"
+    },
+    "startTime": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Order start time"
+    },
+    "endTime": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Order end time"
+    },
+    "duration": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Duration in milliseconds"
+    },
+    "payoutLockTime": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Lock time before payout"
+    },
+    "autoRenew": {
+      "type": "boolean",
+      "description": "Auto-renew status"
+    },
+    "compounding": {
+      "type": "boolean",
+      "description": "Whether compounding is active"
+    },
+    "autoRenewSupported": {
+      "type": "boolean",
+      "description": "Whether product supports auto-renew"
+    },
+    "redemptionProcessing": {
+      "type": "boolean",
+      "description": "Whether a redemption is currently processing"
+    }
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-order-response-schema.json",
+  "title": "OrderResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-spot-legacy-openapi.yml#/components/schemas/OrderResponse",
+  "type": "object",
+  "properties": {
+    "symbol": {
+      "type": "string",
+      "description": "Market symbol"
+    },
+    "orderID": {
+      "type": "string",
+      "description": "Internal order ID"
+    },
+    "clOrderID": {
+      "type": "string",
+      "description": "Custom order ID"
+    },
+    "side": {
+      "type": "string",
+      "description": "BUY or SELL"
+    },
+    "price": {
+      "type": "number",
+      "description": "Order price"
+    },
+    "orderType": {
+      "type": "integer",
+      "description": "76: Limit · 77: Market · 80: Peg/Algo"
+    },
+    "status": {
+      "type": "integer",
+      "description": "Order status code: `2` (ORDER_INSERTED) · `4` (FULLY_MATCHED) · `5` (PARTIAL_FILL) · `6` (CANCELLED) · `9` (TRIGGER_INSERTED) · `10` (TRIGGER_ACTIVATED) · `15` (REJECTED)"
+    },
+    "averageFillPrice": {
+      "type": "number",
+      "description": "Average fill price"
+    },
+    "originalOrderBaseSize": {
+      "type": "number",
+      "description": "Original order quantity expressed in base currency"
+    },
+    "originalOrderQuoteSize": {
+      "type": "number",
+      "description": "Original order quantity expressed in quote currency"
+    },
+    "currentOrderBaseSize": {
+      "type": "number",
+      "description": "Latest order quantity in base currency (after amendments / partial fills)"
+    },
+    "currentOrderQuoteSize": {
+      "type": "number",
+      "description": "Latest order quantity in quote currency"
+    },
+    "remainingOrderBaseSize": {
+      "type": "number",
+      "description": "Unfilled quantity in base currency"
+    },
+    "remainingOrderQuoteSize": {
+      "type": "number",
+      "description": "Unfilled quantity in quote currency"
+    },
+    "filledBaseSize": {
+      "type": "number",
+      "description": "Most recent fill quantity in base currency"
+    },
+    "totalFilledBaseSize": {
+      "type": "number",
+      "description": "Cumulative filled quantity in base currency"
+    },
+    "orderCurrency": {
+      "type": "string",
+      "enum": [
+        "base",
+        "quote"
+      ],
+      "description": "Currency the order size is denominated in: `base` or `quote`"
+    },
+    "size": {
+      "type": "number",
+      "deprecated": true,
+      "description": "**Deprecated in v3.3.** Use `originalOrderBaseSize` / `originalOrderQuoteSize`"
+    },
+    "fillSize": {
+      "type": "number",
+      "deprecated": true,
+      "description": "**Deprecated in v3.3.** Use `filledBaseSize` / `totalFilledBaseSize`"
+    },
+    "remainingSize": {
+      "type": "number",
+      "deprecated": true,
+      "description": "**Deprecated in v3.3.** Use `remainingOrderBaseSize` / `remainingOrderQuoteSize`"
+    },
+    "originalSize": {
+      "type": "number",
+      "deprecated": true,
+      "description": "**Deprecated in v3.3.** Use `originalOrderBaseSize` / `originalOrderQuoteSize`"
+    },
+    "triggerPrice": {
+      "type": "number",
+      "description": "Trigger price (`0` if not a trigger order)"
+    },
+    "stopPrice": {
+      "type": "number",
+      "description": "Stop price"
+    },
+    "time_in_force": {
+      "type": "string",
+      "description": "Time in force: `GTC` · `IOC` · `FOK` · `HALFMIN` · `FIVEMIN` · `HOUR` · `TWELVEHOUR` · `DAY` · `WEEK` · `MONTH`"
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Order timestamp"
+    },
+    "trigger": {
+      "type": "boolean",
+      "description": "Whether the order is a trigger order"
+    },
+    "postOnly": {
+      "type": "boolean",
+      "description": "Whether post-only"
+    },
+    "stealth": {
+      "type": "number",
+      "description": "Stealth value"
+    },
+    "deviation": {
+      "type": "number",
+      "description": "Deviation value"
+    }
+  }
+}

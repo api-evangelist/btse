@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-otcmarket-response-schema.json",
+  "title": "OTCMarketResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-otc-openapi.yml#/components/schemas/OTCMarketResponse",
+  "allOf": [
+    {
+      "$ref": "#/$defs/CommonResponse"
+    },
+    {
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "type": "array",
+          "description": "Market items",
+          "items": {
+            "$ref": "#/$defs/OTCMarketItem"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "CommonResponse": {
+      "type": "object",
+      "required": [
+        "success",
+        "code",
+        "msg",
+        "time"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Request validation result. `true` when the HTTP status is `200`."
+        },
+        "code": {
+          "type": "integer",
+          "description": "Request status code. `1` on success; otherwise an error code."
+        },
+        "msg": {
+          "type": "string",
+          "description": "Request status message. `Success` on success; otherwise an error message."
+        },
+        "time": {
+          "type": "number",
+          "description": "Current Unix timestamp."
+        }
+      }
+    },
+    "OTCMarketItem": {
+      "type": "object",
+      "required": [
+        "asset",
+        "minBaseSize",
+        "maxBaseSize",
+        "quoteCurrencies",
+        "minQuoteSizes",
+        "maxQuoteSizes"
+      ],
+      "properties": {
+        "asset": {
+          "type": "string",
+          "description": "Asset"
+        },
+        "minBaseSize": {
+          "type": "string",
+          "description": "Minimum base currency size"
+        },
+        "maxBaseSize": {
+          "type": "string",
+          "description": "Maximum base currency size"
+        },
+        "quoteCurrencies": {
+          "type": "array",
+          "description": "Supported quote currencies",
+          "items": {
+            "type": "string"
+          }
+        },
+        "minQuoteSizes": {
+          "type": "array",
+          "description": "Minimum size per quote currency (matches `quoteCurrencies` order)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "maxQuoteSizes": {
+          "type": "array",
+          "description": "Maximum size per quote currency (matches `quoteCurrencies` order)",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

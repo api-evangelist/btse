@@ -1,0 +1,624 @@
+openapi: 3.0.3
+info:
+  title: OTC API
+  version: 1.0.0
+  description: |
+    OTC (Over-The-Counter) trading API for large block trades with guaranteed pricing.
+
+    **Base URL:** `https://api.btse.com`
+    **Testnet:** `https://testapi.btse.io`
+
+    ## OTC Trading Flow
+
+    1. **Get Markets** — check available assets and size limits
+    2. **Request Quote** — get a price quote (valid for ~6 seconds)
+    3. **Accept Quote** — execute the quote before it expires
+
+    > **Tip:** Quotes can be **partially accepted** by sending `baseSize` or `quoteSize` in the accept request.
+
+    ## Authentication
+
+    Most OTC endpoints require Trading permission. See the [Authentication Guide](/authentication).
+
+    ## Rate Limit
+
+    50 requests per 2 seconds based on your IP.
+  contact:
+    name: Support
+    url: https://support.btse.com
+
+servers:
+  - url: https://api.btse.com
+    description: Production
+  - url: https://testapi.btse.io
+    description: Testnet
+
+tags:
+  - name: OTC
+    description: OTC trading endpoints
+
+paths:
+  # ─── OTC Endpoints ─────────────────────────────────────────────────────
+
+  /public-api/otc/v1/markets:
+    get:
+      operationId: getOtcMarkets
+      summary: Get OTC Markets
+      description: |
+        Get OTC markets.
+
+        This API can be publicly accessed (without any security headers) to get the result.
+        If you access with `Read` permission authentication, the result will be much more accurate by account setting.
+
+        When requesting a quote, the request size should be in the associated range:
+        - If using `baseSize`, it should be in the range of [`minBaseSize`, `maxBaseSize`).
+        - If using `quoteSize`, it should be in the range of [`minQuoteSizes[i]`, `maxQuoteSizes[i]`].
+      tags: [OTC]
+      security: []
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OTCMarketResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                  - asset: BTC
+                    minBaseSize: "1.0"
+                    maxBaseSize: "539236.0"
+                    quoteCurrencies: [USDT, ETH, DOGE]
+                    minQuoteSizes: ["0.1", "0.000029", "0.69604"]
+                    maxQuoteSizes: ["2500000", "287", "6960396"]
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /public-api/otc/v1/quotes:
+    post:
+      operationId: requestQuote
+      summary: Request Quote
+      description: |
+        Request a quote for an OTC order. Requires the `Trading` permission.
+
+        Choose either `baseSize` or `quoteSize` to submit — these two parameters cannot be sent at the same time.
+
+        > **Important:** A new quote expires after **6 seconds**. Accept it before expiry.
+      tags: [OTC]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OTCRequestQuoteRequest'
+            examples:
+              Buy:
+                value:
+                  side: BUY
+                  baseCurrency: BTC
+                  quoteCurrency: USDT
+                  baseSize: "15.0"
+                  clOrderId: test-0001
+              Buy (with quote size):
+                value:
+                  side: BUY
+                  baseCurrency: BTC
+                  quoteCurrency: USDT
+                  quoteSize: "340000.0"
+                  clOrderId: test-0002
+              Sell:
+                value:
+                  side: SELL
+                  baseCurrency: BTC
+                  quoteCurrency: ETH
+                  baseSize: "15.0"
+                  clOrderId: test-0003
+              Sell (with quote size):
+                value:
+                  side: SELL
+                  baseCurrency: BTC
+                  quoteCurrency: ETH
+                  quoteSize: "300.0"
+                  clOrderId: test-0004
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OTCQuoteResponse'
+              examples:
+                Buy:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1673325777227
+                    data:
+                      quoteId: 0001-0001-0001-0001
+                      clOrderId: test-0001
+                      side: BUY
+                      baseSize: "15.0"
+                      baseCurrency: BTC
+                      quoteSize: "257735.09868"
+                      quoteCurrency: USDT
+                      ratio: "17182.33991211"
+                      expireTime: 1673325783227
+                      ttl: 6
+                      status: NEW_QUOTE
+                Sell (with quote size):
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1673325777227
+                    data:
+                      quoteId: 0004-0004-0004-0004
+                      clOrderId: test-0004
+                      side: SELL
+                      baseSize: "23.0325468695"
+                      baseCurrency: BTC
+                      quoteSize: "300.0"
+                      quoteCurrency: ETH
+                      ratio: "13.025046761"
+                      expireTime: 1673325783227
+                      ttl: 6
+                      status: NEW_QUOTE
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+    get:
+      operationId: getQuote
+      summary: Query Quote
+      description: Query a quote for an OTC order. Requires the `Read` permission.
+      tags: [OTC]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - in: query
+          name: quoteId
+          schema:
+            type: string
+            example: 1234-1234-1234-1234
+          required: true
+          description: Quote ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OTCQuoteResponse'
+              examples:
+                New Quote:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1673325777227
+                    data:
+                      quoteId: 0001-0001-0001-0001
+                      clOrderId: test-0001
+                      side: BUY
+                      baseSize: "15.0"
+                      baseCurrency: BTC
+                      quoteSize: "257735.09868"
+                      quoteCurrency: USDT
+                      ratio: "17182.33991211"
+                      expireTime: 1673325783227
+                      ttl: 6
+                      status: NEW_QUOTE
+                Accepted Quote:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1673325778012
+                    data:
+                      quoteId: 0001-0001-0001-0001
+                      clOrderId: test-0001
+                      side: BUY
+                      baseSize: "15.0"
+                      baseCurrency: BTC
+                      quoteSize: "257735.09868"
+                      quoteCurrency: USDT
+                      ratio: "17182.33991211"
+                      expireTime: 1673325783227
+                      status: COMPLETED
+                Quote Was Expired:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1673325784033
+                    data:
+                      quoteId: 0002-0002-0002-0002
+                      clOrderId: test-0002
+                      side: BUY
+                      baseSize: "19.787758928"
+                      baseCurrency: BTC
+                      quoteSize: "340000.0"
+                      quoteCurrency: USDT
+                      ratio: "17182.33991211"
+                      expireTime: 1673325783227
+                      ttl: 0
+                      status: EXPIRED
+                Requote:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1673506479119
+                    data:
+                      quoteId: 2000-2000-2000-2000
+                      clOrderId: test-0002
+                      side: BUY
+                      baseSize: "18.624803705"
+                      baseCurrency: BTC
+                      quoteSize: "340000.0"
+                      quoteCurrency: USDT
+                      ratio: "18255.225955"
+                      expireTime: 1673506485119
+                      ttl: 6
+                      status: REQUOTE
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /public-api/otc/v1/quotes/accept:
+    post:
+      operationId: acceptQuote
+      summary: Accept Quote
+      description: |
+        Accept a quote for an OTC order. Requires the `Trading` permission.
+
+        After requesting a quote with `baseSize`, you can use `baseSize` to partially accept the quote. Likewise, you can use `quoteSize` to partially accept a quote that was requested with `quoteSize`.
+
+        In any of the scenarios below, the original `baseSize` and `quoteSize` will be accepted in full without any message:
+
+        1. Send neither `baseSize` nor `quoteSize`.
+        2. Send `baseSize` higher than the quoted amount.
+        3. Send `quoteSize` higher than the quoted amount.
+        4. Send `baseSize` when the quote was requested with `quoteSize`.
+        5. Send `quoteSize` when the quote was requested with `baseSize`.
+      tags: [OTC]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OTCAcceptQuoteRequest'
+            examples:
+              Common:
+                value:
+                  quoteId: 0001-0001-0001-0001
+              Accept with specified baseSize:
+                value:
+                  quoteId: 0003-0003-0003-0003
+                  baseSize: "10.0"
+              Accept with specified quoteSize:
+                value:
+                  quoteId: 0004-0004-0004-0004
+                  quoteSize: "200.0"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OTCQuoteResponse'
+              examples:
+                Common:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1673325778012
+                    data:
+                      quoteId: 0001-0001-0001-0001
+                      clOrderId: test-0001
+                      side: BUY
+                      baseSize: "15.0"
+                      baseCurrency: BTC
+                      quoteSize: "257735.09868"
+                      quoteCurrency: USDT
+                      ratio: "17182.33991211"
+                      expireTime: 1673325783227
+                      status: COMPLETED
+                Accept with specified baseSize:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1673325777227
+                    data:
+                      quoteId: 0003-0003-0003-0003
+                      clOrderId: test-0003
+                      side: SELL
+                      baseSize: "10.0"
+                      baseCurrency: BTC
+                      quoteSize: "130.25046761"
+                      quoteCurrency: ETH
+                      ratio: "13.025046761"
+                      expireTime: 1673325783227
+                      status: COMPLETED
+                Accept with specified quoteSize:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1673325777227
+                    data:
+                      quoteId: 0004-0004-0004-0004
+                      clOrderId: test-0004
+                      side: SELL
+                      baseSize: "15.3550312463"
+                      baseCurrency: BTC
+                      quoteSize: "200.0"
+                      quoteCurrency: ETH
+                      ratio: "13.025046761"
+                      expireTime: 1673325783227
+                      status: COMPLETED
+                Accept but expired or ratio change:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1673506479119
+                    data:
+                      quoteId: 2000-2000-2000-2000
+                      clOrderId: test-0002
+                      side: BUY
+                      baseSize: "18.624803705"
+                      baseCurrency: BTC
+                      quoteSize: "340000.0"
+                      quoteCurrency: USDT
+                      ratio: "18255.225955"
+                      expireTime: 1673506485119
+                      ttl: 6
+                      status: REQUOTE
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+# ═════════════════════════════════════════════════════════════════════════
+# Components
+# ═════════════════════════════════════════════════════════════════════════
+
+components:
+  securitySchemes:
+    api:
+      type: apiKey
+      in: header
+      name: request-api
+      description: API key
+    nonce:
+      type: apiKey
+      in: header
+      name: request-nonce
+      description: Current timestamp in milliseconds
+    sign:
+      type: apiKey
+      in: header
+      name: request-sign
+      description: |
+        HMAC-SHA384 signature: `HMAC-SHA384(secret, path + nonce + body)`
+
+  schemas:
+    # ─── Common / Errors ───────────────────────────────────────────────────
+
+    CommonResponse:
+      type: object
+      required: [success, code, msg, time]
+      properties:
+        success:
+          type: boolean
+          description: Request validation result. `true` when the HTTP status is `200`.
+        code:
+          type: integer
+          description: Request status code. `1` on success; otherwise an error code.
+        msg:
+          type: string
+          description: Request status message. `Success` on success; otherwise an error message.
+        time:
+          type: number
+          description: Current Unix timestamp.
+
+    ErrorResponse:
+      type: object
+      properties:
+        success: { type: boolean, description: Always `false` on error }
+        code:    { type: integer, description: Error code }
+        msg:     { type: string,  description: Error message }
+        time:    { type: number,  description: Current Unix timestamp }
+
+    RateLimitError:
+      type: object
+      properties:
+        status:  { type: integer, description: "HTTP status code (429)" }
+        message: { type: string,  description: Rate limit exceeded message }
+
+    # ─── Enums ─────────────────────────────────────────────────────────────
+
+    TxnSideEnum:
+      type: string
+      enum: [BUY, SELL]
+      description: Transaction side
+
+    OTCQuoteStatusEnum:
+      type: string
+      enum: [NEW_QUOTE, REQUOTE, COMPLETED, EXPIRED]
+      description: Quote status
+
+    # ─── Markets ───────────────────────────────────────────────────────────
+
+    OTCMarketItem:
+      type: object
+      required: [asset, minBaseSize, maxBaseSize, quoteCurrencies, minQuoteSizes, maxQuoteSizes]
+      properties:
+        asset:           { type: string, description: Asset }
+        minBaseSize:     { type: string, description: Minimum base currency size }
+        maxBaseSize:     { type: string, description: Maximum base currency size }
+        quoteCurrencies:
+          type: array
+          description: Supported quote currencies
+          items: { type: string }
+        minQuoteSizes:
+          type: array
+          description: Minimum size per quote currency (matches `quoteCurrencies` order)
+          items: { type: string }
+        maxQuoteSizes:
+          type: array
+          description: Maximum size per quote currency (matches `quoteCurrencies` order)
+          items: { type: string }
+
+    OTCMarketResponse:
+      allOf:
+        - $ref: '#/components/schemas/CommonResponse'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              description: Market items
+              items:
+                $ref: '#/components/schemas/OTCMarketItem'
+
+    # ─── Request Quote ─────────────────────────────────────────────────────
+
+    OTCRequestQuoteRequest:
+      type: object
+      required: [side, baseCurrency, quoteCurrency]
+      properties:
+        side:
+          $ref: '#/components/schemas/TxnSideEnum'
+        baseCurrency:  { type: string, description: Base currency }
+        quoteCurrency: { type: string, description: Quote currency }
+        baseSize:
+          type: string
+          description: "Size in `baseCurrency`. Mutually exclusive with `quoteSize`."
+        quoteSize:
+          type: string
+          description: "Size in `quoteCurrency`. Mutually exclusive with `baseSize`."
+        clOrderId:
+          type: string
+          description: Client order ID assigned by the client
+
+    # ─── Accept Quote ──────────────────────────────────────────────────────
+
+    OTCAcceptQuoteRequest:
+      type: object
+      required: [quoteId]
+      properties:
+        quoteId:
+          type: string
+          description: Quote ID returned from Request Quote
+        baseSize:
+          type: string
+          description: "Partial `baseCurrency` amount to accept. Omit both `baseSize` and `quoteSize` to accept the full quoted amount."
+        quoteSize:
+          type: string
+          description: "Partial `quoteCurrency` amount to accept. Omit both `baseSize` and `quoteSize` to accept the full quoted amount."
+
+    # ─── Quote Response ────────────────────────────────────────────────────
+
+    OTCQuoteItem:
+      type: object
+      required: [quoteId, clOrderId, side, baseSize, baseCurrency, quoteSize, quoteCurrency, ratio, status, expireTime]
+      properties:
+        quoteId:       { type: string, description: Quote ID }
+        clOrderId:     { type: string, description: Client order ID assigned by the client }
+        side:
+          $ref: '#/components/schemas/TxnSideEnum'
+        baseSize:
+          type: string
+          description: "Size in `baseCurrency`. Max 8 decimal places when `side=BUY`; max 9 decimal places when `side=SELL`."
+        baseCurrency:  { type: string, description: Base currency }
+        quoteSize:
+          type: string
+          description: "Size in `quoteCurrency`. Max 9 decimal places when `side=BUY`; max 8 decimal places when `side=SELL`."
+        quoteCurrency: { type: string, description: Quote currency }
+        ratio:
+          type: string
+          description: "How many `quoteCurrency` per one `baseCurrency` (`quoteSize` / `baseSize`). Max 10 decimal places."
+        status:
+          $ref: '#/components/schemas/OTCQuoteStatusEnum'
+        expireTime:
+          type: number
+          description: Expiration timestamp (Unix ms)
+        ttl:
+          type: number
+          description: Time to live in seconds
+
+    OTCQuoteResponse:
+      allOf:
+        - $ref: '#/components/schemas/CommonResponse'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              $ref: '#/components/schemas/OTCQuoteItem'

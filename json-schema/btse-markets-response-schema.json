@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-markets-response-schema.json",
+  "title": "MarketsResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-markets-openapi.yml#/components/schemas/MarketsResponse",
+  "allOf": [
+    {
+      "$ref": "#/$defs/CommonResponse"
+    },
+    {
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "type": "object",
+          "required": [
+            "symbols"
+          ],
+          "properties": {
+            "symbols": {
+              "type": "array",
+              "description": "Symbols information",
+              "items": {
+                "$ref": "#/$defs/ExchangeInfoSymbolItem"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "CommonResponse": {
+      "type": "object",
+      "required": [
+        "success",
+        "code",
+        "msg",
+        "time"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Whether the request succeeded. `true` when HTTP status is `200`"
+        },
+        "code": {
+          "type": "integer",
+          "description": "Status code. `1` on success"
+        },
+        "msg": {
+          "type": "string",
+          "description": "Status message"
+        },
+        "time": {
+          "type": "number",
+          "description": "Current unix timestamp"
+        }
+      }
+    },
+    "ExchangeInfoSymbolItem": {
+      "type": "object",
+      "required": [
+        "symbol",
+        "type",
+        "category",
+        "tradeCurrency",
+        "baseCurrency",
+        "quoteCurrency",
+        "active",
+        "minOrderPrice",
+        "minPriceIncrement",
+        "pricePrecision",
+        "minOrderSize",
+        "maxOrderSize",
+        "minSizeIncrement",
+        "sizePrecision"
+      ],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "description": "Symbol name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Spot",
+            "FuturesPerpetual",
+            "FuturesTimeBased"
+          ],
+          "description": "Market type"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "CRYPTO",
+            "FX",
+            "STOCK",
+            "COMMODITIES",
+            "RATES"
+          ],
+          "description": "Market category"
+        },
+        "tradeCurrency": {
+          "type": "string",
+          "description": "Trade currency"
+        },
+        "baseCurrency": {
+          "type": "string",
+          "description": "Base currency"
+        },
+        "quoteCurrency": {
+          "type": "string",
+          "description": "Quote currency"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether the market is active"
+        },
+        "minOrderPrice": {
+          "type": "string",
+          "description": "Minimum order price"
+        },
+        "minPriceIncrement": {
+          "type": "string",
+          "description": "Minimum order price increment"
+        },
+        "pricePrecision": {
+          "type": "integer",
+          "description": "Price precision"
+        },
+        "minOrderSize": {
+          "type": "string",
+          "description": "Minimum order size"
+        },
+        "maxOrderSize": {
+          "type": "string",
+          "description": "Maximum order size"
+        },
+        "minSizeIncrement": {
+          "type": "string",
+          "description": "Minimum size increment"
+        },
+        "sizePrecision": {
+          "type": "integer",
+          "description": "Size precision"
+        },
+        "inactiveTime": {
+          "type": "number",
+          "description": "Inactive time"
+        },
+        "contractSize": {
+          "type": "string",
+          "description": "Contract size"
+        },
+        "availableSettlement": {
+          "type": "array",
+          "description": "Available currencies for settlement",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contractStartTime": {
+          "type": "number",
+          "description": "Contract start time"
+        },
+        "contractEndTime": {
+          "type": "number",
+          "description": "Contract end time"
+        },
+        "matchingStartTime": {
+          "type": "number",
+          "description": "Matching start time"
+        },
+        "becomeInactiveTime": {
+          "type": "number",
+          "description": "Become inactive time"
+        }
+      }
+    }
+  }
+}

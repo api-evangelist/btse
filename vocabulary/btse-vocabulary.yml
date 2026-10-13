@@ -1,0 +1,438 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-vocabulary.py
+source:
+- openapi/btse-earn-openapi.yml
+- openapi/btse-futures-legacy-openapi.yml
+- openapi/btse-futures-openapi.yml
+- openapi/btse-markets-openapi.yml
+- openapi/btse-otc-openapi.yml
+vocabulary:
+  name: BTSE Domain Vocabulary
+  description: 'Terms declared by BTSE''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions. Derived,
+    not authored.'
+  version: '2026-10-13'
+  terms:
+  - term: Earn
+    definition: Investment product endpoints
+    tags:
+    - Resource Group
+    source: openapi/btse-earn-openapi.yml
+  - term: Trade
+    definition: Requires API key with Trading permission
+    tags:
+    - Resource Group
+    source: openapi/btse-futures-legacy-openapi.yml
+  - term: Wallet
+    definition: Requires API key with Read or Transfer permission
+    tags:
+    - Resource Group
+    source: openapi/btse-futures-legacy-openapi.yml
+  - term: Markets
+    definition: Public market data shared by spot and futures markets
+    tags:
+    - Resource Group
+    source: openapi/btse-markets-openapi.yml
+  - term: OTC
+    definition: OTC trading endpoints
+    tags:
+    - Resource Group
+    source: openapi/btse-otc-openapi.yml
+  - term: Account
+    definition: Requires API key with Read permission
+    tags:
+    - Resource Group
+    source: openapi/btse-spot-legacy-openapi.yml
+  - term: ErrorResponse
+    definition: 'Object declared by the contract with fields: status, error, code, message.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/ErrorResponse
+  - term: RateLimitError
+    definition: 'Object declared by the contract with fields: status, message.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/RateLimitError
+  - term: RateObject
+    definition: 'Object declared by the contract with fields: days, rate.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/RateObject
+  - term: InvestmentProduct
+    definition: 'Object declared by the contract with fields: id, name, currency, type, startDate, interestStartDate, rates, compounding, autoRenewSupported,
+      dailyLimit, minSize, incrementalSize.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/InvestmentProduct
+  - term: DepositInvestmentRequest
+    definition: 'Object declared by the contract with fields: productId, amount, renew, day.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/DepositInvestmentRequest
+  - term: DepositInvestmentResponse
+    definition: 'Object declared by the contract with fields: success.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/DepositInvestmentResponse
+  - term: RenewInvestmentRequest
+    definition: 'Object declared by the contract with fields: orderId, autoRenew.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/RenewInvestmentRequest
+  - term: RenewInvestmentResponse
+    definition: 'Object declared by the contract with fields: orderId, autoRenew.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/RenewInvestmentResponse
+  - term: RedeemInvestmentRequest
+    definition: 'Object declared by the contract with fields: orderId, amount.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/RedeemInvestmentRequest
+  - term: RedeemInvestmentResponse
+    definition: 'Object declared by the contract with fields: success.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/RedeemInvestmentResponse
+  - term: InvestmentOrder
+    definition: 'Object declared by the contract with fields: id, name, currency, type, rate, investAmt, interestEarned, nextInterestPayoutTime,
+      startTime, endTime, duration, payoutLockTime. (4 more)'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/InvestmentOrder
+  - term: InvestmentHistoryObject
+    definition: 'Object declared by the contract with fields: txnTime, name, currency, rate, type, txnType, amount, totalAmount, interestEarned,
+      duration.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/InvestmentHistoryObject
+  - term: InvestmentHistoryResponse
+    definition: 'Object declared by the contract with fields: totalRows, pageNumber, pageSize, data.'
+    tags:
+    - Object
+    source: openapi/btse-earn-openapi.yml#/components/schemas/InvestmentHistoryResponse
+  - term: CreateOrderRequest
+    definition: 'Object declared by the contract with fields: symbol, size, side, type, price, time_in_force, txType, stopPrice, triggerPrice,
+      trailValue, postOnly, reduceOnly. (7 more)'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/CreateOrderRequest
+  - term: CreateAlgoOrderRequest
+    definition: 'Object declared by the contract with fields: symbol, price, size, side, clOrderID, deviation, stealth, positionMode.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/CreateAlgoOrderRequest
+  - term: AmendOrderRequest
+    definition: 'Object declared by the contract with fields: symbol, orderID, clOrderID, type, value, orderPrice, orderSize, triggerPrice.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/AmendOrderRequest
+  - term: ClosePositionRequest
+    definition: 'Object declared by the contract with fields: symbol, type, price, postOnly, positionId.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/ClosePositionRequest
+  - term: BindTpSlRequest
+    definition: 'Object declared by the contract with fields: symbol, side, takeProfitPrice, takeProfitTrigger, stopLossPrice, stopLossTrigger,
+      positionMode, positionId.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/BindTpSlRequest
+  - term: SetRiskLimitRequest
+    definition: 'Object declared by the contract with fields: symbol, riskLimitLevel, positionMode.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/SetRiskLimitRequest
+  - term: SetLeverageRequest
+    definition: 'Object declared by the contract with fields: symbol, leverage, marginMode, positionMode, positionId.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/SetLeverageRequest
+  - term: SettlementCurrencyRequest
+    definition: 'Object declared by the contract with fields: symbol, currency, positionId.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/SettlementCurrencyRequest
+  - term: ChangePositionModeRequest
+    definition: 'Object declared by the contract with fields: symbol, positionMode.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/ChangePositionModeRequest
+  - term: WalletTransferRequest
+    definition: 'Object declared by the contract with fields: walletSrc, walletSrcType, walletDest, walletDestType, apiWallets.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/WalletTransferRequest
+  - term: WalletTransferDetail
+    definition: 'Object declared by the contract with fields: currency, allBalance, balance.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/WalletTransferDetail
+  - term: SubAccountTransferRequest
+    definition: 'Object declared by the contract with fields: walletSrcType, walletSrc, walletDestType, walletDest, fromUser, receiver, apiWallets.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/SubAccountTransferRequest
+  - term: FuturesOrderResponse
+    definition: 'Object declared by the contract with fields: symbol, orderID, clOrderID, orderType, side, price, status, time_in_force, timestamp,
+      trigger, triggerPrice, avgFilledPrice. (12 more)'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/FuturesOrderResponse
+  - term: QueryOrderResponse
+    definition: 'Object declared by the contract with fields: orderID, symbol, orderType, side, price, orderValue, originalOrderSize, currentOrderSize,
+      totalFilledSize, remainingSize, pegPriceMin, pegPriceMax. (18 more)'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/QueryOrderResponse
+  - term: OpenOrderResponse
+    definition: 'Object declared by the contract with fields: symbol, orderID, clOrderID, orderType, side, price, orderValue, originalOrderSize,
+      currentOrderSize, totalFilledSize, remainingSize, timestamp. (14 more)'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/OpenOrderResponse
+  - term: FuturesUserTrade
+    definition: 'Object declared by the contract with fields: symbol, side, price, size, serialId, tradeId, orderId, clOrderID, timestamp, base,
+      quote, wallet. (9 more)'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/FuturesUserTrade
+  - term: Position
+    definition: 'Object declared by the contract with fields: symbol, side, size, entryPrice, markPrice, marginType, orderValue, settleWithAsset,
+      totalMaintenanceMargin, unrealizedProfitLoss, liquidationPrice, isolatedLeverage. (9 more)'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/Position
+  - term: RiskLimitStatus
+    definition: 'Object declared by the contract with fields: symbol, riskLimit, riskLimitLevel.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/RiskLimitStatus
+  - term: RiskLimitUpdateResponse
+    definition: 'Object declared by the contract with fields: symbol, status, type, timestamp, message.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/RiskLimitUpdateResponse
+  - term: LeverageStatus
+    definition: 'Object declared by the contract with fields: symbol, leverage, marginMode, positionDirection.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/LeverageStatus
+  - term: LeverageUpdateResponse
+    definition: 'Object declared by the contract with fields: symbol, status, type, timestamp, message.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/LeverageUpdateResponse
+  - term: PositionMode
+    definition: 'Object declared by the contract with fields: symbol, positionMode.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/PositionMode
+  - term: PositionModeUpdateResponse
+    definition: 'Object declared by the contract with fields: symbol, status, type, timestamp, message.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/PositionModeUpdateResponse
+  - term: AccountFee
+    definition: 'Object declared by the contract with fields: symbol, makerFee, takerFee.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/AccountFee
+  - term: MarginSetting
+    definition: 'Object declared by the contract with fields: symbol, initialMarginPercentage, maintenanceMarginPercentage.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/MarginSetting
+  - term: WalletAsset
+    definition: 'Object declared by the contract with fields: balance, assetPrice, currency.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/WalletAsset
+  - term: WalletBalance
+    definition: 'Object declared by the contract with fields: wallet, activeWalletName, queryType, trackingID, walletTotalValue, totalValue, marginBalance,
+      availableBalance, unrealisedProfitLoss, maintenanceMargin, leverage, openMargin. (2 more)'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/WalletBalance
+  - term: WalletHistoryEntry
+    definition: 'Object declared by the contract with fields: currency, amount, fees, orderId, wallet, description, status, type.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/WalletHistoryEntry
+  - term: WalletDetail
+    definition: 'Object declared by the contract with fields: activeWalletName, unrealisedProfitLoss, walletTotalValue, marginBalance, availableBalance,
+      maintenanceMargin.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/WalletDetail
+  - term: UnifiedWalletMargin
+    definition: 'Object declared by the contract with fields: symbol, walletTotalValue, walletTotalUnrealizedProfitLoss, futuresTotalAvailableBalance,
+      wallets.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/UnifiedWalletMargin
+  - term: SubAccountTransferResponse
+    definition: 'Object declared by the contract with fields: code, msg, time, data, success.'
+    tags:
+    - Object
+    source: openapi/btse-futures-legacy-openapi.yml#/components/schemas/SubAccountTransferResponse
+  - term: AmendOrderReq
+    definition: 'Object declared by the contract with fields: orderId, clOrderId, symbol, amendType, orderSize, orderPrice, triggerPrice, slide,
+      totalAmountMode.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/AmendOrderReq
+  - term: AmendOrderResp
+    definition: 'Object declared by the contract with fields: orderId, clOrderId, symbol, orderSide, type, orderPrice, orderSize, triggerPrice,
+      status, timestamp.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/AmendOrderResp
+  - term: SettleInReq
+    definition: 'Object declared by the contract with fields: symbol, currency, positionId.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/SettleInReq
+  - term: SettleInResp
+    definition: 'Object declared by the contract with fields: symbol, timestamp, status, type.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/SettleInResp
+  - term: SetRiskLimitReq
+    definition: 'Object declared by the contract with fields: symbol, riskLimit, riskLimitLevel, positionMode.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/SetRiskLimitReq
+  - term: ChangeRiskLimitResp
+    definition: 'Object declared by the contract with fields: symbol, timestamp, status, type, message.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/ChangeRiskLimitResp
+  - term: BindPositionTpSlReq
+    definition: 'Object declared by the contract with fields: symbol, orderSide, positionMode, positionId, takeProfitTriggerType, takeProfitTriggerPrice,
+      stopLossTriggerType, stopLossTriggerPrice.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/BindPositionTpSlReq
+  - term: BindPositionTpSlResp
+    definition: 'Object declared by the contract with fields: symbol, status, type, orderId, clOrderId, triggerPrice, positionMode, positionDirection,
+      positionId, timestamp, message.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/BindPositionTpSlResp
+  - term: ChangePositionModeReq
+    definition: 'Object declared by the contract with fields: symbol, positionMode.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/ChangePositionModeReq
+  - term: ChangePositionModeResp
+    definition: 'Object declared by the contract with fields: symbol, timestamp, status, type.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/ChangePositionModeResp
+  - term: Limit
+    definition: Limit order
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/Limit
+  - term: Market
+    definition: Market order
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/Market
+  - term: PlaceOrderReq
+    definition: 'Object declared by the contract with fields: orderType.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/PlaceOrderReq
+  - term: PlaceOrderResp
+    definition: 'Object declared by the contract with fields: status, type, symbol, postOnly, orderSide, orderId, clOrderID, timestamp, price,
+      avgFilledPrice, message, originalOrderSize. (8 more)'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/PlaceOrderResp
+  - term: CancelAllAfterReq
+    definition: 'Object declared by the contract with fields: timeoutMs.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/CancelAllAfterReq
+  - term: CancelAllAfterResp
+    definition: 'Object declared by the contract with fields: success.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/CancelAllAfterResp
+  - term: Conditional
+    definition: Conditional order that stays inactive until its trigger price is reached, then submits a limit or market order.
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/Conditional
+  - term: OcO
+    definition: OCO (One-Cancels-the-Other) order pairing a take-profit and a stop-loss leg; when either leg triggers, the other is automatically
+      cancelled.
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/OcO
+  - term: Peg
+    definition: Peg order whose working price automatically tracks the best bid or ask, offset by an optional deviation.
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/Peg
+  - term: PlaceAlgoOrderReq
+    definition: 'Object declared by the contract with fields: orderType.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/PlaceAlgoOrderReq
+  - term: Trailing
+    definition: Trailing stop order that follows the market by a fixed distance and triggers when the reference price retraces beyond that distance
+      from the best reached level.
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/Trailing
+  - term: Twap
+    definition: TWAP (Time-Weighted Average Price) order that splits the parent size into smaller child orders spread over a fixed time window.
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/Twap
+  - term: ChangeLeverageReq
+    definition: 'Object declared by the contract with fields: symbol, leverage, positionMode, positionDirection, marginMode, positionId.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/ChangeLeverageReq
+  - term: ChangeLeverageResp
+    definition: 'Object declared by the contract with fields: symbol, timestamp, status, type, message.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/ChangeLeverageResp
+  - term: TradeHistoryResp
+    definition: 'Object declared by the contract with fields: tradeId, orderId, clOrderId, positionId, orderSide, type, orderDetailType, price,
+      size, avgFilledPrice, filledSize, triggerPrice. (11 more)'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/TradeHistoryResp
+  - term: GetRiskLimitResp
+    definition: 'Object declared by the contract with fields: symbol, riskLimit, riskLimitLevel.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/GetRiskLimitResp
+  - term: PositionResp
+    definition: 'Object declared by the contract with fields: marginType, entryPrice, markPrice, symbol, side, notionalValue, settleWithAsset,
+      unrealizedProfitLoss, totalMaintenanceMargin, size, liquidationPrice, isolatedLeverage. (9 more)'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/PositionResp
+  - term: TPSLObject
+    definition: 'Object declared by the contract with fields: orderId, side, triggerPrice, triggerUseLastPrice.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/TPSLObject
+  - term: PositionModeResp
+    definition: 'Object declared by the contract with fields: symbol, positionMode.'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/PositionModeResp
+  - term: OrderResp
+    definition: 'Object declared by the contract with fields: orderId, clOrderId, symbol, orderSide, type, orderPrice, originalOrderSize, currentOrderSize,
+      totalFilledSize, remainingSize, averageFillPrice, orderState. (33 more)'
+    tags:
+    - Object
+    source: openapi/btse-futures-openapi.yml#/components/schemas/OrderResp

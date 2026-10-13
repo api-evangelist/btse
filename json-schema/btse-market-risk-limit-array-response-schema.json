@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-market-risk-limit-array-response-schema.json",
+  "title": "MarketRiskLimitArrayResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-markets-openapi.yml#/components/schemas/MarketRiskLimitArrayResponse",
+  "allOf": [
+    {
+      "$ref": "#/$defs/CommonResponse"
+    },
+    {
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MarketRiskLimitItem"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "CommonResponse": {
+      "type": "object",
+      "required": [
+        "success",
+        "code",
+        "msg",
+        "time"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Whether the request succeeded. `true` when HTTP status is `200`"
+        },
+        "code": {
+          "type": "integer",
+          "description": "Status code. `1` on success"
+        },
+        "msg": {
+          "type": "string",
+          "description": "Status message"
+        },
+        "time": {
+          "type": "number",
+          "description": "Current unix timestamp"
+        }
+      }
+    },
+    "MarketRiskLimitConfig": {
+      "type": "object",
+      "required": [
+        "level",
+        "value"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "description": "Risk level (starts from 1)"
+        },
+        "value": {
+          "type": "integer",
+          "description": "Risk limit value for this level in notional value"
+        }
+      }
+    },
+    "MarketRiskLimitItem": {
+      "type": "object",
+      "required": [
+        "symbol",
+        "riskLimits"
+      ],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "description": "Symbol"
+        },
+        "riskLimits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MarketRiskLimitConfig"
+          },
+          "description": "Risk limit tiers"
+        }
+      }
+    }
+  }
+}

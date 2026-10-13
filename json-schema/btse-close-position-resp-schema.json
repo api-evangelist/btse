@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-close-position-resp-schema.json",
+  "title": "ClosePositionResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-futures-openapi.yml#/components/schemas/ClosePositionResp",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Status code of the closing order."
+    },
+    "type": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Event type code of the closing order response."
+    },
+    "symbol": {
+      "type": "string",
+      "description": "Market symbol of the closing order (e.g. BTC-PERP)."
+    },
+    "postOnly": {
+      "type": "boolean",
+      "description": "Whether the closing order is post-only."
+    },
+    "orderSide": {
+      "type": "string",
+      "description": "Side of the closing order (opposite to the position direction).",
+      "enum": [
+        "BUY",
+        "SELL"
+      ]
+    },
+    "orderId": {
+      "type": "string",
+      "description": "Server-assigned order id of the closing order."
+    },
+    "clOrderID": {
+      "type": "string",
+      "description": "Client-assigned order id echoed back, if provided in the request."
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Server timestamp of the response, in milliseconds since epoch."
+    },
+    "price": {
+      "type": "number",
+      "format": "double",
+      "description": "Requested limit price of the closing order (0 for market orders)."
+    },
+    "avgFilledPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Average fill price achieved so far."
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable message describing the result."
+    },
+    "originalOrderSize": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Original order size at submission, in contracts."
+    },
+    "currentOrderSize": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Current remaining size on the order book, in contracts."
+    },
+    "filledSize": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Size filled by the most recent fill event, in contracts."
+    },
+    "totalFilledSize": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Total size filled since order submission, in contracts."
+    },
+    "remainingSize": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Size still outstanding on the order, in contracts."
+    },
+    "positionMode": {
+      "type": "string",
+      "description": "Position mode of the closed position (ONE_WAY or HEDGE).",
+      "enum": [
+        "ONE_WAY",
+        "HEDGE",
+        "ISOLATED"
+      ]
+    },
+    "positionDirection": {
+      "type": "string",
+      "description": "Position direction of the closed position (LONG or SHORT).",
+      "enum": [
+        "LONG",
+        "SHORT"
+      ]
+    },
+    "positionId": {
+      "type": "string",
+      "description": "Identifier of the position being closed."
+    },
+    "timeInForce": {
+      "type": "string",
+      "description": "Time-in-force applied to the closing order (e.g. GTC, IOC, FOK)."
+    }
+  }
+}

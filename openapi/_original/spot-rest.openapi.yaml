@@ -1,0 +1,784 @@
+openapi: 3.0.3
+info:
+  title: Spot API
+  version: 3.3.0
+  description: |
+    Spot trading REST API. All private endpoints require HMAC-SHA384 authentication.
+
+    **Base URL:** `https://api.btse.com/spot`
+    **Testnet:** `https://testapi.btse.io/spot`
+
+    ## Authentication
+
+    Private endpoints require three HTTP headers:
+    - `request-api` — your API key
+    - `request-nonce` — current timestamp in milliseconds
+    - `request-sign` — `HMAC-SHA384(secret, path + nonce + body)`
+
+    See the [Authentication Guide](/authentication) for full details.
+
+    ## Rate Limits
+
+    | Bucket | Limit |
+    |--------|-------|
+    | Query endpoints | 15 req/s per endpoint · 30 req/s per user |
+    | Order endpoints | 75 req/s per endpoint · 75 req/s per user |
+
+    > **Tip:** Use the `cancelAllAfter` (Dead Man's Switch) endpoint to protect against connection loss.
+  contact:
+    name: Support
+    url: https://support.btse.com
+
+servers:
+  - url: https://api.btse.com/spot
+    description: Production
+  - url: https://testapi.btse.io/spot
+    description: Testnet
+
+tags:
+  - name: Trade
+    description: Requires API key with Trading permission
+  - name: Account
+    description: Requires API key with Read permission
+
+paths:
+  # ─── Trade Endpoints ───────────────────────────────────────────────────
+  # Public market data endpoints (market_summary, ohlcv, price, orderbook,
+  # orderbook/L2, trades, time) have been migrated to specs/markets-rest.openapi.yaml.
+
+  /api/v3.3/order:
+    post:
+      operationId: createOrder
+      summary: Create New Order
+      x-doc-slug: create-new-order
+      x-auth: trading
+      x-rate-limit: orders
+      description: |
+        Creates a new order. Index Orders only support USD quotes.
+
+        > **Tip:** Use `clOrderID` to track orders with your own identifier. This ID is returned in all order-related responses and WebSocket notifications.
+
+        Supports order types: **LIMIT**, **MARKET**, **OCO**, **PEG** (algo).
+        For trigger orders, set `txType` to `STOP` or `TRIGGER` and provide `triggerPrice`.
+
+        ### Price by Order Type {#price-by-order-type}
+
+        | Order Type | Side | `price` meaning |
+        | --- | --- | --- |
+        | LIMIT | BUY | Max price (quote currency) willing to pay per unit |
+        | LIMIT | SELL | Min price (quote currency) willing to accept per unit |
+        | MARKET | BUY | Max total amount (quote currency) willing to spend |
+        | MARKET | SELL | Not applicable |
+        | TRIGGER LIMIT | BUY | Max price willing to pay |
+        | TRIGGER LIMIT | SELL | Min price willing to accept |
+        | TRIGGER MARKET | BUY | Max total amount willing to spend |
+        | TRAILING STOP MARKET | BUY | Max total amount willing to spend |
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+            examples:
+              market:
+                summary: MARKET order
+                value:
+                  symbol: BTC-USD
+                  size: 1
+                  side: BUY
+                  type: MARKET
+              limit:
+                summary: LIMIT order
+                value:
+                  symbol: BTC-USD
+                  size: 1
+                  price: 34000
+                  side: BUY
+                  type: LIMIT
+              oco:
+                summary: OCO order
+                value:
+                  symbol: BTC-USD
+                  size: 1
+                  price: 24000
+                  side: BUY
+                  type: OCO
+                  txType: LIMIT
+                  stopPrice: 40010
+                  triggerPrice: 40000
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+              example:
+                - status: 2
+                  symbol: BTC-USD
+                  orderType: 76
+                  price: 34000.0
+                  side: BUY
+                  orderID: 990db9b6-2ed4-4c68-b46e-827c88cc3884
+                  timestamp: 1660208800123
+                  triggerPrice: 0.0
+                  stopPrice: null
+                  trigger: false
+                  averageFillPrice: 0.0
+                  clOrderID: null
+                  postOnly: false
+                  time_in_force: GTC
+                  orderCurrency: base
+                  originalOrderBaseSize: 1.0
+                  originalOrderQuoteSize: 34000.0
+                  currentOrderBaseSize: 1.0
+                  currentOrderQuoteSize: 34000.0
+                  remainingOrderBaseSize: 1.0
+                  remainingOrderQuoteSize: 34000.0
+                  filledBaseSize: 0.0
+                  totalFilledBaseSize: 0.0
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+    get:
+      operationId: getOrder
+      summary: Query Order
+      x-doc-slug: query-order
+      x-auth: trading
+      x-rate-limit: query
+      description: Query order detail by `orderID` or `clOrderID`. Only returns open orders and orders cancelled within the last 30 minutes.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: orderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Mandatory when `clOrderID` is not provided. If both are provided, `clOrderID` is ignored
+        - name: clOrderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Mandatory when `orderID` is not provided
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryOrderResponse'
+              example:
+                orderID: "<Order UUID>"
+                symbol: BTC-USDT
+                quote: USDT
+                status: 6
+                orderType: 76
+                price: 30000
+                side: SELL
+                averageFillPrice: 0
+                clOrderID: "<Client OrderID>"
+                timeInForce: GTC
+                timestamp: 1697766317422
+                triggerOrder: false
+                triggerPrice: 0
+                triggered: false
+                orderCurrency: base
+                originalOrderBaseSize: 0.00001
+                originalOrderQuoteSize: 0.3
+                currentOrderBaseSize: 0.00001
+                currentOrderQuoteSize: 0.3
+                remainingOrderBaseSize: 0
+                remainingOrderQuoteSize: 0
+                totalFilledBaseSize: 0
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+    put:
+      operationId: amendOrder
+      summary: Amend Order
+      x-doc-slug: amend-order
+      x-auth: trading
+      x-rate-limit: orders
+      description: |
+        Amend the price, size, or trigger price of a pending order.
+        Does **not** apply to algo orders. For trigger orders, the trigger price
+        cannot be amended after the order has been triggered.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AmendOrderRequest'
+            examples:
+              amend_price:
+                summary: Amend price
+                value:
+                  symbol: BTC-USD
+                  orderID: 25248336-66d8-41ff-99fd-83489c4e6029
+                  type: PRICE
+                  value: 35000
+              amend_size:
+                summary: Amend size
+                value:
+                  symbol: BTC-USD
+                  orderID: 689bf733-4879-4e32-8d1f-cb81f63d24d4
+                  type: SIZE
+                  value: 1.05
+              amend_all:
+                summary: Amend multiple fields
+                value:
+                  symbol: BTC-USD
+                  orderID: cb2785b0-558e-4b30-bf1f-8a8c56174d0c
+                  type: ALL
+                  orderPrice: 40010
+                  orderSize: 1.05
+                  triggerPrice: 40000
+      responses:
+        '200':
+          description: Same fields as Create New Order response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+    delete:
+      operationId: cancelOrder
+      summary: Cancel Order
+      x-doc-slug: cancel-order
+      x-auth: trading
+      x-rate-limit: orders
+      description: |
+        Cancel a pending order. If neither `orderID` nor `clOrderID` is provided, **all orders** in the specified market are cancelled. When cancelling by `clOrderID`, all orders with the same ID are cancelled.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Market symbol
+        - name: orderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Order ID to cancel
+        - name: clOrderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Custom order ID to cancel
+      responses:
+        '200':
+          description: Same fields as Create New Order response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v3.3/order/cancelAllAfter:
+    post:
+      operationId: cancelAllAfter
+      summary: "Dead Man's Switch (Cancel All After)"
+      x-doc-slug: dead-mans-switch-cancel-all-after
+      x-auth: trading
+      x-rate-limit: orders
+      description: |
+        A dead-man's switch that cancels all open orders if the server does not receive a renewal request within the specified timeout. Used to protect against connection loss.
+
+        Send another `cancelAllAfter` request before the timeout expires to extend it.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [timeout]
+              properties:
+                timeout:
+                  type: integer
+                  description: TTL in milliseconds. When reached, all open orders are cancelled
+            example:
+              timeout: 60000
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v3.3/user/open_orders:
+    get:
+      operationId: getOpenOrders
+      summary: Query Open Orders
+      x-doc-slug: query-open-orders
+      x-auth: trading
+      x-rate-limit: query
+      description: Retrieve open orders that have not yet been matched.
+      tags: [Trade]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Market symbol. If omitted, returns open orders for all markets
+      responses:
+        '200':
+          description: Array of order objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+              example:
+                []
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  # ─── Account Endpoints ─────────────────────────────────────────────────
+
+  /api/v3.3/user/trade_history:
+    get:
+      operationId: getUserTradesFills
+      summary: Query User Trades Fills
+      x-doc-slug: query-user-trades-fills
+      x-auth: read
+      x-rate-limit: query
+      description: |
+        Returns the authenticated user's trade history.
+
+        **Time range constraints:**
+        - `startTime` + `endTime`: max 7 days
+        - `startTime` only: 7 days after start
+        - `endTime` only: 7 days before end
+        - Neither: 7 days before current time
+      tags: [Account]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Market symbol. Optional — if omitted, returns trades across all symbols.
+        - name: startTime
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: Starting time in milliseconds
+        - name: endTime
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+          description: Ending time in milliseconds
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Number of records to return
+        - name: clOrderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by custom order ID
+        - name: orderID
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by order ID
+        - name: isMatchSymbol
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: If `true`, exact match on `symbol` only
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserTrade'
+              example:
+                []
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /api/v3.3/user/fees:
+    get:
+      operationId: getAccountFees
+      summary: Query Account Fees
+      x-doc-slug: query-account-fees
+      x-auth: read
+      x-rate-limit: query
+      description: Returns maker/taker fees for the account.
+      tags: [Account]
+      security:
+        - api: []
+          nonce: []
+          sign: []
+      parameters:
+        - name: symbol
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Market symbol. If omitted, returns fees for all markets
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountFee'
+              example:
+                - symbol: BTC-USD
+                  makerFee: 0.002
+                  takerFee: 0.002
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+# ═════════════════════════════════════════════════════════════════════════
+# Components
+# ═════════════════════════════════════════════════════════════════════════
+
+components:
+  securitySchemes:
+    api:
+      type: apiKey
+      in: header
+      name: request-api
+      description: API key
+    nonce:
+      type: apiKey
+      in: header
+      name: request-nonce
+      description: Current timestamp in milliseconds
+    sign:
+      type: apiKey
+      in: header
+      name: request-sign
+      description: "`HMAC-SHA384(secret, path + nonce + body)`"
+
+  schemas:
+    # ─── Trade ─────────────────────────────────────────────────────────────
+
+    CreateOrderRequest:
+      type: object
+      required: [symbol, size, side, type]
+      properties:
+        symbol:           { type: string,  description: Market symbol }
+        price:            { type: number,  description: "Required for LIMIT orders. For MARKET BUY, this is the max total amount (quote currency) willing to spend. Not applicable for MARKET SELL" }
+        size:             { type: number,  description: Order size }
+        side:             { type: string,  enum: [BUY, SELL], description: Order side }
+        time_in_force:    { type: string,  enum: [GTC, IOC, FOK, HALFMIN, FIVEMIN, HOUR, TWELVEHOUR, DAY, WEEK, MONTH], description: "Time in force: `GTC` (Good Till Cancelled) · `IOC` (Immediate Or Cancel) · `FOK` (Fill Or Kill) · `HALFMIN` (30 seconds) · `FIVEMIN` (5 minutes) · `HOUR` (1 hour) · `TWELVEHOUR` (12 hours) · `DAY` (1 day) · `WEEK` (1 week) · `MONTH` (1 month)" }
+        type:             { type: string,  enum: [LIMIT, MARKET, OCO, PEG], description: "Order type: `LIMIT` · `MARKET` · `OCO` (One-Cancels-the-Other) · `PEG` (algo order that tracks market price)" }
+        txType:           { type: string,  enum: [LIMIT, STOP, TRIGGER], description: "Transaction type: `LIMIT` (default) · `STOP` (requires `triggerPrice`) · `TRIGGER` (requires `triggerPrice`)" }
+        stopPrice:        { type: number,  description: Mandatory for OCO orders }
+        triggerPrice:     { type: number,  description: "Mandatory for Stop, Trigger, and OCO orders" }
+        trailValue:       { type: number,  description: Trail value. TP/SL not supported when set }
+        postOnly:         { type: boolean, description: Post-only order — charged maker fees }
+        clOrderID:        { type: string,  description: Custom order ID }
+        stealth:          { type: number,  description: "PEG orders: percentage visible on orderbook" }
+        deviation:        { type: number,  description: "PEG orders: deviation from index price (-10 to 10)" }
+        triggerPriceType: { type: string,  enum: [INDEX_PRICE, LAST_PRICE], description: Trigger price reference }
+
+    AmendOrderRequest:
+      type: object
+      required: [symbol, type]
+      properties:
+        symbol:       { type: string, description: Market symbol }
+        orderID:      { type: string, description: "Internal order ID. Required if `clOrderID` is not provided. Takes precedence over `clOrderID` if both are provided" }
+        clOrderID:    { type: string, description: "Custom order ID. Required if `orderID` is not provided" }
+        type:         { type: string, enum: [PRICE, SIZE, TRIGGERPRICE, ALL], description: "Amendment type: `PRICE` (amend price, use `value`) · `SIZE` (amend size, use `value`) · `TRIGGERPRICE` (amend trigger price, use `value`) · `ALL` (amend multiple fields, use `orderPrice`/`orderSize`/`triggerPrice`)" }
+        value:        { type: number, description: "New value. Required for `PRICE`, `SIZE`, or `TRIGGERPRICE` amendment types" }
+        orderPrice:   { type: number, description: "New order price. Used when `type` is `ALL`" }
+        orderSize:    { type: number, description: "New order size. Used when `type` is `ALL`" }
+        triggerPrice: { type: number, description: "New trigger price (trigger orders only). Used when `type` is `ALL`" }
+
+    OrderResponse:
+      type: object
+      properties:
+        symbol:                   { type: string,  description: Market symbol }
+        orderID:                  { type: string,  description: Internal order ID }
+        clOrderID:                { type: string,  description: Custom order ID }
+        side:                     { type: string,  description: BUY or SELL }
+        price:                    { type: number,  description: Order price }
+        orderType:                { type: integer, description: "76: Limit · 77: Market · 80: Peg/Algo" }
+        status:                   { type: integer, description: "Order status code: `2` (ORDER_INSERTED) · `4` (FULLY_MATCHED) · `5` (PARTIAL_FILL) · `6` (CANCELLED) · `9` (TRIGGER_INSERTED) · `10` (TRIGGER_ACTIVATED) · `15` (REJECTED)" }
+        averageFillPrice:         { type: number,  description: Average fill price }
+        # v3.3 size fields — base/quote currency aware
+        originalOrderBaseSize:    { type: number,  description: Original order quantity expressed in base currency }
+        originalOrderQuoteSize:   { type: number,  description: Original order quantity expressed in quote currency }
+        currentOrderBaseSize:     { type: number,  description: Latest order quantity in base currency (after amendments / partial fills) }
+        currentOrderQuoteSize:    { type: number,  description: Latest order quantity in quote currency }
+        remainingOrderBaseSize:   { type: number,  description: Unfilled quantity in base currency }
+        remainingOrderQuoteSize:  { type: number,  description: Unfilled quantity in quote currency }
+        filledBaseSize:           { type: number,  description: Most recent fill quantity in base currency }
+        totalFilledBaseSize:      { type: number,  description: Cumulative filled quantity in base currency }
+        orderCurrency:            { type: string,  enum: [base, quote], description: "Currency the order size is denominated in: `base` or `quote`" }
+        # Deprecated v3.2 size fields — retained for transition period
+        size:                     { type: number,  deprecated: true, description: "**Deprecated in v3.3.** Use `originalOrderBaseSize` / `originalOrderQuoteSize`" }
+        fillSize:                 { type: number,  deprecated: true, description: "**Deprecated in v3.3.** Use `filledBaseSize` / `totalFilledBaseSize`" }
+        remainingSize:            { type: number,  deprecated: true, description: "**Deprecated in v3.3.** Use `remainingOrderBaseSize` / `remainingOrderQuoteSize`" }
+        originalSize:             { type: number,  deprecated: true, description: "**Deprecated in v3.3.** Use `originalOrderBaseSize` / `originalOrderQuoteSize`" }
+        triggerPrice:             { type: number,  description: "Trigger price (`0` if not a trigger order)" }
+        stopPrice:                { type: number,  description: Stop price }
+        time_in_force:            { type: string,  description: "Time in force: `GTC` · `IOC` · `FOK` · `HALFMIN` · `FIVEMIN` · `HOUR` · `TWELVEHOUR` · `DAY` · `WEEK` · `MONTH`" }
+        timestamp:                { type: integer, format: int64, description: Order timestamp }
+        trigger:                  { type: boolean, description: Whether the order is a trigger order }
+        postOnly:                 { type: boolean, description: Whether post-only }
+        stealth:                  { type: number,  description: Stealth value }
+        deviation:                { type: number,  description: Deviation value }
+
+    QueryOrderResponse:
+      type: object
+      properties:
+        orderID:                  { type: string,  description: Order ID }
+        symbol:                   { type: string,  description: Market symbol }
+        quote:                    { type: string,  description: Quote currency }
+        side:                     { type: string,  description: BUY or SELL }
+        orderType:                { type: integer, description: Order type code }
+        price:                    { type: number,  description: Order price }
+        orderValue:               { type: number,  description: Total order value }
+        averageFillPrice:         { type: number,  description: Average fill price }
+        status:                   { type: integer, description: "Order status code: `2` (ORDER_INSERTED) · `4` (FULLY_MATCHED) · `5` (PARTIAL_FILL) · `6` (CANCELLED) · `9` (TRIGGER_INSERTED) · `10` (TRIGGER_ACTIVATED) · `15` (REJECTED)" }
+        # v3.3 size fields — base/quote currency aware
+        originalOrderBaseSize:    { type: number,  description: Original order quantity expressed in base currency }
+        originalOrderQuoteSize:   { type: number,  description: Original order quantity expressed in quote currency }
+        currentOrderBaseSize:     { type: number,  description: Latest order quantity in base currency }
+        currentOrderQuoteSize:    { type: number,  description: Latest order quantity in quote currency }
+        remainingOrderBaseSize:   { type: number,  description: Unfilled quantity in base currency }
+        remainingOrderQuoteSize:  { type: number,  description: Unfilled quantity in quote currency }
+        totalFilledBaseSize:      { type: number,  description: Cumulative filled quantity in base currency }
+        orderCurrency:            { type: string,  enum: [base, quote], description: "Currency the order size is denominated in: `base` or `quote`" }
+        # Deprecated v3.2 size fields — retained for transition period
+        size:                     { type: number,  deprecated: true, description: "**Deprecated in v3.3.** Use `originalOrderBaseSize` / `originalOrderQuoteSize`" }
+        filledSize:               { type: number,  deprecated: true, description: "**Deprecated in v3.3.** Use `totalFilledBaseSize`" }
+        remainingSize:            { type: number,  deprecated: true, description: "**Deprecated in v3.3.** Use `remainingOrderBaseSize` / `remainingOrderQuoteSize`" }
+        timeInForce:              { type: string,  description: "Time in force: `GTC` · `IOC` · `FOK` · `HALFMIN` · `FIVEMIN` · `HOUR` · `TWELVEHOUR` · `DAY` · `WEEK` · `MONTH`" }
+        timestamp:                { type: integer, format: int64, description: Order timestamp }
+        clOrderID:                { type: string,  description: Custom order ID }
+        triggerOrder:             { type: boolean, description: Whether this is a trigger order }
+        triggerPrice:             { type: number,  description: Trigger price }
+        triggered:                { type: boolean, description: Whether the order has been triggered }
+        trailValue:               { type: number,  description: Trail value }
+
+    # ─── Account ───────────────────────────────────────────────────────────
+
+    UserTrade:
+      type: object
+      properties:
+        symbol:      { type: string,  description: Market symbol }
+        side:        { type: string,  description: BUY or SELL }
+        price:       { type: number,  description: Fill price }
+        size:        { type: number,  description: Fill size }
+        serialId:    { type: integer, format: int64, description: Serial ID }
+        timestamp:   { type: integer, format: int64, description: Fill timestamp }
+        orderId:     { type: string,  description: Order ID }
+        clOrderId:   { type: string,  description: Custom order ID }
+        feeAmount:   { type: number,  description: Fee charged }
+        feeCurrency: { type: string,  description: Fee currency }
+
+    AccountFee:
+      type: object
+      properties:
+        symbol:   { type: string, description: Market symbol }
+        makerFee: { type: number, description: Maker fee rate }
+        takerFee: { type: number, description: Taker fee rate }
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:   { type: integer, description: Error status code }
+        error:    { type: string,  description: Error message }
+        code:     { type: integer, description: Internal error code }
+        message:  { type: string,  description: Human-readable error description }
+
+    RateLimitError:
+      type: object
+      properties:
+        status:  { type: integer, description: "HTTP status code (429)" }
+        message: { type: string,  description: Rate limit exceeded message }

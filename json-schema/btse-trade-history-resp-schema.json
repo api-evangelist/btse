@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-trade-history-resp-schema.json",
+  "title": "TradeHistoryResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-spot-openapi.yml#/components/schemas/TradeHistoryResp",
+  "type": "object",
+  "properties": {
+    "serialId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Monotonic sequence identifier for this trade record."
+    },
+    "tradeId": {
+      "type": "string",
+      "description": "Unique trade identifier."
+    },
+    "orderId": {
+      "type": "string",
+      "description": "Identifier of the order this trade was executed against."
+    },
+    "clOrderId": {
+      "type": "string",
+      "description": "Client-supplied order identifier of the originating order."
+    },
+    "symbol": {
+      "type": "string",
+      "description": "Trading pair, formatted as BASE-QUOTE (e.g. BTC-USDT)."
+    },
+    "base": {
+      "type": "string",
+      "description": "Base currency of the trading pair."
+    },
+    "quote": {
+      "type": "string",
+      "description": "Quote currency of the trading pair."
+    },
+    "orderSide": {
+      "type": "string",
+      "description": "Order side: BUY or SELL."
+    },
+    "orderType": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Numeric order-type code of the originating order (limit, market, peg, TWAP)."
+    },
+    "triggerType": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Numeric trigger order-type code (stop-loss, take-profit, stop-loss-limit, or take-profit-limit). Only meaningful when the originating order was a trigger order."
+    },
+    "triggerPrice": {
+      "type": "number",
+      "format": "double",
+      "description": "Trigger price of the originating order. Only meaningful when the originating order was a trigger order."
+    },
+    "price": {
+      "type": "number",
+      "format": "double",
+      "description": "Execution price of this trade."
+    },
+    "size": {
+      "type": "number",
+      "format": "double",
+      "description": "Original order size of the originating order."
+    },
+    "filledSize": {
+      "type": "number",
+      "format": "double",
+      "description": "Amount filled by this trade, in base currency."
+    },
+    "feeCurrency": {
+      "type": "string",
+      "description": "Currency in which the trading fee was charged."
+    },
+    "feeAmount": {
+      "type": "number",
+      "format": "double",
+      "description": "Trading fee amount charged for this trade, in feeCurrency."
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Trade execution timestamp in Unix epoch milliseconds."
+    }
+  }
+}

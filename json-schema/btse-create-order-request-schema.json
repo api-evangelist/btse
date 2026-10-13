@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-create-order-request-schema.json",
+  "title": "CreateOrderRequest",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-spot-legacy-openapi.yml#/components/schemas/CreateOrderRequest",
+  "type": "object",
+  "required": [
+    "symbol",
+    "size",
+    "side",
+    "type"
+  ],
+  "properties": {
+    "symbol": {
+      "type": "string",
+      "description": "Market symbol"
+    },
+    "price": {
+      "type": "number",
+      "description": "Required for LIMIT orders. For MARKET BUY, this is the max total amount (quote currency) willing to spend. Not applicable for MARKET SELL"
+    },
+    "size": {
+      "type": "number",
+      "description": "Order size"
+    },
+    "side": {
+      "type": "string",
+      "enum": [
+        "BUY",
+        "SELL"
+      ],
+      "description": "Order side"
+    },
+    "time_in_force": {
+      "type": "string",
+      "enum": [
+        "GTC",
+        "IOC",
+        "FOK",
+        "HALFMIN",
+        "FIVEMIN",
+        "HOUR",
+        "TWELVEHOUR",
+        "DAY",
+        "WEEK",
+        "MONTH"
+      ],
+      "description": "Time in force: `GTC` (Good Till Cancelled) · `IOC` (Immediate Or Cancel) · `FOK` (Fill Or Kill) · `HALFMIN` (30 seconds) · `FIVEMIN` (5 minutes) · `HOUR` (1 hour) · `TWELVEHOUR` (12 hours) · `DAY` (1 day) · `WEEK` (1 week) · `MONTH` (1 month)"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "LIMIT",
+        "MARKET",
+        "OCO",
+        "PEG"
+      ],
+      "description": "Order type: `LIMIT` · `MARKET` · `OCO` (One-Cancels-the-Other) · `PEG` (algo order that tracks market price)"
+    },
+    "txType": {
+      "type": "string",
+      "enum": [
+        "LIMIT",
+        "STOP",
+        "TRIGGER"
+      ],
+      "description": "Transaction type: `LIMIT` (default) · `STOP` (requires `triggerPrice`) · `TRIGGER` (requires `triggerPrice`)"
+    },
+    "stopPrice": {
+      "type": "number",
+      "description": "Mandatory for OCO orders"
+    },
+    "triggerPrice": {
+      "type": "number",
+      "description": "Mandatory for Stop, Trigger, and OCO orders"
+    },
+    "trailValue": {
+      "type": "number",
+      "description": "Trail value. TP/SL not supported when set"
+    },
+    "postOnly": {
+      "type": "boolean",
+      "description": "Post-only order — charged maker fees"
+    },
+    "clOrderID": {
+      "type": "string",
+      "description": "Custom order ID"
+    },
+    "stealth": {
+      "type": "number",
+      "description": "PEG orders: percentage visible on orderbook"
+    },
+    "deviation": {
+      "type": "number",
+      "description": "PEG orders: deviation from index price (-10 to 10)"
+    },
+    "triggerPriceType": {
+      "type": "string",
+      "enum": [
+        "INDEX_PRICE",
+        "LAST_PRICE"
+      ],
+      "description": "Trigger price reference"
+    }
+  }
+}

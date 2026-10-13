@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/btse/main/json-schema/btse-open-order-response-schema.json",
+  "title": "OpenOrderResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/btse-futures-legacy-openapi.yml#/components/schemas/OpenOrderResponse",
+  "type": "object",
+  "properties": {
+    "symbol": {
+      "type": "string",
+      "description": "Market symbol"
+    },
+    "orderID": {
+      "type": "string",
+      "description": "Order ID"
+    },
+    "clOrderID": {
+      "type": "string",
+      "description": "Custom order ID"
+    },
+    "orderType": {
+      "type": "integer",
+      "description": "`76`: Limit · `77`: Market · `80`: Algo"
+    },
+    "side": {
+      "type": "string",
+      "description": "Trade side"
+    },
+    "price": {
+      "type": "number",
+      "description": "Order price"
+    },
+    "orderValue": {
+      "type": "number",
+      "description": "Notional value"
+    },
+    "originalOrderSize": {
+      "type": "integer",
+      "description": "Original quantity"
+    },
+    "currentOrderSize": {
+      "type": "integer",
+      "description": "Latest quantity"
+    },
+    "totalFilledSize": {
+      "type": "integer",
+      "description": "Cumulative filled"
+    },
+    "remainingSize": {
+      "type": "integer",
+      "description": "Remaining quantity"
+    },
+    "timestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Order timestamp"
+    },
+    "timeInForce": {
+      "type": "string",
+      "description": "Order validity"
+    },
+    "triggerOrder": {
+      "type": "boolean",
+      "description": "Whether trigger order"
+    },
+    "triggered": {
+      "type": "boolean",
+      "description": "Whether triggered"
+    },
+    "triggerPrice": {
+      "type": "number",
+      "description": "Trigger price"
+    },
+    "reduceOnly": {
+      "type": "boolean",
+      "description": "Whether reduce-only"
+    },
+    "avgFilledPrice": {
+      "type": "number",
+      "description": "Average filled price"
+    },
+    "orderState": {
+      "type": "string",
+      "enum": [
+        "STATUS_ACTIVE",
+        "STATUS_INACTIVE"
+      ],
+      "description": "Order state"
+    },
+    "takeProfitOrder": {
+      "type": "object",
+      "description": "Take profit order info"
+    },
+    "stopLossOrder": {
+      "type": "object",
+      "description": "Stop loss order info"
+    },
+    "closeOrder": {
+      "type": "boolean",
+      "description": "Whether closes a position"
+    },
+    "positionMode": {
+      "type": "string",
+      "description": "`ONE_WAY` · `HEDGE` · `ISOLATED`"
+    },
+    "positionDirection": {
+      "type": "string",
+      "description": "Position direction: `LONG` · `SHORT` (only present in HEDGE/ISOLATED mode)"
+    },
+    "positionId": {
+      "type": "string",
+      "description": "Position ID"
+    },
+    "contractSize": {
+      "type": "number",
+      "description": "Contract size"
+    }
+  }
+}
