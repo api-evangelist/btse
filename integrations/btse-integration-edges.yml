@@ -29,7 +29,7 @@ edges:
   matched_by: domain:btse.com
   partner_gap: no ccxt repo in all/* (catalog gap)
   detected_by: sweep-crypto.py
-  first_seen: '2026-10-13'
+  first_seen: '2026-10-14'
 - partner_name: CoinGecko
   partner: coingecko
   partner_match: aggregator
@@ -42,5 +42,5 @@ edges:
   coingecko_id: btse
   trust_score: 8
   detected_by: sweep-crypto.py
-  first_seen: '2026-10-13'
+  first_seen: '2026-10-14'
 templates: []
