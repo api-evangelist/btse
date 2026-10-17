@@ -1,0 +1,269 @@
+openapi: 3.2.0
+info:
+  title: Btse Account API
+  version: 3.3.0
+  contact:
+    name: Support
+    url: https://support.btse.com
+  description: 'Operations tagged Account across 2 of this provider''s published API definitions: spot-rest.openapi.yaml, btse-spot-legacy-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.btse.com/spot
+  description: Production
+- url: https://testapi.btse.io/spot
+  description: Testnet
+tags:
+- name: Account
+  description: Requires API key with Read permission
+paths:
+  /api/v3.3/user/trade_history:
+    get:
+      operationId: getUserTradesFills
+      summary: Query User Trades Fills
+      x-doc-slug: query-user-trades-fills
+      x-auth: read
+      x-rate-limit: query
+      description: 'Returns the authenticated user''s trade history.
+
+
+        **Time range constraints:**
+
+        - `startTime` + `endTime`: max 7 days
+
+        - `startTime` only: 7 days after start
+
+        - `endTime` only: 7 days before end
+
+        - Neither: 7 days before current time'
+      tags:
+      - Account
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      parameters:
+      - name: symbol
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Market symbol. Optional — if omitted, returns trades across all symbols.
+      - name: startTime
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+        description: Starting time in milliseconds
+      - name: endTime
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+        description: Ending time in milliseconds
+      - name: count
+        in: query
+        required: false
+        schema:
+          type: integer
+        description: Number of records to return
+      - name: clOrderID
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter by custom order ID
+      - name: orderID
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter by order ID
+      - name: isMatchSymbol
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: If `true`, exact match on `symbol` only
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserTrade'
+              example: []
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com/spot
+      description: Production
+    - url: https://testapi.btse.io/spot
+      description: Testnet
+  /api/v3.3/user/fees:
+    get:
+      operationId: getAccountFees
+      summary: Query Account Fees
+      x-doc-slug: query-account-fees
+      x-auth: read
+      x-rate-limit: query
+      description: Returns maker/taker fees for the account.
+      tags:
+      - Account
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      parameters:
+      - name: symbol
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Market symbol. If omitted, returns fees for all markets
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountFee'
+              example:
+              - symbol: BTC-USD
+                makerFee: 0.002
+                takerFee: 0.002
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com/spot
+      description: Production
+    - url: https://testapi.btse.io/spot
+      description: Testnet
+components:
+  schemas:
+    UserTrade:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Market symbol
+        side:
+          type: string
+          description: BUY or SELL
+        price:
+          type: number
+          description: Fill price
+        size:
+          type: number
+          description: Fill size
+        serialId:
+          type: integer
+          format: int64
+          description: Serial ID
+        timestamp:
+          type: integer
+          format: int64
+          description: Fill timestamp
+        orderId:
+          type: string
+          description: Order ID
+        clOrderId:
+          type: string
+          description: Custom order ID
+        feeAmount:
+          type: number
+          description: Fee charged
+        feeCurrency:
+          type: string
+          description: Fee currency
+    RateLimitError:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: HTTP status code (429)
+        message:
+          type: string
+          description: Rate limit exceeded message
+    AccountFee:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Market symbol
+        makerFee:
+          type: number
+          description: Maker fee rate
+        takerFee:
+          type: number
+          description: Taker fee rate
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: Error status code
+        error:
+          type: string
+          description: Error message
+        code:
+          type: integer
+          description: Internal error code
+        message:
+          type: string
+          description: Human-readable error description
+  securitySchemes:
+    api:
+      type: apiKey
+      in: header
+      name: request-api
+      description: API key
+    nonce:
+      type: apiKey
+      in: header
+      name: request-nonce
+      description: Current timestamp in milliseconds
+    sign:
+      type: apiKey
+      in: header
+      name: request-sign
+      description: '`HMAC-SHA384(secret, path + nonce + body)`'
+x-refined-from:
+- spot-rest.openapi.yaml
+- btse-spot-legacy-openapi.yml

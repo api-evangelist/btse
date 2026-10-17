@@ -1,0 +1,1598 @@
+openapi: 3.2.0
+info:
+  title: Btse Markets API
+  version: 1.0.0
+  contact:
+    name: Support
+    url: https://support.btse.com
+  description: 'Operations tagged Markets across 2 of this provider''s published API definitions: markets-rest.openapi.yaml, btse-markets-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.btse.com
+  description: Production
+- url: https://testapi.btse.io
+  description: Testnet
+tags:
+- name: Markets
+  description: Public market data shared by spot and futures markets
+paths:
+  /public-api/market/v1/exchangeInfo:
+    get:
+      operationId: getExchangeInfo
+      summary: Exchange Rule and Symbol Information
+      x-doc-slug: exchange-info
+      x-auth: public
+      x-rate-limit: query
+      description: 'Retrieve exchange information for supported markets and rate limit setting.
+
+
+        This API can be publicly accessed (without any security headers). If you
+
+        access with `Read` permission authentication, the result will be much more
+
+        accurate by account setting.
+
+
+        The `symbol`, `symbols`, and `types` parameters can''t be used in combination
+
+        with each other. You can only use one parameter at a time.
+
+
+        | Options | Example |
+
+        | --- | --- |
+
+        | No parameter | `/exchangeInfo` |
+
+        | symbol | `/exchangeInfo?symbol=BTC-USDT` |
+
+        | symbols | `/exchangeInfo?symbols=["BTC-USDT","ETH-USDT","BTC-PERP-USDT"]` |
+
+        | types | `/exchangeInfo?types=["FuturesPerpetual","FuturesTimeBased"]` |'
+      tags:
+      - Markets
+      security: []
+      parameters:
+      - name: symbol
+        in: query
+        required: false
+        schema:
+          type: string
+          example: BTC-USDT
+        description: One symbol
+      - name: symbols
+        in: query
+        required: false
+        schema:
+          type: string
+          example: '["BTC-USDT","ETH-USDT","BTC-PERP-USDT"]'
+        description: Multiple symbols
+      - name: types
+        in: query
+        required: false
+        schema:
+          type: string
+          example: '["Spot","FuturesPerpetual","FuturesTimeBased"]'
+        description: Multiple types
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeInfoResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                  rateLimits:
+                  - type: RAW_REQUEST
+                    interval: SECOND
+                    intervalNum: 2
+                    limit: 50
+                  symbols:
+                  - symbol: BTC-USDT
+                    type: Spot
+                    category: CRYPTO
+                    tradeCurrency: BTC
+                    baseCurrency: BTC
+                    quoteCurrency: USDT
+                    active: true
+                    minOrderPrice: '0.5'
+                    minPriceIncrement: '0.5'
+                    pricePrecision: 1
+                    minOrderSize: '0.00001'
+                    maxOrderSize: '2000'
+                    minSizeIncrement: '0.00001'
+                    sizePrecision: 5
+                  - symbol: BTC-PERP-USDT
+                    type: FuturesPerpetual
+                    category: CRYPTO
+                    tradeCurrency: BTC-PERP
+                    baseCurrency: BTC
+                    quoteCurrency: USDT
+                    active: true
+                    minOrderPrice: '0.5'
+                    minPriceIncrement: '0.5'
+                    pricePrecision: 1
+                    minOrderSize: '1'
+                    maxOrderSize: '500000'
+                    minSizeIncrement: '1'
+                    sizePrecision: 0
+                    contractSize: '0.001'
+                    availableSettlement:
+                    - USD
+                    - BTC
+                    - USDT
+                    - USDC
+                    - USDP
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/market/v1/markets:
+    get:
+      operationId: getMarkets
+      summary: Markets Information
+      x-doc-slug: markets-information
+      x-auth: public
+      x-rate-limit: query
+      description: 'Retrieve supported markets.
+
+
+        This API can be publicly accessed (without any security headers). If you
+
+        access with `Read` permission authentication, the result will be much more
+
+        accurate by account setting.
+
+
+        The `symbol`, `symbols`, and `types` parameters can''t be used in combination
+
+        with each other.
+
+
+        | Options | Example |
+
+        | --- | --- |
+
+        | No parameter | `/markets` |
+
+        | symbol | `/markets?symbol=BTC-USDT` |
+
+        | symbols | `/markets?symbols=["BTC-USDT","ETH-USDT","BTC-PERP-USDT"]` |
+
+        | types | `/markets?types=["FuturesPerpetual","FuturesTimeBased"]` |'
+      tags:
+      - Markets
+      security: []
+      parameters:
+      - name: symbol
+        in: query
+        required: false
+        schema:
+          type: string
+          example: BTC-USDT
+        description: Symbol
+      - name: symbols
+        in: query
+        required: false
+        schema:
+          type: string
+          example: '["BTC-USDT","ETH-USDT","BTC-PERP-USDT"]'
+        description: Multiple symbols
+      - name: types
+        in: query
+        required: false
+        schema:
+          type: string
+          example: '["Spot","FuturesPerpetual","FuturesTimeBased"]'
+        description: Multiple types
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketsResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                  symbols:
+                  - symbol: BTC-USDT
+                    type: Spot
+                    category: CRYPTO
+                    tradeCurrency: BTC
+                    baseCurrency: BTC
+                    quoteCurrency: USDT
+                    active: true
+                    minOrderPrice: '0.5'
+                    minPriceIncrement: '0.5'
+                    pricePrecision: 1
+                    minOrderSize: '0.00001'
+                    maxOrderSize: '2000'
+                    minSizeIncrement: '0.00001'
+                    sizePrecision: 5
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/market/v1/orderbook:
+    get:
+      operationId: getOrderbook
+      summary: Order Book
+      x-doc-slug: orderbook
+      x-auth: public
+      x-rate-limit: query
+      description: 'Retrieve the level 2 order book for a symbol.
+
+
+        This API can be publicly accessed (without any security headers). If you
+
+        access with `Read` permission authentication, the result will be much more
+
+        accurate by account setting.'
+      tags:
+      - Markets
+      security: []
+      parameters:
+      - name: symbol
+        in: query
+        required: true
+        schema:
+          type: string
+          example: BTC-USDT
+        description: Symbol
+      - name: depth
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 50
+        description: The depth of order book
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderBookResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                  timestamp: 1624989977940
+                  bids:
+                  - - '20334.2'
+                    - '7.67500'
+                  asks:
+                  - - '20339.0'
+                    - '0.60200'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/market/v1/trades:
+    get:
+      operationId: getRecentTrades
+      summary: Recent Trades List
+      x-doc-slug: recent-trades
+      x-auth: public
+      x-rate-limit: query
+      description: 'Retrieve recent transaction data for a symbol.
+
+
+        Only data from the last 3 days is supported. If the count of transactions
+
+        for the specified symbol in the last 3 days is less than the requested
+
+        `limit`, only the available count will be returned.'
+      tags:
+      - Markets
+      security: []
+      parameters:
+      - name: symbol
+        in: query
+        required: true
+        schema:
+          type: string
+          example: BTC-USDT
+        description: Symbol
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 500
+        description: The count of trade list
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecentTradeResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - id: 85997837
+                  timestamp: 1624990000940
+                  price: '20334'
+                  size: '0.0021'
+                  quoteSize: '42.7014'
+                  side: BUY
+                - id: 85997835
+                  timestamp: 1624989977940
+                  price: '20335'
+                  size: '0.0002'
+                  quoteSize: '4.067'
+                  side: SELL
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/market/v1/klines:
+    get:
+      operationId: getKlines
+      summary: Klines (OHLCV)
+      x-doc-slug: klines
+      x-auth: public
+      x-rate-limit: query
+      description: 'Retrieve kline (OHLCV) data for a symbol.
+
+
+        For the `start` and `end` parameter combinations:
+
+
+        | start | end | Behavior |
+
+        | --- | --- | --- |
+
+        | not set | not set | Return recent `limit` data points (count backward). |
+
+        | set | not set | Return `limit` data points from `start` (count forward). |
+
+        | not set | set | Return `limit` data points from `end` (count backward). |
+
+        | set | set | If `start`/`end` and resolution would yield more than `limit` data points, the request is rejected. Otherwise return up to `limit` points from `end` to `start` (count backward). |'
+      tags:
+      - Markets
+      security: []
+      parameters:
+      - name: symbol
+        in: query
+        required: true
+        schema:
+          type: string
+          example: BTC-USDT
+        description: Symbol
+      - name: resolution
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - '1'
+          - '5'
+          - '15'
+          - '30'
+          - '60'
+          - '240'
+          - '360'
+          - '1440'
+          - '10080'
+          - '43200'
+        description: 'Candle size in minutes: `1` (1m), `5` (5m), `15` (15m), `30` (30m),
+
+          `60` (1h), `240` (4h), `360` (6h), `1440` (1d), `10080` (1w), `43200` (1mo).
+
+          '
+      - name: start
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          example: 1667491200
+        description: Start timestamp (seconds)
+      - name: end
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          example: 1667491300
+        description: End timestamp (seconds)
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 300
+        description: The count of klines
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OHLCVResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - - '1667191500'
+                  - '20554.9'
+                  - '20581.2'
+                  - '20542.2'
+                  - '20565.9'
+                  - '2824854.568855'
+                - - '1667192400'
+                  - '20565.4'
+                  - '20594.5'
+                  - '20466.6'
+                  - '20585.9'
+                  - '3283055.501333'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/market/v1/ticker/24hr:
+    get:
+      operationId: get24hrTicker
+      summary: 24hr Ticker Price Change
+      x-doc-slug: ticker-24hr
+      x-auth: public
+      x-rate-limit: query
+      description: 'Retrieve 24hr market statistics. Time is measured in hours; price changes
+
+        are calculated over a window of approximately 24 to 25 hours. Data
+
+        refreshes every minute.
+
+
+        The `symbol`, `symbols`, and `types` parameters are mutually exclusive.
+
+        The `isFull` parameter controls whether the full or simple response shape
+
+        is returned.
+
+
+        | Options | Example |
+
+        | --- | --- |
+
+        | No parameter | `/ticker/24hr` |
+
+        | symbol | `/ticker/24hr?symbol=BTC-USDT` |
+
+        | symbols | `/ticker/24hr?symbols=["BTC-USDT","ETH-USDT","BTC-PERP-USDT"]` |
+
+        | types | `/ticker/24hr?types=["Spot"]` |
+
+        | isFull | `/ticker/24hr?isFull=false` |'
+      tags:
+      - Markets
+      security: []
+      parameters:
+      - name: symbol
+        in: query
+        required: false
+        schema:
+          type: string
+          example: BTC-USDT
+        description: Symbol
+      - name: symbols
+        in: query
+        required: false
+        schema:
+          type: string
+          example: '["BTC-USDT","ETH-USDT","BTC-PERP-USDT"]'
+        description: Multiple symbols
+      - name: types
+        in: query
+        required: false
+        schema:
+          type: string
+          example: '["Spot","FuturesPerpetual","FuturesTimeBased"]'
+        description: Multiple types
+      - name: isFull
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+        description: 'When `true`, return full response (`24HrTickerPriceChangeFullResponse`).
+
+          When `false`, return simple response (`24HrTickerPriceChangeResponse`).
+
+          '
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/Ticker24HrFullArrayResponse'
+                - $ref: '#/components/schemas/Ticker24HrArrayResponse'
+                - $ref: '#/components/schemas/Ticker24HrFullResponse'
+                - $ref: '#/components/schemas/Ticker24HrResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - symbol: BTC-USDT
+                  lastPrice: '20875.31000000'
+                  openPrice: '21323.78000000'
+                  highPrice: '21346.44000000'
+                  lowPrice: '20838.59000000'
+                  amount: '4.12750830'
+                  volume: '99151.67492000'
+                  openTime: 1667696772705
+                  closeTime: 1667783172705
+                  priceChange: '-448.47000000'
+                  priceChangePercent: '-2.103'
+                  prevClosePrice: '21324.77000000'
+                  bidPrice: '20875.00000000'
+                  bidQty: '0.03478000'
+                  askPrice: '20875.77000000'
+                  askQty: '0.01129000'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/market/v1/ticker/price:
+    get:
+      operationId: getPriceTicker
+      summary: Price Ticker
+      x-doc-slug: ticker-price
+      x-auth: public
+      x-rate-limit: query
+      description: 'Retrieve the latest price for one or more symbols.
+
+
+        The `symbol`, `symbols`, and `types` parameters are mutually exclusive.
+
+
+        | Options | Example |
+
+        | --- | --- |
+
+        | No parameter | `/ticker/price` |
+
+        | symbol | `/ticker/price?symbol=BTC-USDT` |
+
+        | symbols | `/ticker/price?symbols=["BTC-USDT","ETH-USDT","BTC-PERP-USDT"]` |
+
+        | types | `/ticker/price?types=["Spot"]` |'
+      tags:
+      - Markets
+      security: []
+      parameters:
+      - name: symbol
+        in: query
+        required: false
+        schema:
+          type: string
+          example: BTC-USDT
+        description: Symbol
+      - name: symbols
+        in: query
+        required: false
+        schema:
+          type: string
+          example: '["BTC-USDT","ETH-USDT","BTC-PERP-USDT"]'
+        description: Multiple symbols
+      - name: types
+        in: query
+        required: false
+        schema:
+          type: string
+          example: '["Spot","FuturesPerpetual","FuturesTimeBased"]'
+        description: Multiple types
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/PriceTickerArrayResponse'
+                - $ref: '#/components/schemas/PriceTickerResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - symbol: BTC-USDT
+                  price: '20875.31000000'
+                  time: 1624989976195
+                - symbol: ETH-BTC
+                  price: '0.07530600'
+                  time: 1624989975876
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/market/v1/ticker/indices:
+    get:
+      operationId: getIndicesTicker
+      summary: Ticker Indices
+      x-doc-slug: ticker-indices
+      x-auth: public
+      x-rate-limit: query
+      description: 'Retrieve the index price and mark price for one or more symbols.
+
+        Mark price is only returned for futures symbols.
+
+
+        | Options | Example |
+
+        | --- | --- |
+
+        | No parameter | `/ticker/indices` |
+
+        | symbol | `/ticker/indices?symbol=BTC-PERP-USDT` |
+
+        | symbols | `/ticker/indices?symbols=["BTC-PERP-USDT","ETH-PERP-USDT"]` |
+
+        | types | `/ticker/indices?types=["Spot","FuturesTimeBased"]` |'
+      tags:
+      - Markets
+      security: []
+      parameters:
+      - name: symbol
+        in: query
+        required: false
+        schema:
+          type: string
+          example: BTC-PERP-USDT
+        description: Symbol
+      - name: symbols
+        in: query
+        required: false
+        schema:
+          type: string
+          example: '["BTC-PERP-USDT","ETH-PERP-USDT"]'
+        description: Multiple symbols
+      - name: types
+        in: query
+        required: false
+        schema:
+          type: string
+          example: '["Spot","FuturesTimeBased","FuturesPerpetual"]'
+        description: Multiple types
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/IndicesTickerArrayResponse'
+                - $ref: '#/components/schemas/IndicesTickerResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - symbol: BTC-USD
+                  indexPrice: '100000.7100000'
+                - symbol: BTC-PERP-USDT
+                  indexPrice: '29647.7100000'
+                  markPrice: '29649.9000000'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/market/v1/ticker/l1:
+    get:
+      operationId: getLevel1Ticker
+      summary: Ticker Order Book Level 1
+      x-doc-slug: ticker-l1
+      x-auth: public
+      x-rate-limit: query
+      description: 'Retrieve the level 1 order book (best bid/ask) for one or more symbols.
+
+
+        The `symbol` and `symbols` parameters are mutually exclusive.
+
+
+        | Options | Example |
+
+        | --- | --- |
+
+        | No parameter | `/ticker/l1` |
+
+        | symbol | `/ticker/l1?symbol=BTC-USDT` |
+
+        | symbols | `/ticker/l1?symbols=["BTC-USDT","BTC-PERP-USDT"]` |'
+      tags:
+      - Markets
+      security: []
+      parameters:
+      - name: symbol
+        in: query
+        required: false
+        schema:
+          type: string
+          example: BTC-USDT
+        description: Symbol
+      - name: symbols
+        in: query
+        required: false
+        schema:
+          type: string
+          example: '["BTC-USDT","BTC-PERP-USDT"]'
+        description: Multiple symbols
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/Level1TickerArrayResponse'
+                - $ref: '#/components/schemas/Level1TickerResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - symbol: BTC-USDT
+                  bidPrice: '20875.00000000'
+                  bidQty: '0.03478000'
+                  askPrice: '20875.77000000'
+                  askQty: '0.01129000'
+                  time: 1673325783227
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/market/v1/recentFundingHistory:
+    get:
+      operationId: getFundingRateHistory
+      summary: Funding Rate History
+      x-doc-slug: funding-rate-history
+      x-auth: public
+      x-rate-limit: query
+      description: 'Retrieve funding rate history for a futures symbol over a specified period.
+
+        Historical rates are sorted in ascending order by `timestamp`.'
+      tags:
+      - Markets
+      security: []
+      parameters:
+      - name: symbol
+        in: query
+        required: true
+        schema:
+          type: string
+          example: BTC-PERP-USDT
+        description: Futures symbol
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - 7D
+          - 2W
+          - 1M
+        description: 'Funding rate history period: `7D` (7 days) · `2W` (2 weeks) · `1M` (1 month)'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundingRateHistoryResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - timestamp: 1715500800000
+                  rate: '0.0000153752'
+                - timestamp: 1715529600000
+                  rate: '0.0000130831'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/market/v1/riskLimits:
+    get:
+      operationId: getMarketRiskLimits
+      summary: Market Risk Limits
+      x-doc-slug: market-risk-limits
+      x-auth: public
+      x-rate-limit: query
+      description: 'Retrieve symbol risk limit information for each tier of the risk limit
+
+        for futures markets.'
+      tags:
+      - Markets
+      security: []
+      parameters:
+      - name: symbol
+        in: query
+        required: false
+        schema:
+          type: string
+          example: BTC-PERP-USDT
+        description: Futures symbol. Omit to return all symbols
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/MarketRiskLimitArrayResponse'
+                - $ref: '#/components/schemas/MarketRiskLimitResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                  symbol: BTC-PERP-USDT
+                  riskLimits:
+                  - level: 1
+                    value: 3000000
+                  - level: 2
+                    value: 6000000
+                  - level: 3
+                    value: 12000000
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+components:
+  schemas:
+    FundingRateHistoryItem:
+      type: object
+      required:
+      - timestamp
+      - rate
+      properties:
+        timestamp:
+          type: number
+          description: Funding timestamp
+        rate:
+          type: string
+          description: Funding rate
+    PriceTickerItem:
+      type: object
+      required:
+      - symbol
+      - price
+      - time
+      properties:
+        symbol:
+          type: string
+          description: Symbol name
+        price:
+          type: string
+          description: Latest price. `0` if no trades yet
+        time:
+          type: number
+          description: Transaction unix timestamp of the price
+    Ticker24HrArrayResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/Ticker24HrItem'
+    Ticker24HrFullArrayResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/Ticker24HrFullItem'
+    IndicesTickerArrayResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/IndicesTickerItem'
+    MarketsResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - symbols
+            properties:
+              symbols:
+                type: array
+                description: Symbols information
+                items:
+                  $ref: '#/components/schemas/ExchangeInfoSymbolItem'
+    IndicesTickerItem:
+      type: object
+      required:
+      - symbol
+      - indexPrice
+      properties:
+        symbol:
+          type: string
+          description: Symbol name
+        indexPrice:
+          type: string
+          description: Index price. `0` if not available
+        markPrice:
+          type: string
+          description: Mark price (futures only). `0` if not available
+    ExchangeInfoSymbolItem:
+      type: object
+      required:
+      - symbol
+      - type
+      - category
+      - tradeCurrency
+      - baseCurrency
+      - quoteCurrency
+      - active
+      - minOrderPrice
+      - minPriceIncrement
+      - pricePrecision
+      - minOrderSize
+      - maxOrderSize
+      - minSizeIncrement
+      - sizePrecision
+      properties:
+        symbol:
+          type: string
+          description: Symbol name
+        type:
+          type: string
+          enum:
+          - Spot
+          - FuturesPerpetual
+          - FuturesTimeBased
+          description: Market type
+        category:
+          type: string
+          enum:
+          - CRYPTO
+          - FX
+          - STOCK
+          - COMMODITIES
+          - RATES
+          description: Market category
+        tradeCurrency:
+          type: string
+          description: Trade currency
+        baseCurrency:
+          type: string
+          description: Base currency
+        quoteCurrency:
+          type: string
+          description: Quote currency
+        active:
+          type: boolean
+          description: Whether the market is active
+        minOrderPrice:
+          type: string
+          description: Minimum order price
+        minPriceIncrement:
+          type: string
+          description: Minimum order price increment
+        pricePrecision:
+          type: integer
+          description: Price precision
+        minOrderSize:
+          type: string
+          description: Minimum order size
+        maxOrderSize:
+          type: string
+          description: Maximum order size
+        minSizeIncrement:
+          type: string
+          description: Minimum size increment
+        sizePrecision:
+          type: integer
+          description: Size precision
+        inactiveTime:
+          type: number
+          description: Inactive time
+        contractSize:
+          type: string
+          description: Contract size
+        availableSettlement:
+          type: array
+          description: Available currencies for settlement
+          items:
+            type: string
+        contractStartTime:
+          type: number
+          description: Contract start time
+        contractEndTime:
+          type: number
+          description: Contract end time
+        matchingStartTime:
+          type: number
+          description: Matching start time
+        becomeInactiveTime:
+          type: number
+          description: Become inactive time
+    RateLimitError:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: HTTP status code (429)
+        message:
+          type: string
+          description: Rate limit exceeded message
+    IndicesTickerResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            $ref: '#/components/schemas/IndicesTickerItem'
+    Level1TickerItem:
+      type: object
+      required:
+      - symbol
+      - bidPrice
+      - bidQty
+      - askPrice
+      - askQty
+      - time
+      properties:
+        symbol:
+          type: string
+          description: Symbol name
+        bidPrice:
+          type: string
+          description: Highest bid price
+        bidQty:
+          type: string
+          description: Quantity at highest bid price
+        askPrice:
+          type: string
+          description: Lowest ask price
+        askQty:
+          type: string
+          description: Quantity at lowest ask price
+        time:
+          type: number
+          description: Update time
+    Ticker24HrFullItem:
+      type: object
+      required:
+      - symbol
+      - lastPrice
+      - openPrice
+      - highPrice
+      - lowPrice
+      - amount
+      - volume
+      - openTime
+      - closeTime
+      - priceChange
+      - priceChangePercent
+      - prevClosePrice
+      - bidPrice
+      - bidQty
+      - askPrice
+      - askQty
+      properties:
+        symbol:
+          type: string
+          description: Symbol name
+        lastPrice:
+          type: string
+          description: Closing price of the interval
+        openPrice:
+          type: string
+          description: Opening price of the interval
+        highPrice:
+          type: string
+          description: Highest price of the interval
+        lowPrice:
+          type: string
+          description: Lowest price of the interval
+        amount:
+          type: string
+          description: Total base currency amount
+        volume:
+          type: string
+          description: Total quote currency volume
+        openTime:
+          type: number
+          description: Starting time of the interval
+        closeTime:
+          type: number
+          description: Closing time of the interval
+        priceChange:
+          type: string
+          description: Difference between open and last price (`lastPrice` − `openPrice`)
+        priceChangePercent:
+          type: string
+          description: Percentage of price change (`priceChange` / `openPrice`)
+        prevClosePrice:
+          type: string
+          description: Previous close price
+        bidPrice:
+          type: string
+          description: Highest bid price
+        bidQty:
+          type: string
+          description: Quantity at highest bid price
+        askPrice:
+          type: string
+          description: Lowest ask price
+        askQty:
+          type: string
+          description: Quantity at lowest ask price
+        openInterest:
+          type: string
+          description: Open interest in contracts (futures only)
+        fundingRate:
+          type: string
+          description: Funding rate (futures only)
+        nextFundingTime:
+          type: number
+          description: Next funding time (futures only)
+        fundingIntervalMinutes:
+          type: number
+          description: Funding interval in minutes (futures only)
+    Level1TickerResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            $ref: '#/components/schemas/Level1TickerItem'
+    RecentTradeItem:
+      type: object
+      required:
+      - id
+      - timestamp
+      - price
+      - size
+      - quoteSize
+      - side
+      properties:
+        id:
+          type: number
+          description: Serial ID
+        timestamp:
+          type: number
+          description: Trade executed unix timestamp
+        price:
+          type: string
+          description: Transacted price
+        size:
+          type: string
+          description: Transacted base currency size
+        quoteSize:
+          type: string
+          description: Transacted quote currency size
+        side:
+          type: string
+          enum:
+          - BUY
+          - SELL
+          description: Trade side
+    OrderBookData:
+      type: object
+      required:
+      - timestamp
+      - bids
+      - asks
+      properties:
+        timestamp:
+          type: number
+          description: Orderbook update unix timestamp
+        bids:
+          type: array
+          description: Bid levels sorted by price descending
+          items:
+            $ref: '#/components/schemas/OrderBookEntry'
+        asks:
+          type: array
+          description: Ask levels sorted by price ascending
+          items:
+            $ref: '#/components/schemas/OrderBookEntry'
+    MarketRiskLimitResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            $ref: '#/components/schemas/MarketRiskLimitItem'
+    Ticker24HrItem:
+      type: object
+      required:
+      - symbol
+      - lastPrice
+      - openPrice
+      - highPrice
+      - lowPrice
+      - amount
+      - volume
+      - openTime
+      - closeTime
+      properties:
+        symbol:
+          type: string
+          description: Symbol name
+        lastPrice:
+          type: string
+          description: Closing price of the interval
+        openPrice:
+          type: string
+          description: Opening price of the interval
+        highPrice:
+          type: string
+          description: Highest price of the interval
+        lowPrice:
+          type: string
+          description: Lowest price of the interval
+        amount:
+          type: string
+          description: Total base currency amount
+        volume:
+          type: string
+          description: Total quote currency volume
+        openTime:
+          type: number
+          description: Starting time of the interval
+        closeTime:
+          type: number
+          description: Closing time of the interval
+    OrderBookResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            $ref: '#/components/schemas/OrderBookData'
+    Ticker24HrFullResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            $ref: '#/components/schemas/Ticker24HrFullItem'
+    PriceTickerArrayResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/PriceTickerItem'
+    Ticker24HrResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            $ref: '#/components/schemas/Ticker24HrItem'
+    ExchangeInfoResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: object
+            required:
+            - rateLimits
+            - symbols
+            properties:
+              rateLimits:
+                type: array
+                description: Rate limit conditions
+                items:
+                  $ref: '#/components/schemas/RateLimitItem'
+              symbols:
+                type: array
+                description: Symbols information
+                items:
+                  $ref: '#/components/schemas/ExchangeInfoSymbolItem'
+    MarketRiskLimitConfig:
+      type: object
+      required:
+      - level
+      - value
+      properties:
+        level:
+          type: integer
+          description: Risk level (starts from 1)
+        value:
+          type: integer
+          description: Risk limit value for this level in notional value
+    OHLCVResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: array
+            description: 'Array of OHLCV arrays: `[openTime, open, high, low, close, baseVolume]`'
+            items:
+              type: array
+              items:
+                type: string
+              minItems: 6
+              maxItems: 6
+    Level1TickerArrayResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/Level1TickerItem'
+    MarketRiskLimitArrayResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/MarketRiskLimitItem'
+    RecentTradeResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/RecentTradeItem'
+    CommonResponse:
+      type: object
+      required:
+      - success
+      - code
+      - msg
+      - time
+      properties:
+        success:
+          type: boolean
+          description: Whether the request succeeded. `true` when HTTP status is `200`
+        code:
+          type: integer
+          description: Status code. `1` on success
+        msg:
+          type: string
+          description: Status message
+        time:
+          type: number
+          description: Current unix timestamp
+    RateLimitItem:
+      type: object
+      required:
+      - type
+      - interval
+      - intervalNum
+      - limit
+      properties:
+        type:
+          type: string
+          enum:
+          - RAW_REQUEST
+          description: Rate limit rule type
+        interval:
+          type: string
+          enum:
+          - SECOND
+          description: Rate limit interval unit
+        intervalNum:
+          type: number
+          description: Rate limit calculation interval
+        limit:
+          type: number
+          description: Rate limit condition limitation
+    PriceTickerResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            $ref: '#/components/schemas/PriceTickerItem'
+    MarketRiskLimitItem:
+      type: object
+      required:
+      - symbol
+      - riskLimits
+      properties:
+        symbol:
+          type: string
+          description: Symbol
+        riskLimits:
+          type: array
+          items:
+            $ref: '#/components/schemas/MarketRiskLimitConfig'
+          description: Risk limit tiers
+    FundingRateHistoryResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      - type: object
+        required:
+        - data
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/FundingRateHistoryItem'
+    OrderBookEntry:
+      type: array
+      description: '[price, volume]'
+      items:
+        type: string
+      minItems: 2
+      maxItems: 2
+  securitySchemes:
+    hmac:
+      type: apiKey
+      in: header
+      name: request-sign
+      description: 'HMAC-SHA384 signature. Headers required:
+
+        - `request-api`: API key
+
+        - `request-nonce`: Current timestamp in milliseconds
+
+        - `request-sign`: `HMAC-SHA384(secret, path + nonce + body)`
+
+        '
+x-refined-from:
+- markets-rest.openapi.yaml
+- btse-markets-openapi.yml

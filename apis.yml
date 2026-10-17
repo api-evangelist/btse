@@ -85,20 +85,16 @@ common:
 - type: ChangeLog
   url: https://docs.btse.com/spot/changelog
 apis:
-- aid: btse:markets
-  name: BTSE Markets API
-  description: 'Public market data: market summary, order book, trades, price, OHLCV and funding rates.'
+- aid: btse:btse-account-api
+  name: BTSE Account API
+  description: Requires API key with Read permission
   humanURL: https://docs.btse.com/markets/overview/
   baseURL: https://api.btse.com
   tags:
-  - Cryptocurrency
-  - Trading
+  - Account
   properties:
   - type: OpenAPI
-    url: openapi/btse-markets-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://docs.btse.com/specs/markets-rest.openapi.yaml
+    url: openapi/btse-account-api-openapi.yml
   - type: Documentation
     url: https://docs.btse.com/markets/overview/
   - type: JSONSchema
@@ -113,21 +109,6 @@ apis:
     url: json-schema/btse-market-risk-limit-array-response-schema.json
   - type: JSONSchema
     url: json-schema/btse-ticker24-hr-full-array-response-schema.json
-  image: https://docs.btse.com/img/logo.svg
-- aid: btse:spot
-  name: BTSE Spot API
-  description: 'Spot trading: place, amend, cancel and query orders, fees and trade history.'
-  humanURL: https://docs.btse.com/spot/overview/
-  baseURL: https://api.btse.com
-  tags:
-  - Cryptocurrency
-  - Trading
-  properties:
-  - type: OpenAPI
-    url: openapi/btse-spot-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://docs.btse.com/specs/spot_openapi_v4.yaml
   - type: Documentation
     url: https://docs.btse.com/spot/overview/
   - type: JSONSchema
@@ -142,23 +123,6 @@ apis:
     url: json-schema/btse-trade-history-resp-schema.json
   - type: JSONSchema
     url: json-schema/btse-conditional-schema.json
-  image: https://docs.btse.com/img/logo.svg
-- aid: btse:spot-legacy
-  name: BTSE Spot (Legacy v3.3) API
-  description: Legacy Spot API v3.3 endpoints.
-  humanURL: https://docs.btse.com/spot/overview/
-  baseURL: https://api.btse.com/spot
-  tags:
-  - Cryptocurrency
-  - Trading
-  properties:
-  - type: OpenAPI
-    url: openapi/btse-spot-legacy-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://docs.btse.com/specs/spot-rest.openapi.yaml
-  - type: Documentation
-    url: https://docs.btse.com/spot/overview/
   - type: JSONSchema
     url: json-schema/btse-order-response-schema.json
   - type: JSONSchema
@@ -171,21 +135,6 @@ apis:
     url: json-schema/btse-user-trade-schema.json
   - type: JSONSchema
     url: json-schema/btse-account-fee-schema.json
-  image: https://docs.btse.com/img/logo.svg
-- aid: btse:futures
-  name: BTSE Futures API
-  description: 'Perpetual futures trading: orders, positions, leverage and risk limits.'
-  humanURL: https://docs.btse.com/futures/overview/
-  baseURL: https://api.btse.com/futures/api
-  tags:
-  - Cryptocurrency
-  - Trading
-  properties:
-  - type: OpenAPI
-    url: openapi/btse-futures-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://docs.btse.com/specs/futures_openapi_v3.yaml
   - type: Documentation
     url: https://docs.btse.com/futures/overview/
   - type: JSONSchema
@@ -193,34 +142,7 @@ apis:
   - type: JSONSchema
     url: json-schema/btse-position-resp-schema.json
   - type: JSONSchema
-    url: json-schema/btse-conditional-schema.json
-  - type: JSONSchema
-    url: json-schema/btse-trade-history-resp-schema.json
-  - type: JSONSchema
-    url: json-schema/btse-twap-schema.json
-  - type: JSONSchema
     url: json-schema/btse-close-position-resp-schema.json
-  image: https://docs.btse.com/img/logo.svg
-- aid: btse:futures-legacy
-  name: BTSE Futures (Legacy v2.3) API
-  description: Legacy Futures API v2.3 endpoints.
-  humanURL: https://docs.btse.com/futures/overview/
-  baseURL: https://api.btse.com/futures
-  tags:
-  - Cryptocurrency
-  - Trading
-  properties:
-  - type: OpenAPI
-    url: openapi/btse-futures-legacy-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://docs.btse.com/specs/futures-rest.openapi.yaml
-  - type: Documentation
-    url: https://docs.btse.com/futures/overview/
-  - type: JSONSchema
-    url: json-schema/btse-create-order-request-schema.json
-  - type: JSONSchema
-    url: json-schema/btse-query-order-response-schema.json
   - type: JSONSchema
     url: json-schema/btse-futures-order-response-schema.json
   - type: JSONSchema
@@ -229,21 +151,6 @@ apis:
     url: json-schema/btse-position-schema.json
   - type: JSONSchema
     url: json-schema/btse-futures-user-trade-schema.json
-  image: https://docs.btse.com/img/logo.svg
-- aid: btse:wallet
-  name: BTSE Wallet API
-  description: Wallet balances, deposits, withdrawals, transfers and asset exchange rates.
-  humanURL: https://docs.btse.com/wallet/overview/
-  baseURL: https://api.btse.com
-  tags:
-  - Cryptocurrency
-  - Trading
-  properties:
-  - type: OpenAPI
-    url: openapi/btse-wallet-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://docs.btse.com/specs/wallet-rest.openapi.yaml
   - type: Documentation
     url: https://docs.btse.com/wallet/overview/
   - type: JSONSchema
@@ -258,21 +165,6 @@ apis:
     url: json-schema/btse-default-response-schema.json
   - type: JSONSchema
     url: json-schema/btse-asset-exchange-rate-response-schema.json
-  image: https://docs.btse.com/img/logo.svg
-- aid: btse:earn
-  name: BTSE Earn API
-  description: 'Earn products: subscribe, redeem and query earn positions.'
-  humanURL: https://docs.btse.com/earn/overview/
-  baseURL: https://api.btse.com/spot
-  tags:
-  - Cryptocurrency
-  - Trading
-  properties:
-  - type: OpenAPI
-    url: openapi/btse-earn-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://docs.btse.com/specs/earn-rest.openapi.yaml
   - type: Documentation
     url: https://docs.btse.com/earn/overview/
   - type: JSONSchema
@@ -287,21 +179,6 @@ apis:
     url: json-schema/btse-renew-investment-request-schema.json
   - type: JSONSchema
     url: json-schema/btse-redeem-investment-request-schema.json
-  image: https://docs.btse.com/img/logo.svg
-- aid: btse:otc
-  name: BTSE OTC API
-  description: 'OTC desk: request quotes and execute OTC trades.'
-  humanURL: https://docs.btse.com/otc/overview/
-  baseURL: https://api.btse.com
-  tags:
-  - Cryptocurrency
-  - Trading
-  properties:
-  - type: OpenAPI
-    url: openapi/btse-otc-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://docs.btse.com/specs/otc-rest.openapi.yaml
   - type: Documentation
     url: https://docs.btse.com/otc/overview/
   - type: JSONSchema
@@ -312,7 +189,734 @@ apis:
     url: json-schema/btse-otcmarket-response-schema.json
   - type: JSONSchema
     url: json-schema/btse-otcquote-response-schema.json
-  image: https://docs.btse.com/img/logo.svg
+- aid: btse:btse-earn-api
+  name: BTSE Earn API
+  description: Investment product endpoints
+  humanURL: https://docs.btse.com/markets/overview/
+  baseURL: https://api.btse.com
+  tags:
+  - Earn
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-earn-api-openapi.yml
+  - type: Documentation
+    url: https://docs.btse.com/markets/overview/
+  - type: JSONSchema
+    url: json-schema/btse-exchange-info-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ohlcvresponse-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-markets-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-funding-rate-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-market-risk-limit-array-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ticker24-hr-full-array-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/spot/overview/
+  - type: JSONSchema
+    url: json-schema/btse-query-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-place-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-twap-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-trade-history-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-conditional-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-query-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-user-trade-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-account-fee-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/futures/overview/
+  - type: JSONSchema
+    url: json-schema/btse-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-close-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-open-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-user-trade-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/wallet/overview/
+  - type: JSONSchema
+    url: json-schema/btse-withdraw-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-transfer-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-convert-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-address-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-default-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-asset-exchange-rate-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/earn/overview/
+  - type: JSONSchema
+    url: json-schema/btse-investment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-product-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-deposit-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-renew-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-redeem-investment-request-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/otc/overview/
+  - type: JSONSchema
+    url: json-schema/btse-otcrequest-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcaccept-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcmarket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcquote-response-schema.json
+- aid: btse:btse-markets-api
+  name: BTSE Markets API
+  description: Public market data shared by spot and futures markets
+  humanURL: https://docs.btse.com/markets/overview/
+  baseURL: https://api.btse.com
+  tags:
+  - Markets
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-markets-api-openapi.yml
+  - type: Documentation
+    url: https://docs.btse.com/markets/overview/
+  - type: JSONSchema
+    url: json-schema/btse-exchange-info-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ohlcvresponse-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-markets-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-funding-rate-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-market-risk-limit-array-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ticker24-hr-full-array-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/spot/overview/
+  - type: JSONSchema
+    url: json-schema/btse-query-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-place-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-twap-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-trade-history-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-conditional-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-query-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-user-trade-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-account-fee-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/futures/overview/
+  - type: JSONSchema
+    url: json-schema/btse-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-close-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-open-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-user-trade-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/wallet/overview/
+  - type: JSONSchema
+    url: json-schema/btse-withdraw-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-transfer-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-convert-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-address-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-default-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-asset-exchange-rate-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/earn/overview/
+  - type: JSONSchema
+    url: json-schema/btse-investment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-product-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-deposit-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-renew-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-redeem-investment-request-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/otc/overview/
+  - type: JSONSchema
+    url: json-schema/btse-otcrequest-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcaccept-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcmarket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcquote-response-schema.json
+- aid: btse:btse-otc-api
+  name: BTSE OTC API
+  description: OTC trading endpoints
+  humanURL: https://docs.btse.com/markets/overview/
+  baseURL: https://api.btse.com
+  tags:
+  - OTC
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-otc-api-openapi.yml
+  - type: Documentation
+    url: https://docs.btse.com/markets/overview/
+  - type: JSONSchema
+    url: json-schema/btse-exchange-info-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ohlcvresponse-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-markets-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-funding-rate-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-market-risk-limit-array-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ticker24-hr-full-array-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/spot/overview/
+  - type: JSONSchema
+    url: json-schema/btse-query-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-place-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-twap-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-trade-history-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-conditional-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-query-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-user-trade-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-account-fee-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/futures/overview/
+  - type: JSONSchema
+    url: json-schema/btse-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-close-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-open-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-user-trade-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/wallet/overview/
+  - type: JSONSchema
+    url: json-schema/btse-withdraw-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-transfer-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-convert-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-address-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-default-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-asset-exchange-rate-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/earn/overview/
+  - type: JSONSchema
+    url: json-schema/btse-investment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-product-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-deposit-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-renew-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-redeem-investment-request-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/otc/overview/
+  - type: JSONSchema
+    url: json-schema/btse-otcrequest-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcaccept-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcmarket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcquote-response-schema.json
+- aid: btse:btse-trade-api
+  name: BTSE Trade API
+  description: Requires API key with Trading permission
+  humanURL: https://docs.btse.com/markets/overview/
+  baseURL: https://api.btse.com
+  tags:
+  - Trade
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-trade-api-openapi.yml
+  - type: Documentation
+    url: https://docs.btse.com/markets/overview/
+  - type: JSONSchema
+    url: json-schema/btse-exchange-info-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ohlcvresponse-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-markets-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-funding-rate-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-market-risk-limit-array-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ticker24-hr-full-array-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/spot/overview/
+  - type: JSONSchema
+    url: json-schema/btse-query-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-place-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-twap-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-trade-history-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-conditional-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-query-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-user-trade-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-account-fee-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/futures/overview/
+  - type: JSONSchema
+    url: json-schema/btse-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-close-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-open-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-user-trade-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/wallet/overview/
+  - type: JSONSchema
+    url: json-schema/btse-withdraw-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-transfer-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-convert-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-address-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-default-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-asset-exchange-rate-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/earn/overview/
+  - type: JSONSchema
+    url: json-schema/btse-investment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-product-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-deposit-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-renew-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-redeem-investment-request-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/otc/overview/
+  - type: JSONSchema
+    url: json-schema/btse-otcrequest-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcaccept-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcmarket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcquote-response-schema.json
+- aid: btse:btse-trade-v3-api
+  name: BTSE Trade V3 API
+  description: The Trade V3 API from BTSE — 11 operation(s) for trade v3.
+  humanURL: https://docs.btse.com/markets/overview/
+  baseURL: https://api.btse.com
+  tags:
+  - Trade V3
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-trade-v3-api-openapi.yml
+  - type: Documentation
+    url: https://docs.btse.com/markets/overview/
+  - type: JSONSchema
+    url: json-schema/btse-exchange-info-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ohlcvresponse-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-markets-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-funding-rate-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-market-risk-limit-array-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ticker24-hr-full-array-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/spot/overview/
+  - type: JSONSchema
+    url: json-schema/btse-query-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-place-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-twap-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-trade-history-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-conditional-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-query-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-user-trade-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-account-fee-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/futures/overview/
+  - type: JSONSchema
+    url: json-schema/btse-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-close-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-open-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-user-trade-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/wallet/overview/
+  - type: JSONSchema
+    url: json-schema/btse-withdraw-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-transfer-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-convert-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-address-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-default-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-asset-exchange-rate-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/earn/overview/
+  - type: JSONSchema
+    url: json-schema/btse-investment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-product-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-deposit-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-renew-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-redeem-investment-request-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/otc/overview/
+  - type: JSONSchema
+    url: json-schema/btse-otcrequest-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcaccept-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcmarket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcquote-response-schema.json
+- aid: btse:btse-trade-v4-api
+  name: BTSE Trade V4 API
+  description: The Trade V4 API from BTSE — 7 operation(s) for trade v4.
+  humanURL: https://docs.btse.com/markets/overview/
+  baseURL: https://api.btse.com
+  tags:
+  - Trade V4
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-trade-v4-api-openapi.yml
+  - type: Documentation
+    url: https://docs.btse.com/markets/overview/
+  - type: JSONSchema
+    url: json-schema/btse-exchange-info-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ohlcvresponse-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-markets-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-funding-rate-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-market-risk-limit-array-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ticker24-hr-full-array-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/spot/overview/
+  - type: JSONSchema
+    url: json-schema/btse-query-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-place-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-twap-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-trade-history-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-conditional-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-query-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-user-trade-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-account-fee-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/futures/overview/
+  - type: JSONSchema
+    url: json-schema/btse-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-close-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-open-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-user-trade-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/wallet/overview/
+  - type: JSONSchema
+    url: json-schema/btse-withdraw-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-transfer-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-convert-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-address-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-default-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-asset-exchange-rate-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/earn/overview/
+  - type: JSONSchema
+    url: json-schema/btse-investment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-product-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-deposit-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-renew-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-redeem-investment-request-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/otc/overview/
+  - type: JSONSchema
+    url: json-schema/btse-otcrequest-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcaccept-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcmarket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcquote-response-schema.json
+- aid: btse:btse-wallet-api
+  name: BTSE Wallet API
+  description: Requires API key with Read or Transfer permission
+  humanURL: https://docs.btse.com/markets/overview/
+  baseURL: https://api.btse.com
+  tags:
+  - Wallet
+  properties:
+  - type: OpenAPI
+    url: openapi/btse-wallet-api-openapi.yml
+  - type: Documentation
+    url: https://docs.btse.com/markets/overview/
+  - type: JSONSchema
+    url: json-schema/btse-exchange-info-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ohlcvresponse-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-markets-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-funding-rate-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-market-risk-limit-array-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-ticker24-hr-full-array-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/spot/overview/
+  - type: JSONSchema
+    url: json-schema/btse-query-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-place-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-twap-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-trade-history-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-conditional-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-query-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-amend-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-user-trade-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-account-fee-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/futures/overview/
+  - type: JSONSchema
+    url: json-schema/btse-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-close-position-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-open-order-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-position-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-futures-user-trade-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/wallet/overview/
+  - type: JSONSchema
+    url: json-schema/btse-withdraw-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-transfer-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-convert-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-create-address-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-default-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-asset-exchange-rate-response-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/earn/overview/
+  - type: JSONSchema
+    url: json-schema/btse-investment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-product-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-investment-history-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-deposit-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-renew-investment-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-redeem-investment-request-schema.json
+  - type: Documentation
+    url: https://docs.btse.com/otc/overview/
+  - type: JSONSchema
+    url: json-schema/btse-otcrequest-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcaccept-quote-request-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcmarket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/btse-otcquote-response-schema.json
 x-enrichment:
   date: '2026-10-13'
   status: enriched

@@ -1,0 +1,2187 @@
+openapi: 3.2.0
+info:
+  title: Btse Wallet API
+  contact:
+    name: Support
+    url: https://support.btse.com
+  version: '1.0'
+  description: 'Operations tagged Wallet across 4 of this provider''s published API definitions: futures-rest.openapi.yaml, wallet-rest.openapi.yaml, btse-futures-legacy-openapi.yml, btse-wallet-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.btse.com/futures
+  description: Production
+- url: https://testapi.btse.io/futures
+  description: Testnet
+- url: https://api.btse.com
+  description: Production
+- url: https://testapi.btse.io
+  description: Testnet
+tags:
+- name: Wallet
+  description: Requires API key with Read or Transfer permission
+paths:
+  /api/v2.3/user/wallet:
+    get:
+      operationId: getWalletBalance
+      summary: Query Wallet Balance
+      description: Returns the user's futures wallet balance.
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      parameters:
+      - name: wallet
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Wallet identifier — `CROSS@` or `ISOLATED@{symbol}-USDT` (e.g. `ISOLATED@BTC-PERP-USDT`). Optional — if omitted, returns balances across all wallets.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletBalance'
+              example:
+              - wallet: CROSS@
+                activeWalletName: String
+                queryType: 0
+                trackingID: 0
+                walletTotalValue: 0
+                totalValue: 100
+                marginBalance: 100
+                availableBalance: 100
+                unrealisedProfitLoss: 0
+                maintenanceMargin: 0
+                leverage: 0
+                openMargin: 0
+                assets:
+                - balance: 0.20183537
+                  assetPrice: 7158.845
+                  currency: BTC
+                assetsInUse:
+                - balance: 0.01
+                  assetPrice: 7158.845
+                  currency: BTC
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com/futures
+      description: Production
+    - url: https://testapi.btse.io/futures
+      description: Testnet
+  /api/v2.3/user/wallet_history:
+    get:
+      operationId: getWalletHistory
+      summary: Query Wallet History
+      description: Returns wallet transaction history for futures wallets.
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      parameters:
+      - name: wallet
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Wallet identifier (`CROSS@` or `ISOLATED@BTC-PERP-USDT`). Omit to return all wallets
+      - name: startTime
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+        description: Start time in milliseconds
+      - name: endTime
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+        description: End time in milliseconds
+      - name: count
+        in: query
+        required: false
+        schema:
+          type: integer
+        description: Number of records to return
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletHistoryEntry'
+              example: []
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com/futures
+      description: Production
+    - url: https://testapi.btse.io/futures
+      description: Testnet
+  /api/v2.3/user/unifiedWallet/margin:
+    get:
+      operationId: getUnifiedWalletMargin
+      summary: Query Unified Wallet Margin
+      description: Returns margin information for the upgraded unified wallet. Use this endpoint if you have upgraded to the unified wallet.
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      parameters:
+      - name: symbol
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Market symbol
+      - name: positionId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Position unique ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnifiedWalletMargin'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com/futures
+      description: Production
+    - url: https://testapi.btse.io/futures
+      description: Testnet
+  /api/v2.3/user/margin:
+    get:
+      operationId: getWalletMargin
+      summary: Query Wallet Margin
+      description: 'Returns margin information for the specified wallet.
+
+        **Not available for unified wallet users** — use Query Unified Wallet Margin instead.'
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      parameters:
+      - name: symbol
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Market symbol
+      responses:
+        '200':
+          description: Same structure as Query Wallet Balance with additional `requestId` field
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletBalance'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com/futures
+      description: Production
+    - url: https://testapi.btse.io/futures
+      description: Testnet
+  /api/v2.3/user/wallet/transfer:
+    post:
+      operationId: transferFundsBetweenFuturesWallets
+      summary: Transfer Funds Between Futures Wallets
+      description: 'Transfers funds between user wallets (e.g. Spot → Cross, Cross → Isolated).
+
+
+        > **Important:** When transferring to/from an `ISOLATED` wallet, you must specify the full wallet identifier (e.g. `ISOLATED@BTC-PERP-USDT`).
+
+        >
+
+        > **Note:** the source wallet must hold balance in every `currency` listed in `apiWallets` before calling this endpoint.'
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletTransferRequest'
+            example:
+              walletSrc: ''
+              walletSrcType: SPOT
+              walletDest: ''
+              walletDestType: CROSS
+              apiWallets:
+              - currency: USD
+                allBalance: true
+              - currency: BTC
+                allBalance: true
+      responses:
+        '200':
+          description: Same structure as Query Wallet Balance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletBalance'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com/futures
+      description: Production
+    - url: https://testapi.btse.io/futures
+      description: Testnet
+  /api/v2.3/subaccount/wallet/transfer:
+    post:
+      operationId: subAccountWalletTransfer
+      summary: Sub-Account Wallet Transfer
+      description: Transfers funds between the main account and a sub-account wallet.
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubAccountTransferRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubAccountTransferResponse'
+        '400':
+          description: Bad Request — invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid API key, nonce, or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+    servers:
+    - url: https://api.btse.com/futures
+      description: Production
+    - url: https://testapi.btse.io/futures
+      description: Testnet
+  /public-api/wallet/v1/assets:
+    get:
+      operationId: getAssets
+      summary: Assets
+      description: Get available asset list.
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      parameters:
+      - name: asset
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Asset
+        example: BTC
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryAssetsResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - asset: BTC
+                  type: CRYPTO
+                  name: Bitcoin
+                  precision: 8
+                  tradeScale: 5
+                - asset: USD
+                  type: FIAT
+                  name: US Dollar
+                  precision: 2
+                  tradeScale: 2
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/wallet/v1/crypto/list:
+    get:
+      operationId: getCryptoList
+      summary: Crypto List
+      description: Get available crypto token list with corresponding action. Only supports `DEPOSIT` and `WITHDRAW`.
+      tags:
+      - Wallet
+      security: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/SupportCryptoActionEnum'
+        description: Action
+        example: DEPOSIT
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CryptoListResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - BTC
+                - ETH
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/wallet/v1/crypto/networks:
+    get:
+      operationId: getCryptoNetworks
+      summary: Crypto Networks
+      description: 'Get crypto network list with corresponding crypto.
+
+
+        This API can be publicly accessed without any security headers to get a default network list.
+
+        If you access with `Read` permission authentication, the result will be much more accurate by account setting.
+
+
+        The response of `depositEnable` and `withdrawEnable` is true by default under the publicly accessed environment.
+
+        - The total deposit fee is `max(depositFeeMin, (amount × depositFeeRate)) + (depositExtFees + depositExtFeeRate × amount)`.
+
+        - The total withdrawal fee is `max(withdrawFeeMin, (amount × withdrawFeeRate)) + (withdrawExtFees + withdrawExtFeeRate × amount)`.
+
+
+        **Note: For crypto with small prices, the** Markets Information **API displays them using K/M/B prefixes and process trades with the corresponding quantities. (ex. `K_PEIPEI`) However, Wallet-related APIs display the actual crypto information, so both requests and responses will use the original crypto name. (ex. `PEIPEI`)**'
+      tags:
+      - Wallet
+      security: []
+      parameters:
+      - name: crypto
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Crypto currency, such as BTC
+        example: BTC
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CryptoNetworksResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - network: ERC20
+                  name: Ethereum (ERC20)
+                  depositEnable: true
+                  withdrawEnable: true
+                  confirmationTime: 15
+                  depositAmtMin: '0'
+                  depositFeeMin: '0'
+                  depositFeeRate: '0'
+                  depositExtFees: '0'
+                  depositExtFeeRate: '0'
+                  needAddressExtension: false
+                  withdrawAmtMin: '36.41'
+                  withdrawFeeMin: '6.41'
+                  withdrawFeeRate: '0'
+                  withdrawExtFees: '0'
+                  withdrawExtFeeRate: '0'
+                - network: RIPPLE
+                  name: Ripple
+                  depositEnable: true
+                  withdrawEnable: true
+                  confirmationTime: 10
+                  depositAmtMin: '0'
+                  depositFeeMin: '0'
+                  depositFeeRate: '0'
+                  depositExtFees: '0'
+                  depositExtFeeRate: '0'
+                  needAddressExtension: true
+                  addressExtensionTypeName: tag
+                  withdrawAmtMin: '0.25'
+                  withdrawFeeMin: '20'
+                  withdrawFeeRate: '0'
+                  withdrawExtFees: '0'
+                  withdrawExtFeeRate: '0'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/wallet/v1/assets/exchangeRate:
+    get:
+      operationId: getAssetExchangeRate
+      summary: Get Asset Exchange Rate
+      description: Retrieve exchange rate about a specific pair. For example, `baseCurrency` and `quoteCurrency`.
+      tags:
+      - Wallet
+      security: []
+      parameters:
+      - name: baseCurrency
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Base currency, such as BTC
+        example: BTC
+      - name: amount
+        in: query
+        required: true
+        schema:
+          type: string
+          example: '2'
+        description: The quantity of `baseCurrency`.
+      - name: quoteCurrency
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Quote currency, such as USDT
+        example: USDT
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetExchangeRateResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - rate: '19026.12846161'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/wallet/v1/user/assets:
+    get:
+      operationId: getUserAssets
+      summary: User Wallet
+      description: Get user's assets list and balance. Requires the `Read` permission.
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      parameters:
+      - name: asset
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Asset
+        example: BTC
+      - name: action
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/AssetActionEnum'
+        description: Support action
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryUserAssetsResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - asset: BTC
+                  type: CRYPTO
+                  totalAmount: '100.0'
+                  availableAmount: '100.0'
+                  availableActions:
+                  - CONVERT
+                  - TRANSFER
+                  - WITHDRAW
+                  - DEPOSIT
+                  - SEND_TO
+                  cryptoNetwork:
+                    depositNetworks:
+                    - BITCOIN
+                    - LIQUID
+                    withdrawalNetworks:
+                    - BITCOIN
+                    - LIQUID
+                - asset: USDT
+                  type: FIAT
+                  totalAmount: '25000.0'
+                  availableAmount: '19000.0'
+                  availableActions:
+                  - CONVERT
+                  - TRANSFER
+                  - WITHDRAW
+                  - DEPOSIT
+                  - SEND_TO
+                  cryptoNetwork:
+                    depositNetworks: []
+                    withdrawalNetworks: []
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/wallet/v1/user/walletHistory:
+    get:
+      operationId: getUserWalletHistory
+      summary: User Wallet History
+      description: 'Query wallet history. Requires the `Read` permission.
+
+
+        Query parameter rules:
+
+        - It''s **RECOMMENDED** to include `walletType` in the query. If it''s not provided, the default will be to query spot wallet history only.
+
+        - `walletName` is required if `walletType` is `ISOLATED`.
+
+        - Only upgraded wallet allow query wallet history by using `walletType=UNIFIED`.
+
+        - `historyTypes` should be encoded to a json array.
+
+        - It will default to fetch data from the past 7 days if the `startTime` and the `endTime` are not set.
+
+        - The `startTime` and `endTime` must be within the range of the past 120 days.
+
+        - If your futures wallet has already been upgraded, querying future wallet history with `walletType=UNIFIED` for retrieving the post-upgrade history.
+
+        - Querying wallet history by setting `walletType=CROSS` or `walletType=ISOLATED` will only return wallet history from before the futures wallet upgrade.
+
+
+        For example,
+
+        ```
+
+        // query spot wallet history since 7 days ago.
+
+        .../public-api/wallet/v1/user/walletHistory?walletType=SPOT
+
+        // query spot deposit and withdraw history since 7 days ago.
+
+        .../public-api/wallet/v1/user/walletHistory?walletType=SPOT&historyTypes=["DEPOSIT","WITHDRAW"]
+
+        // query spot deposit and withdraw history from 2023-01-01 to 2023-03-31.
+
+        .../public-api/wallet/v1/user/walletHistory?walletType=SPOT&historyTypes=["DEPOSIT","WITHDRAW"]&startTime=1672531200000&endTime=1680307200000
+
+        // query BTC-PERP isolated wallet history since 7 days ago.
+
+        .../public-api/wallet/v1/user/walletHistory?walletType=ISOLATED&walletName=ISOLATED@BTC-PERP-USDT
+
+        ```
+
+        The detail which is a transaction on the blockchain will show `cryptoNetwork`, and once the transaction is completed, the `txId` will be displayed.'
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      parameters:
+      - name: walletType
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/WalletTypeEnum'
+        example: SPOT
+      - name: walletName
+        in: query
+        required: false
+        schema:
+          type: string
+        example: ISOLATED@BTC-PERP-USDT
+        description: The name of isolated wallet. Required when `walletType` is `ISOLATED`
+      - name: asset
+        in: query
+        required: false
+        schema:
+          type: string
+          example: BTC
+        description: Asset. Required when `walletType`=`SPOT`.
+      - name: historyTypes
+        in: query
+        required: false
+        schema:
+          description: It's a string using json array format
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletTransactionTypeEnum'
+          example: '["DEPOSIT", "WITHDRAW"]'
+        description: Specified query history types
+      - name: startTime
+        in: query
+        required: false
+        schema:
+          type: number
+          example: 1624987283000
+        description: Starting time (included).
+      - name: endTime
+        in: query
+        required: false
+        schema:
+          type: number
+          example: 1624987283000
+        description: Ending time (excluded).
+      - name: pageSize
+        in: query
+        required: false
+        schema:
+          type: number
+          example: 10
+          default: 10
+          maximum: 100
+        description: Page size for pagination
+      - name: currentPage
+        in: query
+        required: false
+        schema:
+          type: number
+          example: 1
+          default: 1
+        description: Current page number for pagination
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryWalletHistoryResponse'
+              examples:
+                Deposit (crypto):
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1624989977940
+                    data:
+                    - transactionTime: 1678445104907
+                      type: DEPOSIT
+                      walletName: SPOT@
+                      asset: ETH
+                      netAmount: '0.05'
+                      amount: '0.05'
+                      transactionRef: '2023031000000321'
+                      status: COMPLETED
+                      description: null
+                      fee: '0'
+                      cryptoNetwork: ETHEREUM
+                      toAddress: '0xF14BAc881e719934CEFccD1AC5dC5f814dfbCbF8'
+                      confirmTimes: (10/10)
+                      txId: '0x94ead563799ee341cb136c18dc9a71a231abaec820caa18c096febbe92da8709'
+                Withdraw (crypto):
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1624989977940
+                    data:
+                    - transactionTime: 1678957494276
+                      type: WITHDRAW
+                      walletName: SPOT@
+                      asset: USDT
+                      netAmount: '-30'
+                      amount: '-30'
+                      transactionRef: '2023031600000374'
+                      status: COMPLETED
+                      description: null
+                      fee: '6.429'
+                      cryptoNetwork: ERC20
+                      toAddress: '0xF14BAc881e719934CEFccD1AC5dC5f814dfbCbF8'
+                      confirmTimes: (15/15)
+                      txId: '0x0a8487a85f37d4995716419d7d7d7048c9625fab8cae69c235103a39ea789377'
+                Send To:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1624989977940
+                    data:
+                    - transactionTime: 1679619604907
+                      type: SEND
+                      walletName: SPOT@
+                      asset: USDT
+                      netAmount: '-1'
+                      amount: '-1'
+                      transactionRef: '2023024000000034'
+                      status: COMPLETED
+                      description: null
+                      fee: '0'
+                      cryptoNetwork: null
+                      confirmTimes: null
+                      txId: null
+                Others:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1767580139575
+                    data:
+                    - transactionTime: 1767580126422
+                      type: TRANSFER_OUT
+                      walletName: VIRTUAL|4@BTCPFC-USDT#1
+                      asset: USDT
+                      netAmount: '-1.00950715'
+                      amount: '-1.00950715'
+                      transactionRef: e6d252e8-eb64-48cd-81f0-e35ab453059d
+                      status: COMPLETED
+                      description: VIRTUAL|4@BTC-PERP-USD#1->CROSS@;CLOSE
+                      fee: '0'
+                      cryptoNetwork: null
+                      toAddress: null
+                      confirmTimes: null
+                      txId: null
+                    - transactionTime: 1767580126418
+                      type: REALIZED_PNL
+                      walletName: VIRTUAL|4@BTCPFC-USDT#1
+                      asset: USDT
+                      netAmount: '-0.00019329'
+                      amount: '-0.00019329'
+                      transactionRef: 69491374-0a01-4341-92ed-5212eb36b0ff
+                      status: COMPLETED
+                      description: VIRTUAL|4@BTC-PERP-USD#1;TRADE
+                      fee: '0'
+                      cryptoNetwork: null
+                      toAddress: null
+                      confirmTimes: null
+                      txId: null
+                    - transactionTime: 1767578949884
+                      type: TRANSFER_IN
+                      walletName: VIRTUAL|4@BTCPFC-USDT#1
+                      asset: USDT
+                      netAmount: '1'
+                      amount: '1'
+                      transactionRef: 1732d021-75dc-43cc-86b6-ebc767dd0969
+                      status: COMPLETED
+                      description: CROSS@->VIRTUAL|4@BTC-PERP-USD#1;TRANSFER
+                      fee: '0'
+                      cryptoNetwork: null
+                      toAddress: null
+                      confirmTimes: null
+                      txId: null
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/wallet/v1/user/crypto/address:
+    get:
+      operationId: getAddress
+      summary: Query Address
+      description: Query latest 10 active addresses. Requires the `Wallet` permission.
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      parameters:
+      - name: crypto
+        in: query
+        required: true
+        schema:
+          type: string
+          example: USDT
+        description: Crypto currency
+      - name: network
+        in: query
+        required: true
+        schema:
+          type: string
+          example: ERC20
+        description: Crypto network
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryAddressResponse'
+              examples:
+                Common:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1678700285000
+                    data:
+                    - address: '0xc48fd69d0f4B521B7200345A67641aB4076828f2'
+                      addressExtensionTypeName: null
+                      addressExtension: null
+                      createTime: 1678070826000
+                Has Extension:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1678700285000
+                    data:
+                    - address: rHJhVRJGWGDqVX6cX8Ca1nPZMrkARE2VVx
+                      addressExtensionTypeName: tag
+                      addressExtension: '533973779'
+                      createTime: 1678070826000
+    post:
+      operationId: createAddress
+      summary: Create Address
+      description: 'Create address. Requires the `Wallet` permission.
+
+
+        In the `Query address` API, you can retrieve the latest 10 active addresses that can be used for a specific crypto and network.
+
+        If the number of addresses reaches 10, and none of these addresses were used for deposits, the service will restrict the creation of new addresses by returning a HTTP status code `400`.
+
+        If you encounter this situation, use the existing addresses for deposits, then you''ll be able to continue creating new addresses after.'
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAddressRequest'
+            examples:
+              USDT-ERC20:
+                value:
+                  crypto: USDT
+                  network: ERC20
+              USDT-ERC20-Webhook:
+                value:
+                  crypto: USDT
+                  network: ERC20
+                  webhookUrl: '{URL for webhook}'
+              XRP-RIPPLE:
+                value:
+                  crypto: XRP
+                  network: RIPPLE
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAddressResponse'
+              examples:
+                Common:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1678070826000
+                    data:
+                    - address: '0xc48fd69d0f4B521B7200345A67641aB4076828f2'
+                      addressExtensionTypeName: null
+                      addressExtension: null
+                      createTime: 1678070826000
+                Has Extension:
+                  value:
+                    success: true
+                    code: 1
+                    msg: Success
+                    time: 1678070826000
+                    data:
+                    - address: rHJhVRJGWGDqVX6cX8Ca1nPZMrkARE2VVx
+                      addressExtensionTypeName: tag
+                      addressExtension: '533973779'
+                      createTime: 1678070826000
+        '400':
+          description: Request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse_2'
+              examples:
+                Reach Address Creation Limit:
+                  description: Reach Address Creation Limit
+                  value:
+                    success: false
+                    code: 11080001
+                    msg: crypto address full
+                    time: 1662542807278
+    delete:
+      operationId: deleteAddress
+      summary: Delete Address
+      description: 'Rate Limit: 10 requests per 1 day based on IP.
+
+        Delete a crypto address. Requires the `Wallet` permission.'
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      parameters:
+      - name: crypto
+        in: query
+        required: true
+        schema:
+          type: string
+          example: USDT
+        description: Cryptocurrency
+      - name: network
+        in: query
+        required: true
+        schema:
+          type: string
+          example: ERC20
+        description: Crypto network
+      - name: address
+        in: query
+        required: true
+        schema:
+          type: string
+          example: '0xc48fd69d0f4B521B7200345A67641aB4076828f2'
+        description: Crypto address
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - result: OK
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/wallet/v1/user/crypto/withdraw:
+    post:
+      operationId: withdraw
+      summary: Withdraw
+      description: 'Withdraw. Requires the `Withdraw` permission. Please refer to the Crypto Networks endpoint for fee calculation.
+
+
+        The parameter `amountIncludeFee` affects how the fee is handled, with the differences as follows:
+
+        - `amountIncludeFee` = true
+
+        - `amount` is the amount to be deducted from user''s wallet (i.e., including fee). The amount the user receives will be `amount - fee`.
+
+        - `amountIncludeFee` = false
+
+        - `amount` is the amount the user wants to receive (i.e., excluding fee). The amount deducted from user''s wallet will be `amount + fee`.'
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawRequest'
+            examples:
+              Common:
+                value:
+                  crypto: USDT
+                  network: ERC20
+                  address: '0xc48fd69d0f4B521B7200345A67641aB4076828f2'
+                  amount: '36'
+              Has Extension:
+                value:
+                  crypto: XRP
+                  network: RIPPLE
+                  address: rHJhVRJGWGDqVX6cX8Ca1nPZMrkARE2VVx
+                  addressExtension: '533973779'
+                  amount: '20'
+              Has Webhook URL:
+                value:
+                  crypto: USDT
+                  network: ERC20
+                  address: '0xc48fd69d0f4B521B7200345A67641aB4076828f2'
+                  amount: '36'
+                  webhookUrl: '{URL for webhook}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithdrawResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - transactionRef: '2025060500001'
+                  orderId: cca02a29-e47c-4ee7-9d42-28b850a843ec
+                  crypto: USDT
+                  network: ERC20
+                  address: '0xc48fd69d0f4B521B7200345A67641aB4076828f2'
+                  addressExtension: null
+                  amountToAddress: '30.45'
+                  fees: '5.55'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/wallet/v1/user/assets/sendTo:
+    post:
+      operationId: sendTo
+      summary: Send To (transfer to user)
+      description: 'Transfer to another user. Requires the `Transfer` permission.
+
+        Invoke the API with either the `receiverUsername` or the `receiverUid` parameter.'
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+            example:
+              asset: BTC
+              amount: '1'
+              receiverUsername: tester
+              receiverUid: '1234567890'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - transactionRef: '2023010100000001'
+                  asset: BTC
+                  amount: '1'
+                  receiverUsername: tester
+                  receiverUid: '1234567890'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+  /public-api/wallet/v1/user/assets/convert:
+    post:
+      operationId: convert
+      summary: Convert
+      description: Asset conversion. Requires the `Wallet` permission.
+      tags:
+      - Wallet
+      security:
+      - api: []
+        nonce: []
+        sign: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConvertRequest'
+            example:
+              fromAsset: BTC
+              toAsset: USDT
+              amount: '1'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConvertResponse'
+              example:
+                success: true
+                code: 1
+                msg: Success
+                time: 1624989977940
+                data:
+                - fromAsset: BTC
+                  fromAmount: '1'
+                  fromTransactionRef: '2025051000002'
+                  toAsset: USDT
+                  toAmount: '16000.0'
+                  toTransactionRef: '2025051000001'
+                  rate: '16000'
+    servers:
+    - url: https://api.btse.com
+      description: Production
+    - url: https://testapi.btse.io
+      description: Testnet
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: Error status code
+        error:
+          type: string
+          description: Error message
+        code:
+          type: integer
+          description: Internal error code
+        message:
+          type: string
+          description: Human-readable error description
+    UnifiedWalletMargin:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Market symbol
+        walletTotalValue:
+          type: number
+          description: Total wallet value
+        walletTotalUnrealizedProfitLoss:
+          type: number
+          description: Total unrealized P&L
+        futuresTotalAvailableBalance:
+          type: number
+          description: Total available balance
+        wallets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletDetail'
+          description: Per-wallet breakdown
+    WalletTransferDetail:
+      type: object
+      required:
+      - currency
+      - allBalance
+      properties:
+        currency:
+          type: string
+          description: Currency
+        allBalance:
+          type: boolean
+          description: Whether to transfer entire balance. When `true`, `balance` is ignored
+        balance:
+          type: number
+          description: Amount to transfer (e.g. `10`). Required when `allBalance` is `false`
+    RateLimitError:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: HTTP status code (429)
+        message:
+          type: string
+          description: Rate limit exceeded message
+    WalletAsset:
+      type: object
+      properties:
+        balance:
+          type: number
+          description: Asset balance
+        assetPrice:
+          type: number
+          description: Asset price
+        currency:
+          type: string
+          description: Currency
+    SubAccountTransferResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Response code
+        msg:
+          type: string
+          description: Response message
+        time:
+          type: integer
+          format: int64
+          description: Response timestamp
+        data:
+          type: object
+          description: Transfer result data
+        success:
+          type: boolean
+          description: Whether transfer succeeded
+    WalletTransferRequest:
+      type: object
+      required:
+      - walletSrcType
+      - walletDestType
+      - apiWallets
+      properties:
+        walletSrc:
+          type: string
+          description: Source wallet identifier. Required when `walletSrcType` is `ISOLATED`
+        walletSrcType:
+          type: string
+          enum:
+          - SPOT
+          - CROSS
+          - ISOLATED
+          description: Source wallet type
+        walletDest:
+          type: string
+          description: Destination wallet identifier. Required when `walletDestType` is `ISOLATED`
+        walletDestType:
+          type: string
+          enum:
+          - SPOT
+          - CROSS
+          - ISOLATED
+          description: Destination wallet type
+        apiWallets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletTransferDetail'
+          description: Transfer details
+    WalletHistoryEntry:
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency
+        amount:
+          type: number
+          description: Transaction amount
+        fees:
+          type: number
+          description: Fees charged
+        orderId:
+          type: string
+          description: Internal wallet order ID
+        wallet:
+          type: string
+          description: '`CROSS@` or `ISOLATED@`'
+        description:
+          type: string
+          description: Transaction description
+        status:
+          type: integer
+          description: '`1`: PENDING · `2`: PROCESSING · `10`: COMPLETED · `16`: CANCELLED'
+        type:
+          type: integer
+          description: '`105`: Wallet Transfer · `106`: Liquidation · `108`: Realized PnL · `110`: Funding · `121`: Asset Conversion'
+    WalletBalance:
+      type: object
+      properties:
+        wallet:
+          type: string
+          description: Wallet identifier
+        activeWalletName:
+          type: string
+          description: Active wallet name
+        queryType:
+          type: integer
+          description: Query type
+        trackingID:
+          type: integer
+          format: int64
+          description: Internal tracking ID
+        walletTotalValue:
+          type: number
+          description: Wallet total value
+        totalValue:
+          type: number
+          description: Total value
+        marginBalance:
+          type: number
+          description: Margin balance
+        availableBalance:
+          type: number
+          description: Available balance
+        unrealisedProfitLoss:
+          type: number
+          description: Unrealized P&L
+        maintenanceMargin:
+          type: number
+          description: Maintenance margin
+        leverage:
+          type: number
+          description: 'Current leverage (CROSS: current, not setting)'
+        openMargin:
+          type: number
+          description: Open margin
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletAsset'
+          description: Available assets
+        assetsInUse:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletAsset'
+          description: Assets in use
+    WalletDetail:
+      type: object
+      properties:
+        activeWalletName:
+          type: string
+          description: Wallet name
+        unrealisedProfitLoss:
+          type: number
+          description: Wallet unrealized P&L
+        walletTotalValue:
+          type: number
+          description: Wallet total value
+        marginBalance:
+          type: number
+          description: Margin balance
+        availableBalance:
+          type: number
+          description: Available balance
+        maintenanceMargin:
+          type: number
+          description: Maintenance margin
+    SubAccountTransferRequest:
+      type: object
+      required:
+      - walletSrcType
+      - walletDestType
+      - fromUser
+      - receiver
+      - apiWallets
+      properties:
+        walletSrcType:
+          type: string
+          enum:
+          - SPOT
+          - CROSS
+          - ISOLATED
+          description: Source wallet type
+        walletSrc:
+          type: string
+          description: Required when `walletSrcType` is `ISOLATED`
+        walletDestType:
+          type: string
+          enum:
+          - SPOT
+          - CROSS
+          - ISOLATED
+          description: Destination wallet type
+        walletDest:
+          type: string
+          description: Required when `walletDestType` is `ISOLATED`
+        fromUser:
+          type: string
+          description: Source username
+        receiver:
+          type: string
+          description: Receiver username
+        apiWallets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletTransferDetail'
+          description: Transfer details
+    ErrorResponse_2:
+      type: object
+      properties:
+        success:
+          type: boolean
+        code:
+          type: integer
+        msg:
+          type: string
+        time:
+          type: number
+    ConvertItem:
+      type: object
+      required:
+      - fromAsset
+      - fromAmount
+      - fromTransactionRef
+      - toAsset
+      - toAmount
+      - toTransactionRef
+      - rate
+      properties:
+        fromAsset:
+          type: string
+          description: From asset
+        fromAmount:
+          type: string
+          description: From amount
+        fromTransactionRef:
+          type: string
+          description: From transaction reference
+        toAsset:
+          type: string
+          description: To asset
+        toAmount:
+          type: string
+          description: To amount
+        toTransactionRef:
+          type: string
+          description: To transaction reference
+        rate:
+          type: string
+          description: Exchange rate
+    WalletTransactionTypeEnum:
+      type: string
+      enum:
+      - DEPOSIT
+      - WITHDRAW
+      - CONVERT
+      - SEND
+      - RECEIVE
+      - REFERRAL
+      - PAID
+      - GET_PAID
+      - LOTTERY_FREEZE
+      - LOTTERY_UNFREEZE
+      - C2C_FREEZE
+      - C2C_UNFREEZE
+      - C2C_TRANSFER_IN
+      - C2C_TRANSFER_OUT
+      - LAUNCHPAD_FREEZE
+      - LAUNCHPAD_UNFREEZE
+      - LAUNCHPAD_DEDUCTED
+      - LAUNCHPAD_DISTRIBUTED
+      - LAUNCHPAD_CREDIT
+      - LAUNCHPAD_FUND
+      - EARN_PROFIT_SHARING
+      - SUB_ACCOUNT_TRANSFER_IN
+      - SUB_ACCOUNT_TRANSFER_OUT
+      - TRANSFER_OUT
+      - TRANSFER_IN
+      - INVEST
+      - REDEEM
+      - LIQUIDATION
+      - REALIZED_PNL
+      - FUNDING
+      - ASSET_CONVERSION
+      - FUTURES_FUNDING_RECOVER_LOSS_FROM_POSITION_ENTRY_PRICE
+    WithdrawRequest:
+      type: object
+      required:
+      - crypto
+      - network
+      - address
+      - amount
+      properties:
+        crypto:
+          type: string
+          description: Crypto to withdraw
+        network:
+          type: string
+          description: Crypto network to withdraw
+        address:
+          type: string
+          description: Withdrawal address
+        addressExtension:
+          type: string
+          description: Address extension (e.g. XRP tag, EOS memo). Required for networks where `needAddressExtension` is `true` in the [Crypto Networks](../query-crypto-networks) response
+        amount:
+          type: string
+          description: Withdraw amount
+        amountIncludeFee:
+          type: boolean
+          default: true
+          description: 'Whether the fee is included in the amount or not. The default value is set to `true`.
+
+            '
+        webhookUrl:
+          type: string
+          description: If you wish to receive notifications, please fill in the 'webhookUrl' parameter. Also, kindly notify us so that we can add the 'webhookUrl' to the whitelist.
+    AssetExchangeRateResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              rate:
+                type: string
+                description: The rate of base-currency to quote-currency
+    UserAssetCryptoNetwork:
+      type: object
+      required:
+      - depositNetworks
+      - withdrawalNetworks
+      properties:
+        depositNetworks:
+          type: array
+          description: Available network list for crypto deposit
+          items:
+            type: string
+        withdrawalNetworks:
+          type: array
+          description: Available network list for crypto withdrawal
+          items:
+            type: string
+    CryptoNetworkItem:
+      type: object
+      required:
+      - network
+      - name
+      - depositEnable
+      - withdrawEnable
+      - depositAmtMin
+      - depositFeeMin
+      - depositFeeRate
+      - depositExtFees
+      - depositExtFeeRate
+      - needAddressExtension
+      - withdrawAmtMin
+      - withdrawFeeMin
+      - withdrawFeeRate
+      - withdrawExtFees
+      - withdrawExtFeeRate
+      properties:
+        network:
+          type: string
+          description: Network
+        name:
+          type: string
+          description: Network name
+        depositEnable:
+          type: boolean
+          description: Allow to deposit
+        withdrawEnable:
+          type: boolean
+          description: Allow to withdraw
+        confirmationTime:
+          type: integer
+          description: Expected block confirmation time
+        depositAmtMin:
+          type: string
+          description: Minimum amount of deposit
+        depositFeeMin:
+          type: string
+          description: Minimum fees of deposit
+        depositFeeRate:
+          type: string
+          description: Fee rate of deposit
+        depositExtFees:
+          type: string
+          description: Extra fees of deposit
+        depositExtFeeRate:
+          type: string
+          description: Extra fee rate of deposit
+        needAddressExtension:
+          type: boolean
+          description: Supported address extension
+        addressExtensionTypeName:
+          type: string
+          description: Address extension type (e.g. tag)
+        withdrawAmtMin:
+          type: string
+          description: Minimum amount of withdrawal
+        withdrawFeeMin:
+          type: string
+          description: Minimum fees of withdraw
+        withdrawFeeRate:
+          type: string
+          description: Fee rate of withdrawal
+        withdrawExtFees:
+          type: string
+          description: Extra fees of withdraw
+        withdrawExtFeeRate:
+          type: string
+          description: Extra fee rate of withdraw
+    QueryAssetsResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetItem'
+    DefaultResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            required:
+            - result
+            properties:
+              result:
+                type: string
+                description: Processing result. It will be `200 OK` if successful.
+    CryptoListResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            type: string
+            description: Crypto token
+    CreateAddressRequest:
+      type: object
+      required:
+      - crypto
+      - network
+      properties:
+        crypto:
+          type: string
+          description: Crypto currency
+          minLength: 1
+        network:
+          type: string
+          description: Crypto network
+          minLength: 1
+        webhookUrl:
+          type: string
+          description: If you want to receive notifications, fill in the 'webhookUrl' parameter. Then, notify us so we can whitelist the 'webhookUrl'.
+    SupportCryptoActionEnum:
+      type: string
+      enum:
+      - DEPOSIT
+      - WITHDRAW
+    TransferResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferItem'
+    QueryUserAssetsResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAssetItem'
+    ConvertRequest:
+      type: object
+      required:
+      - fromAsset
+      - toAsset
+      - amount
+      properties:
+        fromAsset:
+          type: string
+          description: From asset
+          minLength: 1
+        toAsset:
+          type: string
+          description: To asset
+          minLength: 1
+        amount:
+          type: string
+          description: The amount to convert from an asset, which should be greater than 0. The maximum integer digits is 14 and the maximum decimal places is 10.
+    CreateAddressResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CryptoAddressItem'
+    QueryWalletHistoryResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserWalletHistoryItem'
+    UserAssetItem:
+      type: object
+      required:
+      - asset
+      - type
+      - totalAmount
+      - availableAmount
+      - availableActions
+      - cryptoNetwork
+      properties:
+        asset:
+          type: string
+          description: Asset
+        type:
+          $ref: '#/components/schemas/AssetTypeEnum'
+        totalAmount:
+          type: string
+          description: Total amount
+        availableAmount:
+          type: string
+          description: Available amount
+        availableActions:
+          type: array
+          description: Support actions
+          items:
+            $ref: '#/components/schemas/AssetActionEnum'
+        cryptoNetwork:
+          $ref: '#/components/schemas/UserAssetCryptoNetwork'
+    AssetItem:
+      type: object
+      required:
+      - asset
+      - type
+      - name
+      - precision
+      - tradeScale
+      properties:
+        asset:
+          type: string
+          description: Asset
+        type:
+          $ref: '#/components/schemas/AssetTypeEnum'
+        name:
+          type: string
+          description: Asset name
+        precision:
+          type: integer
+          description: The number of digits after the decimal point (for Withdraw)
+        tradeScale:
+          type: integer
+          description: The number of digits after the decimal point (for Convert/OTC)
+    CryptoNetworksResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CryptoNetworkItem'
+    WithdrawItem:
+      type: object
+      required:
+      - transactionRef
+      - orderId
+      - crypto
+      - network
+      - address
+      - amountToAddress
+      - fees
+      properties:
+        transactionRef:
+          type: string
+          description: Transaction reference
+        orderId:
+          type: string
+          description: Order ID
+        crypto:
+          type: string
+          description: Crypto to withdraw
+        network:
+          type: string
+          description: Crypto network to withdraw
+        address:
+          type: string
+          description: Withdraw to address
+        addressExtension:
+          type: string
+          description: Address extension
+        amountToAddress:
+          type: string
+          description: How many crypto to address
+        fees:
+          type: string
+          description: Fees
+    QueryAddressResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CryptoAddressItem'
+    TransferItem:
+      type: object
+      required:
+      - transactionRef
+      - asset
+      - amount
+      properties:
+        transactionRef:
+          type: string
+          description: Transaction reference
+        asset:
+          type: string
+          description: Asset
+        amount:
+          type: string
+          description: Amount
+        receiverUsername:
+          type: string
+          description: Receiver's username
+        receiverUid:
+          type: string
+          description: Receiver's unique ID
+    AssetTypeEnum:
+      type: string
+      enum:
+      - FIAT
+      - CRYPTO
+      - STABLE_COIN
+    TransferRequest:
+      type: object
+      required:
+      - asset
+      - amount
+      properties:
+        asset:
+          type: string
+          description: The asset to be transferred
+        amount:
+          type: string
+          description: The amount of asset to be transferred
+        receiverUsername:
+          type: string
+          description: Receiver's username. Required if `receiverUid` is not provided
+        receiverUid:
+          type: string
+          description: Receiver's unique ID. Required if `receiverUsername` is not provided
+    WalletTypeEnum:
+      description: '`UNIFIED` only supported for upgraded wallet
+
+        '
+      type: string
+      enum:
+      - SPOT
+      - CROSS
+      - ISOLATED
+      - UNIFIED
+    WalletTransactionStatusEnum:
+      type: string
+      enum:
+      - PENDING
+      - PROCESSING
+      - COMPLETED
+      - CANCELLED
+    WithdrawResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WithdrawItem'
+    AssetActionEnum:
+      type: string
+      enum:
+      - CONVERT
+      - TRANSFER
+      - WITHDRAW
+      - DEPOSIT
+      - SEND_TO
+    UserWalletHistoryItem:
+      type: object
+      required:
+      - transactionTime
+      - type
+      - walletName
+      - asset
+      - netAmount
+      - status
+      - fees
+      properties:
+        transactionTime:
+          type: number
+          description: Transaction time
+        type:
+          $ref: '#/components/schemas/WalletTransactionTypeEnum'
+        walletName:
+          type: string
+          description: Wallet name
+        asset:
+          type: string
+          description: Asset
+        netAmount:
+          type: string
+          description: Net amount
+        amount:
+          type: string
+          description: Amount
+        transactionRef:
+          type: string
+          description: Transaction reference
+        status:
+          $ref: '#/components/schemas/WalletTransactionStatusEnum'
+        description:
+          type: string
+          description: Description
+        fee:
+          type: string
+          description: Fees
+        cryptoNetwork:
+          type: string
+          description: Crypto network
+        toAddress:
+          type: string
+          description: The target address of the blockchain transaction
+        confirmTimes:
+          type: string
+          description: Blockchain transaction confirmation times
+        txId:
+          type: string
+          description: Blockchain transaction ID
+    CommonResponse:
+      type: object
+      required:
+      - success
+      - code
+      - msg
+      - time
+      properties:
+        success:
+          description: Request validation is successful or not. It will be set to `true` when the HTTP status is `200`.
+          type: boolean
+        code:
+          description: Request status code. It will be set to `1` when the request is processed successfully. When unsuccessful, there will be an error code.
+          type: integer
+        msg:
+          description: Request status message. It will be set to `Success` when the request is processed successfully. When unsuccessful, there will be an error message.
+          type: string
+        time:
+          description: Current unix timestamp.
+          type: number
+    ConvertResponse:
+      allOf:
+      - $ref: '#/components/schemas/CommonResponse'
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConvertItem'
+    CryptoAddressItem:
+      type: object
+      required:
+      - address
+      - createTime
+      properties:
+        address:
+          type: string
+          description: Address
+        addressExtensionTypeName:
+          type: string
+          description: Address extension type (e.g. tag)
+        addressExtension:
+          type: string
+          description: Address extension
+        createTime:
+          type: number
+          description: Create time
+    ErrorResponse_3:
+      type: object
+      properties:
+        success:
+          type: boolean
+        code:
+          type: integer
+        msg:
+          type: string
+        time:
+          type: number
+  securitySchemes:
+    api:
+      type: apiKey
+      in: header
+      name: request-api
+      description: API key
+    nonce:
+      type: apiKey
+      in: header
+      name: request-nonce
+      description: Current timestamp in milliseconds
+    sign:
+      type: apiKey
+      in: header
+      name: request-sign
+      description: '`HMAC-SHA384(secret, path + nonce + body)`'
+x-refined-from:
+- futures-rest.openapi.yaml
+- wallet-rest.openapi.yaml
+- btse-futures-legacy-openapi.yml
+- btse-wallet-openapi.yml

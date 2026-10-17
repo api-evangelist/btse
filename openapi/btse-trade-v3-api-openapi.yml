@@ -1,8 +1,8 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Futures API
-  description: External API Documentation
+  title: Btse Trade V3 API
   version: v1
+  description: 'Operations tagged Trade V3 across 2 of this provider''s published API definitions: futures_openapi_v3.yaml, btse-futures-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.btse.com/futures/api
   description: Production
@@ -10,15 +10,15 @@ security:
 - APIKey: []
   Nonce: []
   Signature: []
+tags:
+- name: Trade V3
 paths:
   /v3/trade/orders:
     get:
       tags:
       - Trade V3
       summary: Get orders
-      description: Returns open orders. When orderId or clOrderId is provided, returns
-        that single order; otherwise returns the caller's open orders, optionally
-        filtered by symbol.
+      description: Returns open orders. When orderId or clOrderId is provided, returns that single order; otherwise returns the caller's open orders, optionally filtered by symbol.
       operationId: getOrders
       parameters:
       - name: orderId
@@ -37,26 +37,22 @@ paths:
           description: Client-assigned order id to look up a single order.
       - name: symbol
         in: query
-        description: Trading pair symbol to filter open orders. Ignored when orderId
-          or clOrderId is provided.
+        description: Trading pair symbol to filter open orders. Ignored when orderId or clOrderId is provided.
         required: false
         schema:
           type: string
-          description: Trading pair symbol to filter open orders. Ignored when orderId
-            or clOrderId is provided.
+          description: Trading pair symbol to filter open orders. Ignored when orderId or clOrderId is provided.
         examples:
           default:
             value: BTC-PERP
       - name: includeCancelled
         in: query
-        description: If true, cancelled orders are included in the result. Only honored
-          when looking up by orderId or clOrderId.
+        description: If true, cancelled orders are included in the result. Only honored when looking up by orderId or clOrderId.
         required: false
         schema:
           type: boolean
           default: false
-          description: If true, cancelled orders are included in the result. Only
-            honored when looking up by orderId or clOrderId.
+          description: If true, cancelled orders are included in the result. Only honored when looking up by orderId or clOrderId.
       responses:
         '200':
           description: OK
@@ -118,8 +114,7 @@ paths:
       tags:
       - Trade V3
       summary: Amend an order
-      description: Amends an existing order's price, size, or trigger price. The amendType
-        field selects which field(s) are changed and which inputs are required.
+      description: Amends an existing order's price, size, or trigger price. The amendType field selects which field(s) are changed and which inputs are required.
       operationId: amendOrder
       requestBody:
         content:
@@ -160,8 +155,7 @@ paths:
       tags:
       - Trade V3
       summary: Place an order
-      description: Places a LIMIT or MARKET order. The orderType field selects the
-        request variant and its required fields.
+      description: Places a LIMIT or MARKET order. The orderType field selects the request variant and its required fields.
       operationId: placeOrder
       parameters:
       - name: BROKER-ID
@@ -248,8 +242,7 @@ paths:
       tags:
       - Trade V3
       summary: Cancel an order
-      description: Cancels a single order identified by orderId or clOrderId for the
-        given symbol.
+      description: Cancels a single order identified by orderId or clOrderId for the given symbol.
       operationId: cancelOrder
       requestBody:
         content:
@@ -284,13 +277,15 @@ paths:
                     filledSize: 0
                     status: 6
                     timestamp: 1784882345126
+    servers:
+    - url: https://api.btse.com/futures/api
+      description: Production
   /v3/trade/settle_in:
     post:
       tags:
       - Trade V3
       summary: Change settlement currency
-      description: Switches the collateral (settlement) currency of the caller's position
-        on the given symbol.
+      description: Switches the collateral (settlement) currency of the caller's position on the given symbol.
       operationId: settleIn
       requestBody:
         content:
@@ -318,13 +313,15 @@ paths:
                     timestamp: 1784882345085
                     status: 20
                     type: 96
+    servers:
+    - url: https://api.btse.com/futures/api
+      description: Production
   /v3/trade/risk_limit:
     get:
       tags:
       - Trade V3
       summary: Get risk limit
-      description: Returns the currently configured risk-limit tier for the given
-        market.
+      description: Returns the currently configured risk-limit tier for the given market.
       operationId: getRiskLimit
       parameters:
       - name: symbol
@@ -354,8 +351,7 @@ paths:
       tags:
       - Trade V3
       summary: Change risk limit
-      description: Updates the risk-limit tier for a market by either notional value
-        (riskLimit) or tier index (riskLimitLevel).
+      description: Updates the risk-limit tier for a market by either notional value (riskLimit) or tier index (riskLimitLevel).
       operationId: changeRiskLimit
       requestBody:
         content:
@@ -382,16 +378,16 @@ paths:
                     timestamp: 1784882344227
                     status: 20
                     type: 94
-                    message: 'New risk limit set to 1. Initial Margin: 0.01, Maintenance
-                      Margin: 0.005'
+                    message: 'New risk limit set to 1. Initial Margin: 0.01, Maintenance Margin: 0.005'
+    servers:
+    - url: https://api.btse.com/futures/api
+      description: Production
   /v3/trade/positions/tpsl:
     post:
       tags:
       - Trade V3
       summary: Bind take-profit / stop-loss to a position
-      description: Attaches a take-profit and/or stop-loss trigger order to an existing
-        position; at least one of takeProfitTriggerPrice or stopLossTriggerPrice must
-        be provided.
+      description: Attaches a take-profit and/or stop-loss trigger order to an existing position; at least one of takeProfitTriggerPrice or stopLossTriggerPrice must be provided.
       operationId: bindPositionTpSl
       requestBody:
         content:
@@ -432,24 +428,24 @@ paths:
                     positionId: BTC-PERP-USDT
                     timestamp: 1784882344606
                     message: null
+    servers:
+    - url: https://api.btse.com/futures/api
+      description: Production
   /v3/trade/position_mode:
     get:
       tags:
       - Trade V3
       summary: Get position mode
-      description: Returns the current position mode per market, optionally filtered
-        by symbol.
+      description: Returns the current position mode per market, optionally filtered by symbol.
       operationId: getPositionMode
       parameters:
       - name: symbol
         in: query
-        description: Optional market symbol filter (e.g. BTC-PERP). Omit to return
-          position modes for all symbols.
+        description: Optional market symbol filter (e.g. BTC-PERP). Omit to return position modes for all symbols.
         required: false
         schema:
           type: string
-          description: Optional market symbol filter (e.g. BTC-PERP). Omit to return
-            position modes for all symbols.
+          description: Optional market symbol filter (e.g. BTC-PERP). Omit to return position modes for all symbols.
         examples:
           default:
             value: BTC-PERP
@@ -471,8 +467,7 @@ paths:
       tags:
       - Trade V3
       summary: Change position mode
-      description: Switches a market's position mode between ONE_WAY (net position)
-        and HEDGE (independent long and short positions).
+      description: Switches a market's position mode between ONE_WAY (net position) and HEDGE (independent long and short positions).
       operationId: changePositionMode
       requestBody:
         content:
@@ -499,14 +494,15 @@ paths:
                     timestamp: 1784882344272
                     status: 134
                     type: 129
+    servers:
+    - url: https://api.btse.com/futures/api
+      description: Production
   /v3/trade/orders/cancel_all_after:
     post:
       tags:
       - Trade V3
       summary: Cancel all after (dead man's switch)
-      description: Arms a timer that cancels all of the caller's outstanding orders
-        if no follow-up call is received within timeoutMs. Calling again resets the
-        timer; sending 0 disarms it.
+      description: Arms a timer that cancels all of the caller's outstanding orders if no follow-up call is received within timeoutMs. Calling again resets the timer; sending 0 disarms it.
       operationId: cancelAllAfter
       requestBody:
         content:
@@ -529,13 +525,15 @@ paths:
                 default:
                   value:
                     success: true
+    servers:
+    - url: https://api.btse.com/futures/api
+      description: Production
   /v3/trade/orders/algo:
     post:
       tags:
       - Trade V3
       summary: Place an algo order
-      description: 'Places an algorithmic order. Supported orderType variants: OCO,
-        TRAILING, CONDITIONAL, TWAP, and PEG; each variant has its own required fields.'
+      description: 'Places an algorithmic order. Supported orderType variants: OCO, TRAILING, CONDITIONAL, TWAP, and PEG; each variant has its own required fields.'
       operationId: placeAlgoOrder
       parameters:
       - name: BROKER-ID
@@ -725,13 +723,15 @@ paths:
                     positionDirection: null
                     positionId: BTC-PERP-USDT
                     timeInForce: GTC
+    servers:
+    - url: https://api.btse.com/futures/api
+      description: Production
   /v3/trade/leverage:
     get:
       tags:
       - Trade V3
       summary: Get leverage settings
-      description: Returns the current leverage configuration for the given symbol,
-        or the default leverage when the caller has no position on it.
+      description: Returns the current leverage configuration for the given symbol, or the default leverage when the caller has no position on it.
       operationId: getLeverage
       parameters:
       - name: symbol
@@ -765,8 +765,7 @@ paths:
       tags:
       - Trade V3
       summary: Set leverage
-      description: Updates the leverage, margin mode, and position mode for the given
-        symbol.
+      description: Updates the leverage, margin mode, and position mode for the given symbol.
       operationId: changeLeverage
       requestBody:
         content:
@@ -793,69 +792,60 @@ paths:
                     timestamp: 1784882344185
                     status: 20
                     type: 93
-                    message: 'Leverage changed successfully to isolated mode, leverage:
-                      10.0'
+                    message: 'Leverage changed successfully to isolated mode, leverage: 10.0'
+    servers:
+    - url: https://api.btse.com/futures/api
+      description: Production
   /v3/trade/trade_history:
     get:
       tags:
       - Trade V3
       summary: Get trade history
-      description: Returns the caller's historical fills, with optional filters (symbol,
-        time range, cursor, order IDs, client order ID) and pagination.
+      description: Returns the caller's historical fills, with optional filters (symbol, time range, cursor, order IDs, client order ID) and pagination.
       operationId: getTradeHistory
       parameters:
       - name: symbol
         in: query
-        description: Trading symbol filter (e.g., BTC-PERP). Optional; when omitted,
-          fills across all symbols are returned.
+        description: Trading symbol filter (e.g., BTC-PERP). Optional; when omitted, fills across all symbols are returned.
         required: false
         schema:
           type: string
-          description: Trading symbol filter (e.g., BTC-PERP). Optional; when omitted,
-            fills across all symbols are returned.
+          description: Trading symbol filter (e.g., BTC-PERP). Optional; when omitted, fills across all symbols are returned.
         examples:
           default:
             value: BTC-PERP
       - name: startTime
         in: query
-        description: Return only fills executed at or after this Unix timestamp in
-          milliseconds.
+        description: Return only fills executed at or after this Unix timestamp in milliseconds.
         required: false
         schema:
           type: integer
           format: int64
-          description: Return only fills executed at or after this Unix timestamp
-            in milliseconds.
+          description: Return only fills executed at or after this Unix timestamp in milliseconds.
       - name: endTime
         in: query
-        description: Return only fills executed before this Unix timestamp in milliseconds.
-          Must be greater than startTime.
+        description: Return only fills executed before this Unix timestamp in milliseconds. Must be greater than startTime.
         required: false
         schema:
           type: integer
           format: int64
-          description: Return only fills executed before this Unix timestamp in milliseconds.
-            Must be greater than startTime.
+          description: Return only fills executed before this Unix timestamp in milliseconds. Must be greater than startTime.
       - name: beforeSerialId
         in: query
-        description: 'Pagination cursor: return fills with serial id less than this
-          value.'
+        description: 'Pagination cursor: return fills with serial id less than this value.'
         required: false
         schema:
           type: integer
           format: int64
-          description: 'Pagination cursor: return fills with serial id less than this
-            value.'
+          description: 'Pagination cursor: return fills with serial id less than this value.'
       - name: afterSerialId
         in: query
-        description: 'Pagination cursor: return fills with serial id greater than
-          this value.'
+        description: 'Pagination cursor: return fills with serial id greater than this value.'
         required: false
         schema:
           type: integer
           format: int64
-          description: 'Pagination cursor: return fills with serial id greater than
-            this value.'
+          description: 'Pagination cursor: return fills with serial id greater than this value.'
       - name: orderIds
         in: query
         description: Restrict results to fills belonging to these order IDs.
@@ -868,13 +858,11 @@ paths:
             description: Restrict results to fills belonging to these order IDs.
       - name: clOrderId
         in: query
-        description: Restrict results to fills belonging to this client-assigned order
-          ID.
+        description: Restrict results to fills belonging to this client-assigned order ID.
         required: false
         schema:
           type: string
-          description: Restrict results to fills belonging to this client-assigned
-            order ID.
+          description: Restrict results to fills belonging to this client-assigned order ID.
       - name: count
         in: query
         description: Maximum number of fills per page.
@@ -931,24 +919,24 @@ paths:
                     total: -0.00012002
                     serialId: 375598162
                     timestamp: 1784882344446
+    servers:
+    - url: https://api.btse.com/futures/api
+      description: Production
   /v3/trade/positions:
     get:
       tags:
       - Trade V3
       summary: Get open positions
-      description: Returns the caller's open futures positions, optionally filtered
-        by market symbol.
+      description: Returns the caller's open futures positions, optionally filtered by market symbol.
       operationId: getPositions
       parameters:
       - name: symbol
         in: query
-        description: Optional market symbol filter (e.g. BTC-PERP). Omit to return
-          all open positions.
+        description: Optional market symbol filter (e.g. BTC-PERP). Omit to return all open positions.
         required: false
         schema:
           type: string
-          description: Optional market symbol filter (e.g. BTC-PERP). Omit to return
-            all open positions.
+          description: Optional market symbol filter (e.g. BTC-PERP). Omit to return all open positions.
         examples:
           default:
             value: BTC-PERP
@@ -989,8 +977,7 @@ paths:
       tags:
       - Trade V3
       summary: Close a position
-      description: Submits a closing order (LIMIT or MARKET) against an existing position
-        identified by positionId.
+      description: Submits a closing order (LIMIT or MARKET) against an existing position identified by positionId.
       operationId: closePosition
       requestBody:
         content:
@@ -1034,24 +1021,24 @@ paths:
                     positionDirection: null
                     positionId: BTC-PERP-USDT
                     timeInForce: GTC
+    servers:
+    - url: https://api.btse.com/futures/api
+      description: Production
   /v3/trade/margin_setting:
     get:
       tags:
       - Trade V3
       summary: Get margin settings
-      description: Returns the initial and maintenance margin percentages for the
-        specified symbol, or for all supported symbols when no symbol is provided.
+      description: Returns the initial and maintenance margin percentages for the specified symbol, or for all supported symbols when no symbol is provided.
       operationId: getMarginSetting
       parameters:
       - name: symbol
         in: query
-        description: Trading symbol filter (e.g., BTC-PERP). Optional; when omitted,
-          margin settings for all supported symbols are returned.
+        description: Trading symbol filter (e.g., BTC-PERP). Optional; when omitted, margin settings for all supported symbols are returned.
         required: false
         schema:
           type: string
-          description: Trading symbol filter (e.g., BTC-PERP). Optional; when omitted,
-            margin settings for all supported symbols are returned.
+          description: Trading symbol filter (e.g., BTC-PERP). Optional; when omitted, margin settings for all supported symbols are returned.
         examples:
           default:
             value: BTC-PERP
@@ -1070,299 +1057,44 @@ paths:
                   - symbol: BTC-PERP
                     initialMarginPercentage: 0.01
                     maintenanceMarginPercentage: 0.005
+    servers:
+    - url: https://api.btse.com/futures/api
+      description: Production
 components:
   schemas:
-    AmendOrderReq:
-      type: object
-      properties:
-        orderId:
-          type: string
-          description: Server-assigned order id of the order to amend. Required if
-            clOrderId is not provided.
-        clOrderId:
-          type: string
-          description: Client-assigned order id of the order to amend. Required if
-            orderId is not provided.
-        symbol:
-          type: string
-          description: Trading pair symbol of the order to amend.
-        amendType:
-          type: string
-          description: 'Which field to amend: PRICE, SIZE, TRIGGER_PRICE, or ALL.'
-          enum:
-          - PRICE
-          - SIZE
-          - TRIGGER_PRICE
-          - ALL
-        orderSize:
-          type: number
-          format: double
-          description: New order size in number of contracts. Required when amendType
-            is SIZE, or ALL when combined with orderPrice.
-        orderPrice:
-          type: number
-          format: double
-          description: New limit price. Required when amendType is PRICE (unless slide
-            is true) or ALL when combined with orderSize.
-        triggerPrice:
-          type: number
-          format: double
-          description: New trigger price. Required when amendType is TRIGGER_PRICE.
-        slide:
-          type: boolean
-          description: If true and amendType is PRICE, the price is slid to the best
-            available price instead of being taken from orderPrice.
-        totalAmountMode:
-          type: boolean
-          description: If true, orderSize is treated as the desired total original
-            size rather than an incremental change.
-      required:
-      - amendType
-      - symbol
-    AmendOrderResp:
-      type: object
-      properties:
-        orderId:
-          type: string
-          description: Server-assigned order id of the amended order.
-        clOrderId:
-          type: string
-          description: Client-assigned order id echoed from the request.
-        symbol:
-          type: string
-          description: Trading pair symbol of the amended order.
-        orderSide:
-          type: string
-          description: 'Order side: BUY or SELL.'
-          enum:
-          - BUY
-          - SELL
-        type:
-          type: integer
-          format: int32
-          description: Order type code.
-        orderPrice:
-          type: number
-          format: double
-          description: Limit price after the amendment.
-        orderSize:
-          type: number
-          format: double
-          description: Order size after the amendment, in number of contracts.
-        triggerPrice:
-          type: number
-          format: double
-          description: Trigger price after the amendment, if applicable.
-        status:
-          type: integer
-          format: int32
-          description: Order status code after the amendment.
-        timestamp:
-          type: integer
-          format: int64
-          description: Server timestamp of the amendment, in milliseconds since epoch.
-    SettleInReq:
+    ChangeLeverageReq:
       type: object
       properties:
         symbol:
           type: string
-          description: Trading symbol whose position collateral currency should be
-            switched (e.g., BTC-PERP).
-        currency:
-          type: string
-          description: Target settlement currency to hold the position's collateral
-            in (e.g., USDT).
-        positionId:
-          type: string
-          description: Existing position identifier to switch. Optional; when omitted
-            the symbol's default position is used.
-      required:
-      - currency
-      - symbol
-    SettleInResp:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Trading symbol whose position collateral currency was switched.
-        timestamp:
-          type: integer
-          format: int64
-          description: Server processing time, Unix timestamp in milliseconds.
-        status:
-          type: integer
-          format: int32
-          description: Result status code (0 indicates success; non-zero indicates
-            failure).
-        type:
-          type: integer
-          format: int32
-          description: Result type code returned by the trading system.
-    SetRiskLimitReq:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Market symbol to configure (e.g. BTC-PERP).
-        riskLimit:
-          type: integer
-          format: int64
-          description: Target risk-limit notional value. Required if riskLimitLevel
-            is not provided.
-        riskLimitLevel:
-          type: integer
-          format: int32
-          description: Target risk-limit tier index. Required if riskLimit is not
-            provided.
+          description: Trading symbol to update (e.g., BTC-PERP).
+        leverage:
+          type: number
+          description: Target leverage multiplier to apply.
         positionMode:
           type: string
-          description: Position mode of the position the risk limit applies to (ONE_WAY
-            or HEDGE). Required in hedge mode.
-          enum:
-          - ONE_WAY
-          - HEDGE
-          - ISOLATED
-      required:
-      - symbol
-    ChangeRiskLimitResp:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Market symbol that was updated (e.g. BTC-PERP).
-        timestamp:
-          type: integer
-          format: int64
-          description: Server timestamp of the response, in milliseconds since epoch.
-        status:
-          type: integer
-          format: int32
-          description: Status code of the risk-limit change.
-        type:
-          type: integer
-          format: int32
-          description: Event type code of the response.
-        message:
-          type: string
-          description: Human-readable message describing the result.
-    BindPositionTpSlReq:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Market symbol of the position to attach TP/SL to (e.g. BTC-PERP).
-        orderSide:
-          type: string
-          description: Side of the closing trigger order; the opposite of the position
-            direction (SELL for LONG, BUY for SHORT).
-          enum:
-          - BUY
-          - SELL
-        positionMode:
-          type: string
-          description: Position mode of the target position (ONE_WAY or HEDGE). Required
-            in hedge mode to disambiguate.
-          enum:
-          - ONE_WAY
-          - HEDGE
-          - ISOLATED
-        positionId:
-          type: string
-          description: Identifier of the position to attach TP/SL to.
-        takeProfitTriggerType:
-          type: string
-          description: Reference price type used to evaluate the take-profit trigger
-            (INDEX_PRICE, LAST_PRICE, or MARK_PRICE).
-          enum:
-          - INDEX_PRICE
-          - LAST_PRICE
-          - MARK_PRICE
-        takeProfitTriggerPrice:
-          type: number
-          format: double
-          description: Take-profit trigger price. Required if stopLossTriggerPrice
-            is not provided.
-        stopLossTriggerType:
-          type: string
-          description: Reference price type used to evaluate the stop-loss trigger
-            (INDEX_PRICE, LAST_PRICE, or MARK_PRICE).
-          enum:
-          - INDEX_PRICE
-          - LAST_PRICE
-          - MARK_PRICE
-        stopLossTriggerPrice:
-          type: number
-          format: double
-          description: Stop-loss trigger price. Required if takeProfitTriggerPrice
-            is not provided.
-      required:
-      - orderSide
-      - positionId
-      - symbol
-    BindPositionTpSlResp:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Market symbol of the position (e.g. BTC-PERP).
-        status:
-          type: integer
-          format: int32
-          description: Status code of the TP/SL binding.
-        type:
-          type: integer
-          format: int32
-          description: Event type code of the TP/SL response entry (indicates whether
-            it represents take-profit or stop-loss).
-        orderId:
-          type: string
-          description: Server-assigned identifier of the created trigger order.
-        clOrderId:
-          type: string
-          description: Client-assigned order id, if provided in the request.
-        triggerPrice:
-          type: number
-          format: double
-          description: Trigger price at which the take-profit or stop-loss will fire.
-        positionMode:
-          type: string
-          description: Position mode of the target position (ONE_WAY or HEDGE).
+          description: 'Position mode: ONE_WAY (single net position per symbol) or HEDGE (separate long and short positions). Defaults to ONE_WAY when omitted.'
           enum:
           - ONE_WAY
           - HEDGE
           - ISOLATED
         positionDirection:
           type: string
-          description: Position direction of the target position (LONG or SHORT).
+          description: Position direction (LONG or SHORT). Used together with HEDGE position mode to identify which side to update when positionId is not supplied.
           enum:
           - LONG
           - SHORT
+        marginMode:
+          type: string
+          description: 'Margin mode to apply: CROSS or ISOLATED.'
+          enum:
+          - CROSS
+          - ISOLATED
         positionId:
           type: string
-          description: Identifier of the position the trigger is attached to.
-        timestamp:
-          type: integer
-          format: int64
-          description: Server timestamp of the response, in milliseconds since epoch.
-        message:
-          type: string
-          description: Human-readable message describing the result.
-    ChangePositionModeReq:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Market symbol to configure (e.g. BTC-PERP).
-        positionMode:
-          type: string
-          description: 'Target position mode: ONE_WAY (net position) or HEDGE (independent
-            long and short positions).'
-          enum:
-          - ONE_WAY
-          - HEDGE
-          - ISOLATED
+          description: Existing position identifier to update. Optional; disambiguates the target position in hedge mode.
       required:
-      - positionMode
+      - leverage
       - symbol
     ChangePositionModeResp:
       type: object
@@ -1382,178 +1114,7 @@ components:
           type: integer
           format: int32
           description: Event type code of the response.
-    Limit:
-      allOf:
-      - $ref: '#/components/schemas/PlaceOrderReq'
-      - type: object
-        properties:
-          clOrderId:
-            type: string
-            description: Client-assigned order identifier for tracking and idempotency.
-          symbol:
-            type: string
-            description: Trading pair symbol.
-          orderType:
-            type: string
-            description: Order type. Must be LIMIT for this variant.
-            enum:
-            - LIMIT
-            - MARKET
-            - OCO
-            - TWAP
-            - PEG
-            - CONDITIONAL
-            - TRAILING
-          orderSide:
-            type: string
-            description: 'Order side: BUY or SELL.'
-            enum:
-            - BUY
-            - SELL
-          orderSize:
-            type: integer
-            format: int64
-            description: Order size in number of contracts.
-          takeProfitTriggerType:
-            type: string
-            description: Reference price type used to evaluate the take-profit trigger.
-            enum:
-            - INDEX_PRICE
-            - LAST_PRICE
-            - MARK_PRICE
-          stopLossTriggerType:
-            type: string
-            description: Reference price type used to evaluate the stop-loss trigger.
-            enum:
-            - INDEX_PRICE
-            - LAST_PRICE
-            - MARK_PRICE
-          takeProfitTriggerPrice:
-            type: number
-            format: double
-            description: Take-profit trigger price. When reached, an attached take-profit
-              order is fired.
-          stopLossTriggerPrice:
-            type: number
-            format: double
-            description: Stop-loss trigger price. When reached, an attached stop-loss
-              order is fired.
-          positionMode:
-            type: string
-            description: Position mode this order applies to (one-way or hedge).
-            enum:
-            - ONE_WAY
-            - HEDGE
-            - ISOLATED
-          reduceOnly:
-            type: boolean
-            description: If true, the order can only reduce an existing position and
-              cannot open or increase one.
-          timeInForce:
-            type: string
-            description: Time-in-force policy for the limit order. Defaults to GTC
-              when omitted.
-            enum:
-            - FOK
-            - GTC
-            - IOC
-            - HALFSEC
-            - HALFMIN
-            - FIVEMIN
-            - HOUR
-            - TWELVEHOUR
-            - DAY
-            - WEEK
-            - MONTH
-          postOnly:
-            type: boolean
-            description: If true, the order is rejected if it would take liquidity,
-              ensuring maker-only execution.
-          orderPrice:
-            type: number
-            format: double
-            description: Limit price for the order.
-      description: Limit order
-      required:
-      - orderPrice
-      - orderSide
-      - orderSize
-      - orderType
-      - symbol
-    Market:
-      allOf:
-      - $ref: '#/components/schemas/PlaceOrderReq'
-      - type: object
-        properties:
-          clOrderId:
-            type: string
-            description: Client-assigned order identifier for tracking and idempotency.
-          symbol:
-            type: string
-            description: Trading pair symbol.
-          orderType:
-            type: string
-            description: Order type. Must be MARKET for this variant.
-            enum:
-            - LIMIT
-            - MARKET
-            - OCO
-            - TWAP
-            - PEG
-            - CONDITIONAL
-            - TRAILING
-          orderSide:
-            type: string
-            description: 'Order side: BUY or SELL.'
-            enum:
-            - BUY
-            - SELL
-          orderSize:
-            type: integer
-            format: int64
-            description: Order size in number of contracts.
-          takeProfitTriggerType:
-            type: string
-            description: Reference price type used to evaluate the take-profit trigger.
-            enum:
-            - INDEX_PRICE
-            - LAST_PRICE
-            - MARK_PRICE
-          stopLossTriggerType:
-            type: string
-            description: Reference price type used to evaluate the stop-loss trigger.
-            enum:
-            - INDEX_PRICE
-            - LAST_PRICE
-            - MARK_PRICE
-          takeProfitTriggerPrice:
-            type: number
-            format: double
-            description: Take-profit trigger price. When reached, an attached take-profit
-              order is fired.
-          stopLossTriggerPrice:
-            type: number
-            format: double
-            description: Stop-loss trigger price. When reached, an attached stop-loss
-              order is fired.
-          positionMode:
-            type: string
-            description: Position mode this order applies to (one-way or hedge).
-            enum:
-            - ONE_WAY
-            - HEDGE
-            - ISOLATED
-          reduceOnly:
-            type: boolean
-            description: If true, the order can only reduce an existing position and
-              cannot open or increase one.
-      description: Market order
-      required:
-      - orderSide
-      - orderSize
-      - orderType
-      - symbol
-    PlaceOrderReq:
+    PlaceAlgoOrderReq:
       discriminator:
         propertyName: orderType
       properties:
@@ -1561,219 +1122,6 @@ components:
           type: string
       required:
       - orderType
-    PlaceOrderResp:
-      type: object
-      properties:
-        status:
-          type: integer
-          format: int32
-          description: Order status code returned for this placement.
-        type:
-          type: integer
-          format: int32
-          description: Order type code.
-        symbol:
-          type: string
-          description: Trading pair symbol.
-        postOnly:
-          type: boolean
-          description: True if the order was accepted as maker-only.
-        orderSide:
-          type: string
-          description: 'Order side: BUY or SELL.'
-          enum:
-          - BUY
-          - SELL
-        orderId:
-          type: string
-          description: Server-assigned order id.
-        clOrderID:
-          type: string
-          description: Client-assigned order id echoed from the request.
-        timestamp:
-          type: integer
-          format: int64
-          description: Server timestamp of the placement, in milliseconds since epoch.
-        price:
-          type: number
-          format: double
-          description: Limit price submitted with the order.
-        avgFilledPrice:
-          type: number
-          format: double
-          description: Average fill price across executions so far. Zero if nothing
-            has filled.
-        message:
-          type: string
-          description: Human-readable message returned by the platform (e.g. rejection
-            reason).
-        originalOrderSize:
-          type: integer
-          format: int64
-          description: Original order size in number of contracts as submitted.
-        currentOrderSize:
-          type: integer
-          format: int64
-          description: Current remaining order size after fills or amendments.
-        filledSize:
-          type: integer
-          format: int64
-          description: Size filled in the most recent match, in contracts.
-        totalFilledSize:
-          type: integer
-          format: int64
-          description: Cumulative filled size across all matches, in contracts.
-        remainingSize:
-          type: integer
-          format: int64
-          description: Remaining unfilled size, in contracts.
-        positionMode:
-          type: string
-          description: Position mode this order applies to (one-way or hedge).
-          enum:
-          - ONE_WAY
-          - HEDGE
-          - ISOLATED
-        positionDirection:
-          type: string
-          description: 'Position direction the order will affect: LONG or SHORT.'
-          enum:
-          - LONG
-          - SHORT
-        positionId:
-          type: string
-          description: Identifier of the position the order is bound to.
-        timeInForce:
-          type: string
-          description: Time-in-force policy applied to the order (e.g. GTC, IOC, FOK).
-    CancelAllAfterReq:
-      type: object
-      properties:
-        timeoutMs:
-          type: integer
-          format: int64
-          description: Timer duration in milliseconds. If no cancel-all-after request
-            is received again within this window, all of the caller's outstanding
-            orders are cancelled. Send 0 to disarm the timer.
-          minimum: 0
-      required:
-      - timeoutMs
-    CancelAllAfterResp:
-      type: object
-      properties:
-        success:
-          type: boolean
-          description: True if the cancel-all-after timer was successfully armed or
-            updated.
-    Conditional:
-      allOf:
-      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
-      - type: object
-        properties:
-          clOrderId:
-            type: string
-            description: Client-assigned order identifier for tracking and idempotency.
-          symbol:
-            type: string
-            description: Trading pair symbol.
-          orderType:
-            type: string
-            description: Order type. Must be CONDITIONAL for this variant.
-            enum:
-            - LIMIT
-            - MARKET
-            - OCO
-            - TWAP
-            - PEG
-            - CONDITIONAL
-            - TRAILING
-          orderSide:
-            type: string
-            description: 'Order side: BUY or SELL.'
-            enum:
-            - BUY
-            - SELL
-          orderSize:
-            type: integer
-            format: int64
-            description: Order size in number of contracts.
-          positionMode:
-            type: string
-            default: ONE_WAY
-            description: Position mode this order applies to (one-way or hedge).
-            enum:
-            - ONE_WAY
-            - HEDGE
-            - ISOLATED
-          timeInForce:
-            type: string
-            default: GTC
-            description: Time-in-force policy applied once the order is triggered.
-            enum:
-            - FOK
-            - GTC
-            - IOC
-            - HALFSEC
-            - HALFMIN
-            - FIVEMIN
-            - HOUR
-            - TWELVEHOUR
-            - DAY
-            - WEEK
-            - MONTH
-          reduceOnly:
-            type: boolean
-            description: If true, the order can only reduce an existing position and
-              cannot open or increase one.
-          postOnly:
-            type: boolean
-            description: If true, the triggered order is rejected if it would take
-              liquidity, ensuring maker-only execution.
-          orderPrice:
-            type: number
-            format: double
-            description: Limit price used once the order is triggered. Omit for a
-              market-style trigger.
-          triggerPrice:
-            type: number
-            format: double
-            description: Price at which the order becomes active.
-          triggerType:
-            type: string
-            description: Reference price type used to evaluate the trigger.
-            enum:
-            - INDEX_PRICE
-            - LAST_PRICE
-            - MARK_PRICE
-          takeProfitTriggerType:
-            type: string
-            description: Reference price type used to evaluate the take-profit trigger.
-            enum:
-            - INDEX_PRICE
-            - LAST_PRICE
-            - MARK_PRICE
-          stopLossTriggerType:
-            type: string
-            description: Reference price type used to evaluate the stop-loss trigger.
-            enum:
-            - INDEX_PRICE
-            - LAST_PRICE
-            - MARK_PRICE
-          takeProfitTriggerPrice:
-            type: number
-            format: double
-            description: Take-profit trigger price attached to the resulting order.
-          stopLossTriggerPrice:
-            type: number
-            format: double
-            description: Stop-loss trigger price attached to the resulting order.
-      description: Conditional order that stays inactive until its trigger price is
-        reached, then submits a limit or market order.
-      required:
-      - orderSide
-      - orderSize
-      - orderType
-      - symbol
     OcO:
       allOf:
       - $ref: '#/components/schemas/PlaceAlgoOrderReq'
@@ -1835,8 +1183,7 @@ components:
             description: If true, both legs can only reduce an existing position.
           postOnly:
             type: boolean
-            description: If true, each leg is rejected if it would take liquidity,
-              ensuring maker-only execution.
+            description: If true, each leg is rejected if it would take liquidity, ensuring maker-only execution.
           takeProfitOrderPrice:
             type: number
             format: double
@@ -1857,8 +1204,7 @@ components:
             - INDEX_PRICE
             - LAST_PRICE
             - MARK_PRICE
-      description: OCO (One-Cancels-the-Other) order pairing a take-profit and a stop-loss
-        leg; when either leg triggers, the other is automatically cancelled.
+      description: OCO (One-Cancels-the-Other) order pairing a take-profit and a stop-loss leg; when either leg triggers, the other is automatically cancelled.
       required:
       - orderSide
       - orderSize
@@ -1867,288 +1213,6 @@ components:
       - stopLossTriggerPrice
       - symbol
       - takeProfitOrderPrice
-    Peg:
-      allOf:
-      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
-      - type: object
-        properties:
-          clOrderId:
-            type: string
-            description: Client-assigned order identifier for tracking and idempotency.
-          symbol:
-            type: string
-            description: Trading pair symbol.
-          orderType:
-            type: string
-            description: Order type. Must be PEG for this variant.
-            enum:
-            - LIMIT
-            - MARKET
-            - OCO
-            - TWAP
-            - PEG
-            - CONDITIONAL
-            - TRAILING
-          orderSide:
-            type: string
-            description: 'Order side: BUY or SELL.'
-            enum:
-            - BUY
-            - SELL
-          orderSize:
-            type: integer
-            format: int64
-            description: Order size in number of contracts.
-          positionMode:
-            type: string
-            description: Position mode this order applies to (one-way or hedge).
-            enum:
-            - ONE_WAY
-            - HEDGE
-            - ISOLATED
-          orderPrice:
-            type: number
-            format: double
-            description: Optional worst-price limit; the pegged price will not cross
-              this bound.
-          deviation:
-            type: number
-            format: double
-            description: Offset applied to the pegged reference price.
-          stealth:
-            type: number
-            format: double
-            description: Portion of the order size displayed on the book; the remainder
-              is hidden.
-      description: Peg order whose working price automatically tracks the best bid
-        or ask, offset by an optional deviation.
-      required:
-      - deviation
-      - orderSide
-      - orderSize
-      - orderType
-      - stealth
-      - symbol
-    PlaceAlgoOrderReq:
-      discriminator:
-        propertyName: orderType
-      properties:
-        orderType:
-          type: string
-      required:
-      - orderType
-    Trailing:
-      allOf:
-      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
-      - type: object
-        properties:
-          clOrderId:
-            type: string
-            description: Client-assigned order identifier for tracking and idempotency.
-          symbol:
-            type: string
-            description: Trading pair symbol.
-          orderType:
-            type: string
-            description: Order type. Must be TRAILING for this variant.
-            enum:
-            - LIMIT
-            - MARKET
-            - OCO
-            - TWAP
-            - PEG
-            - CONDITIONAL
-            - TRAILING
-          orderSide:
-            type: string
-            description: 'Order side: BUY or SELL.'
-            enum:
-            - BUY
-            - SELL
-          orderSize:
-            type: integer
-            format: int64
-            description: Order size in number of contracts.
-          positionMode:
-            type: string
-            default: ONE_WAY
-            description: Position mode this order applies to (one-way or hedge).
-            enum:
-            - ONE_WAY
-            - HEDGE
-            - ISOLATED
-          reduceOnly:
-            type: boolean
-            description: If true, the order can only reduce an existing position and
-              cannot open or increase one.
-          trailValue:
-            type: number
-            format: double
-            description: Trailing distance the stop price maintains from the best
-              reached reference price.
-          trailValueType:
-            type: string
-            description: How trailValue is interpreted (absolute price offset or percentage).
-            enum:
-            - DISTANCE
-            - PERCENTAGE
-          trailTriggerPriceType:
-            type: string
-            description: Reference price type used to evaluate the trailing trigger.
-            enum:
-            - INDEX_PRICE
-            - LAST_PRICE
-            - MARK_PRICE
-          activationTriggerPrice:
-            type: number
-            format: double
-            description: Optional price at which the trailing logic starts. Trailing
-              is inactive until this price is reached.
-          activationTriggerType:
-            type: string
-            description: Reference price type used to evaluate the activation price.
-            enum:
-            - INDEX_PRICE
-            - LAST_PRICE
-            - MARK_PRICE
-      description: Trailing stop order that follows the market by a fixed distance
-        and triggers when the reference price retraces beyond that distance from the
-        best reached level.
-      required:
-      - orderSide
-      - orderSize
-      - orderType
-      - symbol
-      - trailTriggerPriceType
-      - trailValue
-      - trailValueType
-    Twap:
-      allOf:
-      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
-      - type: object
-        properties:
-          clOrderId:
-            type: string
-            description: Client-assigned order identifier for tracking and idempotency.
-          symbol:
-            type: string
-            description: Trading pair symbol.
-          orderType:
-            type: string
-            description: Order type. Must be TWAP for this variant.
-            enum:
-            - LIMIT
-            - MARKET
-            - OCO
-            - TWAP
-            - PEG
-            - CONDITIONAL
-            - TRAILING
-          orderSide:
-            type: string
-            description: 'Order side: BUY or SELL.'
-            enum:
-            - BUY
-            - SELL
-          orderSize:
-            type: integer
-            format: int64
-            description: Total order size in number of contracts, distributed across
-              child orders.
-          reduceOnly:
-            type: boolean
-            description: If true, the order can only reduce an existing position and
-              cannot open or increase one.
-          timePeriod:
-            type: integer
-            format: int64
-            description: Total execution window in seconds over which child orders
-              are dispatched.
-            maximum: 86400
-            minimum: 60
-          randomizeSize:
-            type: boolean
-            description: If true, individual child order sizes are randomized within
-              limits to reduce predictability.
-          subTwapMaxOrderSize:
-            type: number
-            format: double
-            description: Maximum size of each child order.
-          maxSpread:
-            type: number
-            format: double
-            description: Maximum acceptable bid-ask spread. Child orders are paused
-              when the spread is wider.
-          makerFirst:
-            type: boolean
-            description: If true, child orders prefer maker execution before falling
-              back to taker behavior.
-          maxDistanceThroughBook:
-            type: number
-            format: double
-            description: Maximum distance a child order may cross into the order book.
-          pausePrice:
-            type: number
-            format: double
-            description: Reference price beyond which the TWAP schedule pauses to
-              avoid adverse execution.
-          activationTriggerPrice:
-            type: number
-            format: double
-            description: Optional price at which the TWAP schedule begins. Inactive
-              until this price is reached.
-          activationTriggerType:
-            type: string
-            description: Reference price type used to evaluate the activation price.
-            enum:
-            - INDEX_PRICE
-            - LAST_PRICE
-            - MARK_PRICE
-      description: TWAP (Time-Weighted Average Price) order that splits the parent
-        size into smaller child orders spread over a fixed time window.
-      required:
-      - orderSide
-      - orderSize
-      - orderType
-      - symbol
-    ChangeLeverageReq:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Trading symbol to update (e.g., BTC-PERP).
-        leverage:
-          type: number
-          description: Target leverage multiplier to apply.
-        positionMode:
-          type: string
-          description: 'Position mode: ONE_WAY (single net position per symbol) or
-            HEDGE (separate long and short positions). Defaults to ONE_WAY when omitted.'
-          enum:
-          - ONE_WAY
-          - HEDGE
-          - ISOLATED
-        positionDirection:
-          type: string
-          description: Position direction (LONG or SHORT). Used together with HEDGE
-            position mode to identify which side to update when positionId is not
-            supplied.
-          enum:
-          - LONG
-          - SHORT
-        marginMode:
-          type: string
-          description: 'Margin mode to apply: CROSS or ISOLATED.'
-          enum:
-          - CROSS
-          - ISOLATED
-        positionId:
-          type: string
-          description: Existing position identifier to update. Optional; disambiguates
-            the target position in hedge mode.
-      required:
-      - leverage
-      - symbol
     ChangeLeverageResp:
       type: object
       properties:
@@ -2162,8 +1226,7 @@ components:
         status:
           type: integer
           format: int32
-          description: Result status code (0 indicates success; non-zero indicates
-            failure).
+          description: Result status code (0 indicates success; non-zero indicates failure).
         type:
           type: integer
           format: int32
@@ -2171,558 +1234,6 @@ components:
         message:
           type: string
           description: Human-readable status message; typically populated on failure.
-    TradeHistoryResp:
-      type: object
-      properties:
-        tradeId:
-          type: string
-          description: Unique fill (trade) identifier.
-        orderId:
-          type: string
-          description: Order identifier this fill belongs to.
-        clOrderId:
-          type: string
-          description: Client-assigned order identifier this fill belongs to.
-        positionId:
-          type: string
-          description: Position identifier this fill contributed to.
-        orderSide:
-          type: string
-          description: 'Trade side: BUY or SELL.'
-          enum:
-          - BUY
-          - SELL
-        type:
-          type: integer
-          format: int32
-          description: Numeric order type code of the order that produced this fill.
-        orderDetailType:
-          type: string
-          description: Detailed classification of the fill (e.g., regular trade, liquidation,
-            funding).
-          enum:
-          - TWAP
-          - PARTIAL_LIQUIDATION
-          - FORCED_MARKET_BUY
-          - FORCED_MARKET_SELL
-        price:
-          type: number
-          format: double
-          description: Order price originally submitted by the user.
-        size:
-          type: integer
-          format: int64
-          description: Original order size, in contracts.
-        avgFilledPrice:
-          type: number
-          format: double
-          description: Execution price of this fill.
-        filledSize:
-          type: integer
-          format: int64
-          description: Filled quantity of this fill, in contracts.
-        triggerPrice:
-          type: number
-          format: double
-          description: Trigger price for stop/trigger orders; 0 when not applicable.
-        contractSize:
-          type: number
-          format: double
-          description: Contract multiplier for the symbol at the time of the fill.
-        base:
-          type: string
-          description: Base currency of the trading symbol.
-        quote:
-          type: string
-          description: Quote currency of the trading symbol.
-        symbol:
-          type: string
-          description: Trading symbol.
-        wallet:
-          type: string
-          description: Wallet name associated with the fill.
-        feeCurrency:
-          type: string
-          description: Currency the fee was charged in.
-        feeAmount:
-          type: number
-          format: double
-          description: Fee amount charged for this fill.
-        realizedPnl:
-          type: number
-          format: double
-          description: Realized profit or loss from this fill, in the quote currency.
-        total:
-          type: number
-          format: double
-          description: Total notional value of this fill (price * filled size * contract
-            size).
-        serialId:
-          type: integer
-          format: int32
-          description: Monotonically increasing serial id used for cursor-based pagination.
-        timestamp:
-          type: integer
-          format: int64
-          description: Fill execution time, Unix timestamp in milliseconds.
-    GetRiskLimitResp:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Market symbol the risk limit applies to (e.g. BTC-PERP).
-        riskLimit:
-          type: integer
-          format: int64
-          description: Current risk-limit notional value configured for the symbol.
-        riskLimitLevel:
-          type: integer
-          format: int32
-          description: Current risk-limit tier index configured for the symbol.
-    PositionResp:
-      type: object
-      properties:
-        marginType:
-          type: string
-          description: Margin mode of the position (e.g. CROSS or ISOLATED).
-          enum:
-          - CROSS
-          - SPOT
-          - ISOLATED
-          - LEAD
-          - COPY
-          - ALL
-        entryPrice:
-          type: number
-          format: double
-          description: Average entry price of the position.
-        markPrice:
-          type: number
-          format: double
-          description: Latest mark price used to value the position.
-        symbol:
-          type: string
-          description: Market symbol of the position (e.g. BTC-PERP).
-        side:
-          type: string
-          description: Side of the position (BUY for long, SELL for short).
-          enum:
-          - BUY
-          - SELL
-        notionalValue:
-          type: number
-          format: double
-          description: Notional value of the position, in the settlement currency.
-        settleWithAsset:
-          type: string
-          description: Asset used to settle PnL and fees for this position.
-        unrealizedProfitLoss:
-          type: number
-          format: double
-          description: Unrealized profit or loss at the latest mark price.
-        totalMaintenanceMargin:
-          type: number
-          format: double
-          description: Total maintenance margin currently required for the position.
-        size:
-          type: integer
-          format: int32
-          description: Position size, in contracts.
-        liquidationPrice:
-          type: number
-          format: double
-          description: Estimated liquidation price based on the current margin and
-            mark price.
-        isolatedLeverage:
-          type: number
-          format: double
-          description: Isolated leverage configured on the position; only applicable
-            in isolated margin mode.
-        timestamp:
-          type: integer
-          format: int64
-          description: Server timestamp of the position snapshot, in milliseconds
-            since epoch.
-        takeProfitOrder:
-          $ref: '#/components/schemas/TPSLObject'
-          description: Take-profit trigger currently attached to the position, if
-            any.
-        stopLossOrder:
-          $ref: '#/components/schemas/TPSLObject'
-          description: Stop-loss trigger currently attached to the position, if any.
-        positionMode:
-          type: string
-          description: 'Position mode: ONE_WAY (net position) or HEDGE (independent
-            long and short positions).'
-          enum:
-          - ONE_WAY
-          - HEDGE
-          - ISOLATED
-        positionDirection:
-          type: string
-          description: Position direction in hedge mode (LONG or SHORT).
-          enum:
-          - LONG
-          - SHORT
-        positionId:
-          type: string
-          description: Unique identifier of the position.
-        walletName:
-          type: string
-          description: Name of the wallet holding the position.
-        currentLeverage:
-          type: number
-          format: double
-          description: Effective leverage currently applied to the position.
-        minimumRequiredMargin:
-          type: number
-          format: double
-          description: Minimum initial margin required to hold the position at its
-            current size.
-    TPSLObject:
-      type: object
-      properties:
-        orderId:
-          type: string
-        side:
-          type: string
-          enum:
-          - BUY
-          - SELL
-        triggerPrice:
-          type: number
-          format: double
-        triggerUseLastPrice:
-          type: boolean
-    PositionModeResp:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Market symbol the position mode applies to (e.g. BTC-PERP).
-        positionMode:
-          type: string
-          description: 'Current position mode: ONE_WAY (net position) or HEDGE (independent
-            long and short positions).'
-          enum:
-          - ONE_WAY
-          - HEDGE
-          - ISOLATED
-    OrderResp:
-      type: object
-      properties:
-        orderId:
-          type: string
-          description: Server-assigned order id.
-        clOrderId:
-          type: string
-          description: Client-assigned order id echoed from placement.
-        symbol:
-          type: string
-          description: Trading pair symbol.
-        orderSide:
-          type: string
-          description: 'Order side: BUY or SELL.'
-          enum:
-          - BUY
-          - SELL
-        type:
-          type: integer
-          format: int32
-          description: Order type code.
-        orderPrice:
-          type: number
-          format: double
-          description: Limit price of the order.
-        originalOrderSize:
-          type: integer
-          format: int32
-          description: Original order size in number of contracts at placement.
-        currentOrderSize:
-          type: integer
-          format: int32
-          description: Current remaining order size in number of contracts after fills
-            and amendments.
-        totalFilledSize:
-          type: integer
-          format: int32
-          description: Cumulative filled size in number of contracts.
-        remainingSize:
-          type: integer
-          format: int32
-          description: Remaining unfilled size in number of contracts.
-        averageFillPrice:
-          type: number
-          format: double
-          description: Average fill price across executions so far.
-        orderState:
-          type: string
-          description: Human-readable order state name.
-        timestamp:
-          type: integer
-          format: int64
-          description: Server timestamp of the last state change, in milliseconds
-            since epoch.
-        reduceOnly:
-          type: boolean
-          description: True if the order can only reduce an existing position.
-        positionMode:
-          type: string
-          description: Position mode this order applies to (one-way or hedge).
-          enum:
-          - ONE_WAY
-          - HEDGE
-          - ISOLATED
-        positionDirection:
-          type: string
-          description: 'Position direction the order affects: LONG or SHORT.'
-          enum:
-          - LONG
-          - SHORT
-        positionId:
-          type: string
-          description: Identifier of the position the order is bound to.
-        closeOrder:
-          type: boolean
-          description: True if the order is a close-position order.
-        pegPriceMin:
-          type: number
-          format: double
-          description: Lower bound of the peg order price band.
-        pegPriceMax:
-          type: number
-          format: double
-          description: Upper bound of the peg order price band.
-        pegPriceDeviation:
-          type: number
-          format: double
-          description: Offset applied to the pegged reference price.
-        currentPegPrice:
-          type: number
-          format: double
-          description: Current pegged working price.
-        triggerOrder:
-          type: boolean
-          description: True if this order is a conditional trigger order that has
-            not yet fired.
-        triggered:
-          type: boolean
-          description: True once the trigger condition has fired.
-        triggerPrice:
-          type: number
-          format: double
-          description: Configured trigger price.
-        triggerOriginalPrice:
-          type: number
-          format: double
-          description: Original submitted trigger price prior to any amendment.
-        triggerOrderType:
-          type: integer
-          format: int32
-          description: Order type code the trigger will submit once fired.
-        triggerTrailingStopDeviation:
-          type: number
-          format: double
-          description: Trailing distance for the trigger's trailing-stop behavior.
-        triggerStopPrice:
-          type: number
-          format: double
-          description: Stop price used by the triggered order once activated.
-        triggerUseLastPrice:
-          type: boolean
-          description: True if last-traded-price is used as the trigger reference,
-            otherwise mark price is used.
-        trailValue:
-          type: number
-          format: double
-          description: Trailing distance the stop maintains from the best reached
-            reference price.
-        trailValueType:
-          type: string
-          description: How trailValue is interpreted (absolute price offset or percentage).
-          enum:
-          - DISTANCE
-          - PERCENTAGE
-        activationPrice:
-          type: number
-          format: double
-          description: Price at which trailing or scheduled logic activates.
-        activationPriceType:
-          type: string
-          description: Reference price type used to evaluate the activation price.
-          enum:
-          - INDEX_PRICE
-          - LAST_PRICE
-          - MARK_PRICE
-        takeProfitOrder:
-          $ref: '#/components/schemas/TriggerOrderResp'
-          description: Attached take-profit trigger, if any.
-        stopLossOrder:
-          $ref: '#/components/schemas/TriggerOrderResp'
-          description: Attached stop-loss trigger, if any.
-        cancelDuration:
-          type: integer
-          format: int64
-          description: Cancel duration in milliseconds derived from time-in-force.
-            Zero for GTC.
-        timeInForce:
-          type: string
-          description: Time-in-force policy applied to the order (e.g. GTC, IOC, FOK).
-        stealth:
-          type: number
-          format: double
-          description: Portion of the order size displayed on the book; the remainder
-            is hidden.
-        contractSize:
-          type: number
-          format: double
-          description: Contract size (units of underlying per contract) for this symbol.
-        wrapperOrder:
-          type: boolean
-          description: True if the order is a wrapper that spawns child orders (e.g.
-            activation wrappers).
-        ocoPeerOrderId:
-          type: string
-          description: Order id of the peer OCO leg, if this order is part of an OCO
-            pair.
-        orderDetailType:
-          type: string
-          description: Fine-grained order detail type classification.
-          enum:
-          - TWAP
-          - PARTIAL_LIQUIDATION
-          - FORCED_MARKET_BUY
-          - FORCED_MARKET_SELL
-        originalOrderValue:
-          type: number
-          format: double
-          description: Notional value at placement, computed from original size, contract
-            size and reference price.
-        currentOrderValue:
-          type: number
-          format: double
-          description: Current notional value, computed from remaining size, contract
-            size and current working price.
-    TriggerOrderResp:
-      type: object
-      properties:
-        orderId:
-          type: string
-          description: Server-assigned order id of the attached trigger order.
-        side:
-          type: string
-          description: 'Order side of the trigger leg: BUY or SELL.'
-          enum:
-          - BUY
-          - SELL
-        triggerPrice:
-          type: number
-          format: double
-          description: Price at which this trigger fires.
-        triggerUseLastPrice:
-          type: boolean
-          description: True if last-traded-price is used as the trigger reference,
-            otherwise mark price is used.
-    MarginSettingResp:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Trading symbol.
-        initialMarginPercentage:
-          type: number
-          format: double
-          description: Initial margin percentage required to open a position on this
-            symbol.
-        maintenanceMarginPercentage:
-          type: number
-          format: double
-          description: Maintenance margin percentage required to keep a position open
-            on this symbol.
-    LeverageResp:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Trading symbol.
-        leverage:
-          type: number
-          format: double
-          description: Effective leverage multiplier for the position, or the default
-            leverage when the user has no position on this symbol.
-        marginMode:
-          type: string
-          description: 'Margin mode: CROSS or ISOLATED.'
-          enum:
-          - CROSS
-          - ISOLATED
-        positionMode:
-          type: string
-          description: 'Position mode: ONE_WAY or HEDGE. Null when the user has no
-            position on this symbol.'
-          enum:
-          - ONE_WAY
-          - HEDGE
-          - ISOLATED
-        positionDirection:
-          type: string
-          description: Position direction (LONG or SHORT) for hedge-mode positions;
-            null otherwise.
-          enum:
-          - LONG
-          - SHORT
-    ClosePositionReq:
-      type: object
-      properties:
-        symbol:
-          type: string
-          description: Market symbol of the position to close (e.g. BTC-PERP).
-        positionId:
-          type: string
-          description: Identifier of the position to close.
-        orderType:
-          type: string
-          description: Order type used to close the position (LIMIT or MARKET).
-          enum:
-          - LIMIT
-          - MARKET
-          - OCO
-          - TWAP
-          - PEG
-          - CONDITIONAL
-          - TRAILING
-        orderPrice:
-          type: number
-          format: double
-          description: Limit price for the closing order. Required when orderType
-            == LIMIT.
-        postOnly:
-          type: boolean
-          description: If true, the closing order will only be placed as a maker;
-            otherwise it is cancelled.
-        timeInForce:
-          type: string
-          default: GTC
-          description: Time-in-force for the closing order. Defaults to GTC when omitted.
-          enum:
-          - FOK
-          - GTC
-          - IOC
-          - HALFSEC
-          - HALFMIN
-          - FIVEMIN
-          - HOUR
-          - TWELVEHOUR
-          - DAY
-          - WEEK
-          - MONTH
-        clOrderId:
-          type: string
-          description: Optional client-assigned order id echoed back in the response.
-      required:
-      - orderType
-      - positionId
-      - symbol
     ClosePositionResp:
       type: object
       properties:
@@ -2805,24 +1316,276 @@ components:
           description: Identifier of the position being closed.
         timeInForce:
           type: string
-          description: Time-in-force applied to the closing order (e.g. GTC, IOC,
-            FOK).
-    CancelOrderReq:
+          description: Time-in-force applied to the closing order (e.g. GTC, IOC, FOK).
+    BindPositionTpSlReq:
       type: object
       properties:
         symbol:
           type: string
-          description: Trading pair symbol of the order to cancel.
+          description: Market symbol of the position to attach TP/SL to (e.g. BTC-PERP).
+        orderSide:
+          type: string
+          description: Side of the closing trigger order; the opposite of the position direction (SELL for LONG, BUY for SHORT).
+          enum:
+          - BUY
+          - SELL
+        positionMode:
+          type: string
+          description: Position mode of the target position (ONE_WAY or HEDGE). Required in hedge mode to disambiguate.
+          enum:
+          - ONE_WAY
+          - HEDGE
+          - ISOLATED
+        positionId:
+          type: string
+          description: Identifier of the position to attach TP/SL to.
+        takeProfitTriggerType:
+          type: string
+          description: Reference price type used to evaluate the take-profit trigger (INDEX_PRICE, LAST_PRICE, or MARK_PRICE).
+          enum:
+          - INDEX_PRICE
+          - LAST_PRICE
+          - MARK_PRICE
+        takeProfitTriggerPrice:
+          type: number
+          format: double
+          description: Take-profit trigger price. Required if stopLossTriggerPrice is not provided.
+        stopLossTriggerType:
+          type: string
+          description: Reference price type used to evaluate the stop-loss trigger (INDEX_PRICE, LAST_PRICE, or MARK_PRICE).
+          enum:
+          - INDEX_PRICE
+          - LAST_PRICE
+          - MARK_PRICE
+        stopLossTriggerPrice:
+          type: number
+          format: double
+          description: Stop-loss trigger price. Required if takeProfitTriggerPrice is not provided.
+      required:
+      - orderSide
+      - positionId
+      - symbol
+    AmendOrderReq:
+      type: object
+      properties:
         orderId:
           type: string
-          description: Server-assigned order id to cancel. Required if clOrderId is
-            not provided.
+          description: Server-assigned order id of the order to amend. Required if clOrderId is not provided.
         clOrderId:
           type: string
-          description: Client-assigned order id to cancel. Required if orderId is
-            not provided.
+          description: Client-assigned order id of the order to amend. Required if orderId is not provided.
+        symbol:
+          type: string
+          description: Trading pair symbol of the order to amend.
+        amendType:
+          type: string
+          description: 'Which field to amend: PRICE, SIZE, TRIGGER_PRICE, or ALL.'
+          enum:
+          - PRICE
+          - SIZE
+          - TRIGGER_PRICE
+          - ALL
+        orderSize:
+          type: number
+          format: double
+          description: New order size in number of contracts. Required when amendType is SIZE, or ALL when combined with orderPrice.
+        orderPrice:
+          type: number
+          format: double
+          description: New limit price. Required when amendType is PRICE (unless slide is true) or ALL when combined with orderSize.
+        triggerPrice:
+          type: number
+          format: double
+          description: New trigger price. Required when amendType is TRIGGER_PRICE.
+        slide:
+          type: boolean
+          description: If true and amendType is PRICE, the price is slid to the best available price instead of being taken from orderPrice.
+        totalAmountMode:
+          type: boolean
+          description: If true, orderSize is treated as the desired total original size rather than an incremental change.
       required:
+      - amendType
       - symbol
+    Market:
+      allOf:
+      - $ref: '#/components/schemas/PlaceOrderReq'
+      - type: object
+        properties:
+          clOrderId:
+            type: string
+            description: Client-assigned order identifier for tracking and idempotency.
+          symbol:
+            type: string
+            description: Trading pair symbol.
+          orderType:
+            type: string
+            description: Order type. Must be MARKET for this variant.
+            enum:
+            - LIMIT
+            - MARKET
+            - OCO
+            - TWAP
+            - PEG
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: 'Order side: BUY or SELL.'
+            enum:
+            - BUY
+            - SELL
+          orderSize:
+            type: integer
+            format: int64
+            description: Order size in number of contracts.
+          takeProfitTriggerType:
+            type: string
+            description: Reference price type used to evaluate the take-profit trigger.
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+          stopLossTriggerType:
+            type: string
+            description: Reference price type used to evaluate the stop-loss trigger.
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+          takeProfitTriggerPrice:
+            type: number
+            format: double
+            description: Take-profit trigger price. When reached, an attached take-profit order is fired.
+          stopLossTriggerPrice:
+            type: number
+            format: double
+            description: Stop-loss trigger price. When reached, an attached stop-loss order is fired.
+          positionMode:
+            type: string
+            description: Position mode this order applies to (one-way or hedge).
+            enum:
+            - ONE_WAY
+            - HEDGE
+            - ISOLATED
+          reduceOnly:
+            type: boolean
+            description: If true, the order can only reduce an existing position and cannot open or increase one.
+      description: Market order
+      required:
+      - orderSide
+      - orderSize
+      - orderType
+      - symbol
+    TradeHistoryResp:
+      type: object
+      properties:
+        tradeId:
+          type: string
+          description: Unique fill (trade) identifier.
+        orderId:
+          type: string
+          description: Order identifier this fill belongs to.
+        clOrderId:
+          type: string
+          description: Client-assigned order identifier this fill belongs to.
+        positionId:
+          type: string
+          description: Position identifier this fill contributed to.
+        orderSide:
+          type: string
+          description: 'Trade side: BUY or SELL.'
+          enum:
+          - BUY
+          - SELL
+        type:
+          type: integer
+          format: int32
+          description: Numeric order type code of the order that produced this fill.
+        orderDetailType:
+          type: string
+          description: Detailed classification of the fill (e.g., regular trade, liquidation, funding).
+          enum:
+          - TWAP
+          - PARTIAL_LIQUIDATION
+          - FORCED_MARKET_BUY
+          - FORCED_MARKET_SELL
+        price:
+          type: number
+          format: double
+          description: Order price originally submitted by the user.
+        size:
+          type: integer
+          format: int64
+          description: Original order size, in contracts.
+        avgFilledPrice:
+          type: number
+          format: double
+          description: Execution price of this fill.
+        filledSize:
+          type: integer
+          format: int64
+          description: Filled quantity of this fill, in contracts.
+        triggerPrice:
+          type: number
+          format: double
+          description: Trigger price for stop/trigger orders; 0 when not applicable.
+        contractSize:
+          type: number
+          format: double
+          description: Contract multiplier for the symbol at the time of the fill.
+        base:
+          type: string
+          description: Base currency of the trading symbol.
+        quote:
+          type: string
+          description: Quote currency of the trading symbol.
+        symbol:
+          type: string
+          description: Trading symbol.
+        wallet:
+          type: string
+          description: Wallet name associated with the fill.
+        feeCurrency:
+          type: string
+          description: Currency the fee was charged in.
+        feeAmount:
+          type: number
+          format: double
+          description: Fee amount charged for this fill.
+        realizedPnl:
+          type: number
+          format: double
+          description: Realized profit or loss from this fill, in the quote currency.
+        total:
+          type: number
+          format: double
+          description: Total notional value of this fill (price * filled size * contract size).
+        serialId:
+          type: integer
+          format: int32
+          description: Monotonically increasing serial id used for cursor-based pagination.
+        timestamp:
+          type: integer
+          format: int64
+          description: Fill execution time, Unix timestamp in milliseconds.
+    SettleInResp:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Trading symbol whose position collateral currency was switched.
+        timestamp:
+          type: integer
+          format: int64
+          description: Server processing time, Unix timestamp in milliseconds.
+        status:
+          type: integer
+          format: int32
+          description: Result status code (0 indicates success; non-zero indicates failure).
+        type:
+          type: integer
+          format: int32
+          description: Result type code returned by the trading system.
     CancelOrderResp:
       type: object
       properties:
@@ -2864,8 +1627,1141 @@ components:
         timestamp:
           type: integer
           format: int64
-          description: Server timestamp of the cancellation, in milliseconds since
-            epoch.
+          description: Server timestamp of the cancellation, in milliseconds since epoch.
+    GetRiskLimitResp:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Market symbol the risk limit applies to (e.g. BTC-PERP).
+        riskLimit:
+          type: integer
+          format: int64
+          description: Current risk-limit notional value configured for the symbol.
+        riskLimitLevel:
+          type: integer
+          format: int32
+          description: Current risk-limit tier index configured for the symbol.
+    TPSLObject:
+      type: object
+      properties:
+        orderId:
+          type: string
+        side:
+          type: string
+          enum:
+          - BUY
+          - SELL
+        triggerPrice:
+          type: number
+          format: double
+        triggerUseLastPrice:
+          type: boolean
+    Peg:
+      allOf:
+      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
+      - type: object
+        properties:
+          clOrderId:
+            type: string
+            description: Client-assigned order identifier for tracking and idempotency.
+          symbol:
+            type: string
+            description: Trading pair symbol.
+          orderType:
+            type: string
+            description: Order type. Must be PEG for this variant.
+            enum:
+            - LIMIT
+            - MARKET
+            - OCO
+            - TWAP
+            - PEG
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: 'Order side: BUY or SELL.'
+            enum:
+            - BUY
+            - SELL
+          orderSize:
+            type: integer
+            format: int64
+            description: Order size in number of contracts.
+          positionMode:
+            type: string
+            description: Position mode this order applies to (one-way or hedge).
+            enum:
+            - ONE_WAY
+            - HEDGE
+            - ISOLATED
+          orderPrice:
+            type: number
+            format: double
+            description: Optional worst-price limit; the pegged price will not cross this bound.
+          deviation:
+            type: number
+            format: double
+            description: Offset applied to the pegged reference price.
+          stealth:
+            type: number
+            format: double
+            description: Portion of the order size displayed on the book; the remainder is hidden.
+      description: Peg order whose working price automatically tracks the best bid or ask, offset by an optional deviation.
+      required:
+      - deviation
+      - orderSide
+      - orderSize
+      - orderType
+      - stealth
+      - symbol
+    SettleInReq:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Trading symbol whose position collateral currency should be switched (e.g., BTC-PERP).
+        currency:
+          type: string
+          description: Target settlement currency to hold the position's collateral in (e.g., USDT).
+        positionId:
+          type: string
+          description: Existing position identifier to switch. Optional; when omitted the symbol's default position is used.
+      required:
+      - currency
+      - symbol
+    ChangeRiskLimitResp:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Market symbol that was updated (e.g. BTC-PERP).
+        timestamp:
+          type: integer
+          format: int64
+          description: Server timestamp of the response, in milliseconds since epoch.
+        status:
+          type: integer
+          format: int32
+          description: Status code of the risk-limit change.
+        type:
+          type: integer
+          format: int32
+          description: Event type code of the response.
+        message:
+          type: string
+          description: Human-readable message describing the result.
+    PositionResp:
+      type: object
+      properties:
+        marginType:
+          type: string
+          description: Margin mode of the position (e.g. CROSS or ISOLATED).
+          enum:
+          - CROSS
+          - SPOT
+          - ISOLATED
+          - LEAD
+          - COPY
+          - ALL
+        entryPrice:
+          type: number
+          format: double
+          description: Average entry price of the position.
+        markPrice:
+          type: number
+          format: double
+          description: Latest mark price used to value the position.
+        symbol:
+          type: string
+          description: Market symbol of the position (e.g. BTC-PERP).
+        side:
+          type: string
+          description: Side of the position (BUY for long, SELL for short).
+          enum:
+          - BUY
+          - SELL
+        notionalValue:
+          type: number
+          format: double
+          description: Notional value of the position, in the settlement currency.
+        settleWithAsset:
+          type: string
+          description: Asset used to settle PnL and fees for this position.
+        unrealizedProfitLoss:
+          type: number
+          format: double
+          description: Unrealized profit or loss at the latest mark price.
+        totalMaintenanceMargin:
+          type: number
+          format: double
+          description: Total maintenance margin currently required for the position.
+        size:
+          type: integer
+          format: int32
+          description: Position size, in contracts.
+        liquidationPrice:
+          type: number
+          format: double
+          description: Estimated liquidation price based on the current margin and mark price.
+        isolatedLeverage:
+          type: number
+          format: double
+          description: Isolated leverage configured on the position; only applicable in isolated margin mode.
+        timestamp:
+          type: integer
+          format: int64
+          description: Server timestamp of the position snapshot, in milliseconds since epoch.
+        takeProfitOrder:
+          $ref: '#/components/schemas/TPSLObject'
+          description: Take-profit trigger currently attached to the position, if any.
+        stopLossOrder:
+          $ref: '#/components/schemas/TPSLObject'
+          description: Stop-loss trigger currently attached to the position, if any.
+        positionMode:
+          type: string
+          description: 'Position mode: ONE_WAY (net position) or HEDGE (independent long and short positions).'
+          enum:
+          - ONE_WAY
+          - HEDGE
+          - ISOLATED
+        positionDirection:
+          type: string
+          description: Position direction in hedge mode (LONG or SHORT).
+          enum:
+          - LONG
+          - SHORT
+        positionId:
+          type: string
+          description: Unique identifier of the position.
+        walletName:
+          type: string
+          description: Name of the wallet holding the position.
+        currentLeverage:
+          type: number
+          format: double
+          description: Effective leverage currently applied to the position.
+        minimumRequiredMargin:
+          type: number
+          format: double
+          description: Minimum initial margin required to hold the position at its current size.
+    OrderResp:
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: Server-assigned order id.
+        clOrderId:
+          type: string
+          description: Client-assigned order id echoed from placement.
+        symbol:
+          type: string
+          description: Trading pair symbol.
+        orderSide:
+          type: string
+          description: 'Order side: BUY or SELL.'
+          enum:
+          - BUY
+          - SELL
+        type:
+          type: integer
+          format: int32
+          description: Order type code.
+        orderPrice:
+          type: number
+          format: double
+          description: Limit price of the order.
+        originalOrderSize:
+          type: integer
+          format: int32
+          description: Original order size in number of contracts at placement.
+        currentOrderSize:
+          type: integer
+          format: int32
+          description: Current remaining order size in number of contracts after fills and amendments.
+        totalFilledSize:
+          type: integer
+          format: int32
+          description: Cumulative filled size in number of contracts.
+        remainingSize:
+          type: integer
+          format: int32
+          description: Remaining unfilled size in number of contracts.
+        averageFillPrice:
+          type: number
+          format: double
+          description: Average fill price across executions so far.
+        orderState:
+          type: string
+          description: Human-readable order state name.
+        timestamp:
+          type: integer
+          format: int64
+          description: Server timestamp of the last state change, in milliseconds since epoch.
+        reduceOnly:
+          type: boolean
+          description: True if the order can only reduce an existing position.
+        positionMode:
+          type: string
+          description: Position mode this order applies to (one-way or hedge).
+          enum:
+          - ONE_WAY
+          - HEDGE
+          - ISOLATED
+        positionDirection:
+          type: string
+          description: 'Position direction the order affects: LONG or SHORT.'
+          enum:
+          - LONG
+          - SHORT
+        positionId:
+          type: string
+          description: Identifier of the position the order is bound to.
+        closeOrder:
+          type: boolean
+          description: True if the order is a close-position order.
+        pegPriceMin:
+          type: number
+          format: double
+          description: Lower bound of the peg order price band.
+        pegPriceMax:
+          type: number
+          format: double
+          description: Upper bound of the peg order price band.
+        pegPriceDeviation:
+          type: number
+          format: double
+          description: Offset applied to the pegged reference price.
+        currentPegPrice:
+          type: number
+          format: double
+          description: Current pegged working price.
+        triggerOrder:
+          type: boolean
+          description: True if this order is a conditional trigger order that has not yet fired.
+        triggered:
+          type: boolean
+          description: True once the trigger condition has fired.
+        triggerPrice:
+          type: number
+          format: double
+          description: Configured trigger price.
+        triggerOriginalPrice:
+          type: number
+          format: double
+          description: Original submitted trigger price prior to any amendment.
+        triggerOrderType:
+          type: integer
+          format: int32
+          description: Order type code the trigger will submit once fired.
+        triggerTrailingStopDeviation:
+          type: number
+          format: double
+          description: Trailing distance for the trigger's trailing-stop behavior.
+        triggerStopPrice:
+          type: number
+          format: double
+          description: Stop price used by the triggered order once activated.
+        triggerUseLastPrice:
+          type: boolean
+          description: True if last-traded-price is used as the trigger reference, otherwise mark price is used.
+        trailValue:
+          type: number
+          format: double
+          description: Trailing distance the stop maintains from the best reached reference price.
+        trailValueType:
+          type: string
+          description: How trailValue is interpreted (absolute price offset or percentage).
+          enum:
+          - DISTANCE
+          - PERCENTAGE
+        activationPrice:
+          type: number
+          format: double
+          description: Price at which trailing or scheduled logic activates.
+        activationPriceType:
+          type: string
+          description: Reference price type used to evaluate the activation price.
+          enum:
+          - INDEX_PRICE
+          - LAST_PRICE
+          - MARK_PRICE
+        takeProfitOrder:
+          $ref: '#/components/schemas/TriggerOrderResp'
+          description: Attached take-profit trigger, if any.
+        stopLossOrder:
+          $ref: '#/components/schemas/TriggerOrderResp'
+          description: Attached stop-loss trigger, if any.
+        cancelDuration:
+          type: integer
+          format: int64
+          description: Cancel duration in milliseconds derived from time-in-force. Zero for GTC.
+        timeInForce:
+          type: string
+          description: Time-in-force policy applied to the order (e.g. GTC, IOC, FOK).
+        stealth:
+          type: number
+          format: double
+          description: Portion of the order size displayed on the book; the remainder is hidden.
+        contractSize:
+          type: number
+          format: double
+          description: Contract size (units of underlying per contract) for this symbol.
+        wrapperOrder:
+          type: boolean
+          description: True if the order is a wrapper that spawns child orders (e.g. activation wrappers).
+        ocoPeerOrderId:
+          type: string
+          description: Order id of the peer OCO leg, if this order is part of an OCO pair.
+        orderDetailType:
+          type: string
+          description: Fine-grained order detail type classification.
+          enum:
+          - TWAP
+          - PARTIAL_LIQUIDATION
+          - FORCED_MARKET_BUY
+          - FORCED_MARKET_SELL
+        originalOrderValue:
+          type: number
+          format: double
+          description: Notional value at placement, computed from original size, contract size and reference price.
+        currentOrderValue:
+          type: number
+          format: double
+          description: Current notional value, computed from remaining size, contract size and current working price.
+    BindPositionTpSlResp:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Market symbol of the position (e.g. BTC-PERP).
+        status:
+          type: integer
+          format: int32
+          description: Status code of the TP/SL binding.
+        type:
+          type: integer
+          format: int32
+          description: Event type code of the TP/SL response entry (indicates whether it represents take-profit or stop-loss).
+        orderId:
+          type: string
+          description: Server-assigned identifier of the created trigger order.
+        clOrderId:
+          type: string
+          description: Client-assigned order id, if provided in the request.
+        triggerPrice:
+          type: number
+          format: double
+          description: Trigger price at which the take-profit or stop-loss will fire.
+        positionMode:
+          type: string
+          description: Position mode of the target position (ONE_WAY or HEDGE).
+          enum:
+          - ONE_WAY
+          - HEDGE
+          - ISOLATED
+        positionDirection:
+          type: string
+          description: Position direction of the target position (LONG or SHORT).
+          enum:
+          - LONG
+          - SHORT
+        positionId:
+          type: string
+          description: Identifier of the position the trigger is attached to.
+        timestamp:
+          type: integer
+          format: int64
+          description: Server timestamp of the response, in milliseconds since epoch.
+        message:
+          type: string
+          description: Human-readable message describing the result.
+    Limit:
+      allOf:
+      - $ref: '#/components/schemas/PlaceOrderReq'
+      - type: object
+        properties:
+          clOrderId:
+            type: string
+            description: Client-assigned order identifier for tracking and idempotency.
+          symbol:
+            type: string
+            description: Trading pair symbol.
+          orderType:
+            type: string
+            description: Order type. Must be LIMIT for this variant.
+            enum:
+            - LIMIT
+            - MARKET
+            - OCO
+            - TWAP
+            - PEG
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: 'Order side: BUY or SELL.'
+            enum:
+            - BUY
+            - SELL
+          orderSize:
+            type: integer
+            format: int64
+            description: Order size in number of contracts.
+          takeProfitTriggerType:
+            type: string
+            description: Reference price type used to evaluate the take-profit trigger.
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+          stopLossTriggerType:
+            type: string
+            description: Reference price type used to evaluate the stop-loss trigger.
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+          takeProfitTriggerPrice:
+            type: number
+            format: double
+            description: Take-profit trigger price. When reached, an attached take-profit order is fired.
+          stopLossTriggerPrice:
+            type: number
+            format: double
+            description: Stop-loss trigger price. When reached, an attached stop-loss order is fired.
+          positionMode:
+            type: string
+            description: Position mode this order applies to (one-way or hedge).
+            enum:
+            - ONE_WAY
+            - HEDGE
+            - ISOLATED
+          reduceOnly:
+            type: boolean
+            description: If true, the order can only reduce an existing position and cannot open or increase one.
+          timeInForce:
+            type: string
+            description: Time-in-force policy for the limit order. Defaults to GTC when omitted.
+            enum:
+            - FOK
+            - GTC
+            - IOC
+            - HALFSEC
+            - HALFMIN
+            - FIVEMIN
+            - HOUR
+            - TWELVEHOUR
+            - DAY
+            - WEEK
+            - MONTH
+          postOnly:
+            type: boolean
+            description: If true, the order is rejected if it would take liquidity, ensuring maker-only execution.
+          orderPrice:
+            type: number
+            format: double
+            description: Limit price for the order.
+      description: Limit order
+      required:
+      - orderPrice
+      - orderSide
+      - orderSize
+      - orderType
+      - symbol
+    CancelAllAfterReq:
+      type: object
+      properties:
+        timeoutMs:
+          type: integer
+          format: int64
+          description: Timer duration in milliseconds. If no cancel-all-after request is received again within this window, all of the caller's outstanding orders are cancelled. Send 0 to disarm the timer.
+          minimum: 0
+      required:
+      - timeoutMs
+    ClosePositionReq:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Market symbol of the position to close (e.g. BTC-PERP).
+        positionId:
+          type: string
+          description: Identifier of the position to close.
+        orderType:
+          type: string
+          description: Order type used to close the position (LIMIT or MARKET).
+          enum:
+          - LIMIT
+          - MARKET
+          - OCO
+          - TWAP
+          - PEG
+          - CONDITIONAL
+          - TRAILING
+        orderPrice:
+          type: number
+          format: double
+          description: Limit price for the closing order. Required when orderType == LIMIT.
+        postOnly:
+          type: boolean
+          description: If true, the closing order will only be placed as a maker; otherwise it is cancelled.
+        timeInForce:
+          type: string
+          default: GTC
+          description: Time-in-force for the closing order. Defaults to GTC when omitted.
+          enum:
+          - FOK
+          - GTC
+          - IOC
+          - HALFSEC
+          - HALFMIN
+          - FIVEMIN
+          - HOUR
+          - TWELVEHOUR
+          - DAY
+          - WEEK
+          - MONTH
+        clOrderId:
+          type: string
+          description: Optional client-assigned order id echoed back in the response.
+      required:
+      - orderType
+      - positionId
+      - symbol
+    PlaceOrderResp:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: Order status code returned for this placement.
+        type:
+          type: integer
+          format: int32
+          description: Order type code.
+        symbol:
+          type: string
+          description: Trading pair symbol.
+        postOnly:
+          type: boolean
+          description: True if the order was accepted as maker-only.
+        orderSide:
+          type: string
+          description: 'Order side: BUY or SELL.'
+          enum:
+          - BUY
+          - SELL
+        orderId:
+          type: string
+          description: Server-assigned order id.
+        clOrderID:
+          type: string
+          description: Client-assigned order id echoed from the request.
+        timestamp:
+          type: integer
+          format: int64
+          description: Server timestamp of the placement, in milliseconds since epoch.
+        price:
+          type: number
+          format: double
+          description: Limit price submitted with the order.
+        avgFilledPrice:
+          type: number
+          format: double
+          description: Average fill price across executions so far. Zero if nothing has filled.
+        message:
+          type: string
+          description: Human-readable message returned by the platform (e.g. rejection reason).
+        originalOrderSize:
+          type: integer
+          format: int64
+          description: Original order size in number of contracts as submitted.
+        currentOrderSize:
+          type: integer
+          format: int64
+          description: Current remaining order size after fills or amendments.
+        filledSize:
+          type: integer
+          format: int64
+          description: Size filled in the most recent match, in contracts.
+        totalFilledSize:
+          type: integer
+          format: int64
+          description: Cumulative filled size across all matches, in contracts.
+        remainingSize:
+          type: integer
+          format: int64
+          description: Remaining unfilled size, in contracts.
+        positionMode:
+          type: string
+          description: Position mode this order applies to (one-way or hedge).
+          enum:
+          - ONE_WAY
+          - HEDGE
+          - ISOLATED
+        positionDirection:
+          type: string
+          description: 'Position direction the order will affect: LONG or SHORT.'
+          enum:
+          - LONG
+          - SHORT
+        positionId:
+          type: string
+          description: Identifier of the position the order is bound to.
+        timeInForce:
+          type: string
+          description: Time-in-force policy applied to the order (e.g. GTC, IOC, FOK).
+    SetRiskLimitReq:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Market symbol to configure (e.g. BTC-PERP).
+        riskLimit:
+          type: integer
+          format: int64
+          description: Target risk-limit notional value. Required if riskLimitLevel is not provided.
+        riskLimitLevel:
+          type: integer
+          format: int32
+          description: Target risk-limit tier index. Required if riskLimit is not provided.
+        positionMode:
+          type: string
+          description: Position mode of the position the risk limit applies to (ONE_WAY or HEDGE). Required in hedge mode.
+          enum:
+          - ONE_WAY
+          - HEDGE
+          - ISOLATED
+      required:
+      - symbol
+    Trailing:
+      allOf:
+      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
+      - type: object
+        properties:
+          clOrderId:
+            type: string
+            description: Client-assigned order identifier for tracking and idempotency.
+          symbol:
+            type: string
+            description: Trading pair symbol.
+          orderType:
+            type: string
+            description: Order type. Must be TRAILING for this variant.
+            enum:
+            - LIMIT
+            - MARKET
+            - OCO
+            - TWAP
+            - PEG
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: 'Order side: BUY or SELL.'
+            enum:
+            - BUY
+            - SELL
+          orderSize:
+            type: integer
+            format: int64
+            description: Order size in number of contracts.
+          positionMode:
+            type: string
+            default: ONE_WAY
+            description: Position mode this order applies to (one-way or hedge).
+            enum:
+            - ONE_WAY
+            - HEDGE
+            - ISOLATED
+          reduceOnly:
+            type: boolean
+            description: If true, the order can only reduce an existing position and cannot open or increase one.
+          trailValue:
+            type: number
+            format: double
+            description: Trailing distance the stop price maintains from the best reached reference price.
+          trailValueType:
+            type: string
+            description: How trailValue is interpreted (absolute price offset or percentage).
+            enum:
+            - DISTANCE
+            - PERCENTAGE
+          trailTriggerPriceType:
+            type: string
+            description: Reference price type used to evaluate the trailing trigger.
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+          activationTriggerPrice:
+            type: number
+            format: double
+            description: Optional price at which the trailing logic starts. Trailing is inactive until this price is reached.
+          activationTriggerType:
+            type: string
+            description: Reference price type used to evaluate the activation price.
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+      description: Trailing stop order that follows the market by a fixed distance and triggers when the reference price retraces beyond that distance from the best reached level.
+      required:
+      - orderSide
+      - orderSize
+      - orderType
+      - symbol
+      - trailTriggerPriceType
+      - trailValue
+      - trailValueType
+    PositionModeResp:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Market symbol the position mode applies to (e.g. BTC-PERP).
+        positionMode:
+          type: string
+          description: 'Current position mode: ONE_WAY (net position) or HEDGE (independent long and short positions).'
+          enum:
+          - ONE_WAY
+          - HEDGE
+          - ISOLATED
+    CancelAllAfterResp:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: True if the cancel-all-after timer was successfully armed or updated.
+    Conditional:
+      allOf:
+      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
+      - type: object
+        properties:
+          clOrderId:
+            type: string
+            description: Client-assigned order identifier for tracking and idempotency.
+          symbol:
+            type: string
+            description: Trading pair symbol.
+          orderType:
+            type: string
+            description: Order type. Must be CONDITIONAL for this variant.
+            enum:
+            - LIMIT
+            - MARKET
+            - OCO
+            - TWAP
+            - PEG
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: 'Order side: BUY or SELL.'
+            enum:
+            - BUY
+            - SELL
+          orderSize:
+            type: integer
+            format: int64
+            description: Order size in number of contracts.
+          positionMode:
+            type: string
+            default: ONE_WAY
+            description: Position mode this order applies to (one-way or hedge).
+            enum:
+            - ONE_WAY
+            - HEDGE
+            - ISOLATED
+          timeInForce:
+            type: string
+            default: GTC
+            description: Time-in-force policy applied once the order is triggered.
+            enum:
+            - FOK
+            - GTC
+            - IOC
+            - HALFSEC
+            - HALFMIN
+            - FIVEMIN
+            - HOUR
+            - TWELVEHOUR
+            - DAY
+            - WEEK
+            - MONTH
+          reduceOnly:
+            type: boolean
+            description: If true, the order can only reduce an existing position and cannot open or increase one.
+          postOnly:
+            type: boolean
+            description: If true, the triggered order is rejected if it would take liquidity, ensuring maker-only execution.
+          orderPrice:
+            type: number
+            format: double
+            description: Limit price used once the order is triggered. Omit for a market-style trigger.
+          triggerPrice:
+            type: number
+            format: double
+            description: Price at which the order becomes active.
+          triggerType:
+            type: string
+            description: Reference price type used to evaluate the trigger.
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+          takeProfitTriggerType:
+            type: string
+            description: Reference price type used to evaluate the take-profit trigger.
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+          stopLossTriggerType:
+            type: string
+            description: Reference price type used to evaluate the stop-loss trigger.
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+          takeProfitTriggerPrice:
+            type: number
+            format: double
+            description: Take-profit trigger price attached to the resulting order.
+          stopLossTriggerPrice:
+            type: number
+            format: double
+            description: Stop-loss trigger price attached to the resulting order.
+      description: Conditional order that stays inactive until its trigger price is reached, then submits a limit or market order.
+      required:
+      - orderSide
+      - orderSize
+      - orderType
+      - symbol
+    Twap:
+      allOf:
+      - $ref: '#/components/schemas/PlaceAlgoOrderReq'
+      - type: object
+        properties:
+          clOrderId:
+            type: string
+            description: Client-assigned order identifier for tracking and idempotency.
+          symbol:
+            type: string
+            description: Trading pair symbol.
+          orderType:
+            type: string
+            description: Order type. Must be TWAP for this variant.
+            enum:
+            - LIMIT
+            - MARKET
+            - OCO
+            - TWAP
+            - PEG
+            - CONDITIONAL
+            - TRAILING
+          orderSide:
+            type: string
+            description: 'Order side: BUY or SELL.'
+            enum:
+            - BUY
+            - SELL
+          orderSize:
+            type: integer
+            format: int64
+            description: Total order size in number of contracts, distributed across child orders.
+          reduceOnly:
+            type: boolean
+            description: If true, the order can only reduce an existing position and cannot open or increase one.
+          timePeriod:
+            type: integer
+            format: int64
+            description: Total execution window in seconds over which child orders are dispatched.
+            maximum: 86400
+            minimum: 60
+          randomizeSize:
+            type: boolean
+            description: If true, individual child order sizes are randomized within limits to reduce predictability.
+          subTwapMaxOrderSize:
+            type: number
+            format: double
+            description: Maximum size of each child order.
+          maxSpread:
+            type: number
+            format: double
+            description: Maximum acceptable bid-ask spread. Child orders are paused when the spread is wider.
+          makerFirst:
+            type: boolean
+            description: If true, child orders prefer maker execution before falling back to taker behavior.
+          maxDistanceThroughBook:
+            type: number
+            format: double
+            description: Maximum distance a child order may cross into the order book.
+          pausePrice:
+            type: number
+            format: double
+            description: Reference price beyond which the TWAP schedule pauses to avoid adverse execution.
+          activationTriggerPrice:
+            type: number
+            format: double
+            description: Optional price at which the TWAP schedule begins. Inactive until this price is reached.
+          activationTriggerType:
+            type: string
+            description: Reference price type used to evaluate the activation price.
+            enum:
+            - INDEX_PRICE
+            - LAST_PRICE
+            - MARK_PRICE
+      description: TWAP (Time-Weighted Average Price) order that splits the parent size into smaller child orders spread over a fixed time window.
+      required:
+      - orderSide
+      - orderSize
+      - orderType
+      - symbol
+    LeverageResp:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Trading symbol.
+        leverage:
+          type: number
+          format: double
+          description: Effective leverage multiplier for the position, or the default leverage when the user has no position on this symbol.
+        marginMode:
+          type: string
+          description: 'Margin mode: CROSS or ISOLATED.'
+          enum:
+          - CROSS
+          - ISOLATED
+        positionMode:
+          type: string
+          description: 'Position mode: ONE_WAY or HEDGE. Null when the user has no position on this symbol.'
+          enum:
+          - ONE_WAY
+          - HEDGE
+          - ISOLATED
+        positionDirection:
+          type: string
+          description: Position direction (LONG or SHORT) for hedge-mode positions; null otherwise.
+          enum:
+          - LONG
+          - SHORT
+    AmendOrderResp:
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: Server-assigned order id of the amended order.
+        clOrderId:
+          type: string
+          description: Client-assigned order id echoed from the request.
+        symbol:
+          type: string
+          description: Trading pair symbol of the amended order.
+        orderSide:
+          type: string
+          description: 'Order side: BUY or SELL.'
+          enum:
+          - BUY
+          - SELL
+        type:
+          type: integer
+          format: int32
+          description: Order type code.
+        orderPrice:
+          type: number
+          format: double
+          description: Limit price after the amendment.
+        orderSize:
+          type: number
+          format: double
+          description: Order size after the amendment, in number of contracts.
+        triggerPrice:
+          type: number
+          format: double
+          description: Trigger price after the amendment, if applicable.
+        status:
+          type: integer
+          format: int32
+          description: Order status code after the amendment.
+        timestamp:
+          type: integer
+          format: int64
+          description: Server timestamp of the amendment, in milliseconds since epoch.
+    ChangePositionModeReq:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Market symbol to configure (e.g. BTC-PERP).
+        positionMode:
+          type: string
+          description: 'Target position mode: ONE_WAY (net position) or HEDGE (independent long and short positions).'
+          enum:
+          - ONE_WAY
+          - HEDGE
+          - ISOLATED
+      required:
+      - positionMode
+      - symbol
+    PlaceOrderReq:
+      discriminator:
+        propertyName: orderType
+      properties:
+        orderType:
+          type: string
+      required:
+      - orderType
+    CancelOrderReq:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Trading pair symbol of the order to cancel.
+        orderId:
+          type: string
+          description: Server-assigned order id to cancel. Required if clOrderId is not provided.
+        clOrderId:
+          type: string
+          description: Client-assigned order id to cancel. Required if orderId is not provided.
+      required:
+      - symbol
+    MarginSettingResp:
+      type: object
+      properties:
+        symbol:
+          type: string
+          description: Trading symbol.
+        initialMarginPercentage:
+          type: number
+          format: double
+          description: Initial margin percentage required to open a position on this symbol.
+        maintenanceMarginPercentage:
+          type: number
+          format: double
+          description: Maintenance margin percentage required to keep a position open on this symbol.
+    TriggerOrderResp:
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: Server-assigned order id of the attached trigger order.
+        side:
+          type: string
+          description: 'Order side of the trigger leg: BUY or SELL.'
+          enum:
+          - BUY
+          - SELL
+        triggerPrice:
+          type: number
+          format: double
+          description: Price at which this trigger fires.
+        triggerUseLastPrice:
+          type: boolean
+          description: True if last-traded-price is used as the trigger reference, otherwise mark price is used.
   securitySchemes:
     APIKey:
       type: apiKey
@@ -2879,8 +2775,9 @@ components:
       in: header
     Signature:
       type: apiKey
-      description: 'A composite signature produced based on the following algorithm:
-        Signature=HMAC.Sha384 (secretkey, (urlpath + request-nonce + bodyStr)) (note:
-        bodyStr = '''' when no data)'
+      description: 'A composite signature produced based on the following algorithm: Signature=HMAC.Sha384 (secretkey, (urlpath + request-nonce + bodyStr)) (note: bodyStr = '''' when no data)'
       name: request-sign
       in: header
+x-refined-from:
+- futures_openapi_v3.yaml
+- btse-futures-openapi.yml
