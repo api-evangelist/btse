@@ -13,6 +13,14 @@ modified: '2026-10-13'
 tags:
 - Company
 - Cryptocurrency
+- Exchange
+- Trading
+- Digital Assets
+- Futures
+- WebSocket
+tags_raw:
+- Company
+- Cryptocurrency
 - Exchanges
 - Trading
 - Digital Assets
@@ -819,6 +827,8 @@ apis:
   humanURL: https://docs.btse.com/markets/overview/
   baseURL: https://api.btse.com
   tags:
+  - Wallets
+  tags_raw:
   - Wallet
   properties:
   - type: OpenAPI
