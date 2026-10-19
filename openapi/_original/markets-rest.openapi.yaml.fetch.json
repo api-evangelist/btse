@@ -1,0 +1,12 @@
+{
+ "url": "https://docs.btse.com/specs/markets-rest.openapi.yaml",
+ "requested_url": "https://docs.btse.com/specs/markets-rest.openapi.yaml",
+ "status": 200,
+ "content_type": "binary/octet-stream",
+ "bytes": 43353,
+ "sha256": "6c130e1db9f793a30b0167ad1f3f9f4d89532b5d566be422c9dc1d2e10df148f",
+ "fetched_at": "2026-10-19",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the archived file is byte-identical to what the provider serves."
+}
