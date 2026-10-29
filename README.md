@@ -64,5 +64,202 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-BTSE is a company surfaced via the API Evangelist harvest backlog (source: market-gap:crypto-exchanges) and added to the network as a stub for full-pipeline profiling.
-- https://www.btse.com
+BTSE is a global cryptocurrency exchange offering spot, perpetual futures, OTC, earn and wallet services. Its developer program at docs.btse.com publishes OpenAPI 3 contracts for the Markets, Spot, Futures, Wallet, Earn and OTC REST APIs, AsyncAPI contracts for its WebSocket streams, a FIX protocol interface, HMAC-SHA384 request signing, and a testnet at testapi.btse.io.
+
+**Areas:** Company · Cryptocurrency · Exchange · Trading · Digital Assets · Futures · WebSocket
+
+## BTSE on APIs.io
+
+Everything profiled for BTSE is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/btse/](https://apis.io/providers/btse/)** — or go straight to one of the APIs or properties below.
+
+### APIs (8)
+
+- [BTSE Account API](https://apis.io/apis/btse/btse-account-api/) — Requires API key with Read permission
+- [BTSE Earn API](https://apis.io/apis/btse/btse-earn-api/) — Investment product endpoints
+- [BTSE Markets API](https://apis.io/apis/btse/btse-markets-api/) — Public market data shared by spot and futures markets
+- [BTSE OTC API](https://apis.io/apis/btse/btse-otc-api/) — OTC trading endpoints
+- [BTSE Trade API](https://apis.io/apis/btse/btse-trade-api/) — Requires API key with Trading permission
+- [BTSE Trade V3 API](https://apis.io/apis/btse/btse-trade-v3-api/) — The Trade V3 API from BTSE — 11 operation(s) for trade v3.
+- [BTSE Trade V4 API](https://apis.io/apis/btse/btse-trade-v4-api/) — The Trade V4 API from BTSE — 7 operation(s) for trade v4.
+- [BTSE Wallet API](https://apis.io/apis/btse/btse-wallet-api/) — Requires API key with Read or Transfer permission
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (3)
+
+Event-driven and webhook contracts.
+
+- [Futures WebSocket API](https://apis.io/asyncapis/btse/btse-futures-websocket-asyncapi/)
+- [OTC WebSocket API](https://apis.io/asyncapis/btse/btse-otc-websocket-asyncapi/)
+- [Spot WebSocket API](https://apis.io/asyncapis/btse/btse-spot-websocket-asyncapi/)
+
+#### Event channels (40)
+
+Individual events and webhooks the provider emits.
+
+- [allPositionV4](https://apis.io/channels/btse/allpositionv4/)
+- [auth](https://apis.io/channels/btse/auth/)
+- [fills](https://apis.io/channels/btse/fills/)
+- [fillsV2](https://apis.io/channels/btse/fillsv2/)
+- [allPositionV4](https://apis.io/channels/btse/futures-websocket-api-allpositionv4/)
+- [auth](https://apis.io/channels/btse/futures-websocket-api-auth/)
+- [fillsV2](https://apis.io/channels/btse/futures-websocket-api-fillsv2/)
+- [notificationApiV4](https://apis.io/channels/btse/futures-websocket-api-notificationapiv4/)
+- [ping](https://apis.io/channels/btse/futures-websocket-api-ping/)
+- [positionsV3](https://apis.io/channels/btse/futures-websocket-api-positionsv3/)
+- [snapshotL1:{symbol}](https://apis.io/channels/btse/futures-websocket-api-snapshotl1-symbol/)
+- [subscription](https://apis.io/channels/btse/futures-websocket-api-subscription/)
+- [tradeHistoryApiV3:{symbol}](https://apis.io/channels/btse/futures-websocket-api-tradehistoryapiv3-symbol/)
+- [update:{symbol}_{grouping}](https://apis.io/channels/btse/futures-websocket-api-update-symbol-grouping/)
+- [notificationApiV3](https://apis.io/channels/btse/notificationapiv3/)
+- [notificationApiV4](https://apis.io/channels/btse/notificationapiv4/)
+- [auth](https://apis.io/channels/btse/otc-websocket-api-auth/)
+- [auth](https://apis.io/channels/btse/otc-websocket-api-auth-2/)
+- [quote](https://apis.io/channels/btse/otc-websocket-api-quote/)
+- [ping](https://apis.io/channels/btse/ping/)
+- [positionsV3](https://apis.io/channels/btse/positionsv3/)
+- [quote](https://apis.io/channels/btse/quote/)
+- [snapshotL1:{symbol}](https://apis.io/channels/btse/snapshotl1-symbol/)
+- [auth](https://apis.io/channels/btse/spot-websocket-api-auth/)
+- [auth](https://apis.io/channels/btse/spot-websocket-api-auth-2/)
+- …and 15 more published on APIs.io
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [btse-mcp.yml](https://apis.io/servers/btse/btse-mcp-yml/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Btse Agentic Access](https://apis.io/agentic-access/btse/btse-agentic-access/)
+
+#### JSON Schema (41)
+
+The data models the API reads and writes.
+
+- [AccountFee](https://apis.io/schemas/btse/btse-account-fee/)
+- [AmendOrderRequest](https://apis.io/schemas/btse/btse-amend-order-request/)
+- [AmendOrderResp](https://apis.io/schemas/btse/btse-amend-order-resp/)
+- [AssetExchangeRateResponse](https://apis.io/schemas/btse/btse-asset-exchange-rate-response/)
+- [ClosePositionResp](https://apis.io/schemas/btse/btse-close-position-resp/)
+- [Conditional](https://apis.io/schemas/btse/btse-conditional/)
+- [ConvertRequest](https://apis.io/schemas/btse/btse-convert-request/)
+- [CreateAddressRequest](https://apis.io/schemas/btse/btse-create-address-request/)
+- [CreateOrderRequest](https://apis.io/schemas/btse/btse-create-order-request/)
+- [DefaultResponse](https://apis.io/schemas/btse/btse-default-response/)
+- [DepositInvestmentRequest](https://apis.io/schemas/btse/btse-deposit-investment-request/)
+- [ExchangeInfoResponse](https://apis.io/schemas/btse/btse-exchange-info-response/)
+- [FundingRateHistoryResponse](https://apis.io/schemas/btse/btse-funding-rate-history-response/)
+- [FuturesOrderResponse](https://apis.io/schemas/btse/btse-futures-order-response/)
+- [FuturesUserTrade](https://apis.io/schemas/btse/btse-futures-user-trade/)
+- [InvestmentHistoryResponse](https://apis.io/schemas/btse/btse-investment-history-response/)
+- [InvestmentOrder](https://apis.io/schemas/btse/btse-investment-order/)
+- [InvestmentProduct](https://apis.io/schemas/btse/btse-investment-product/)
+- [MarketRiskLimitArrayResponse](https://apis.io/schemas/btse/btse-market-risk-limit-array-response/)
+- [MarketsResponse](https://apis.io/schemas/btse/btse-markets-response/)
+- [OHLCVResponse](https://apis.io/schemas/btse/btse-ohlcvresponse/)
+- [OpenOrderResponse](https://apis.io/schemas/btse/btse-open-order-response/)
+- [OrderResp](https://apis.io/schemas/btse/btse-order-resp/)
+- [OrderResponse](https://apis.io/schemas/btse/btse-order-response/)
+- [OTCAcceptQuoteRequest](https://apis.io/schemas/btse/btse-otcaccept-quote-request/)
+- …and 16 more published on APIs.io
+
+#### JSON-LD (1)
+
+Linked-data contexts for the provider's vocabulary.
+
+- [Btse Context](https://apis.io/jsonld/btse/btse-context/)
+
+#### Governance rules (1)
+
+Spectral rulesets for the provider's contracts.
+
+- [BTSE API Rules](https://apis.io/rules/btse/btse-rules/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Btse Authentication](https://apis.io/security/btse/btse-authentication/)
+- [Btse Domain Security](https://apis.io/security/btse/btse-domain-security/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Btse Rate Limits](https://apis.io/rate-limits/btse/btse-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.btse.com)
+- [Documentation](https://docs.btse.com/)
+- [Getting started](https://docs.btse.com/quickstart/)
+- [API reference](https://docs.btse.com/api-explorer/markets/markets-api/)
+- [Sign up](https://www.btse.com/en/register)
+- [Support](https://support.btse.com)
+- [Changelog](https://docs.btse.com/spot/changelog)
+- [Terms of service](https://www.btse.com/en/termsandconditions)
+- [Privacy policy](https://www.btse.com/en/privacy)
+- [GitHub](https://github.com/btsecom)
+
+## API Evangelist rating
+
+**Kin Score 55.6** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 78.6 |
+| Contract quality | 77.3 |
+| Contract governance | 22.0 |
+| Operational transparency | 52.6 |
+| Developer ergonomics | 61.9 |
+| Access clarity | 34.2 |
+
+**Agent readiness 34.6** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | documented (partial credit) |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | — |
+
+**Regulatory alignment 23.1** — Securities & Market Data
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/btse/](https://apis.io/providers/btse/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for BTSE: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/btse/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
